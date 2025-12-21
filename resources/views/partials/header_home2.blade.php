@@ -1,0 +1,316 @@
+@php
+  use Illuminate\Support\Str;
+
+  // Ensure categories (with brands) are available
+  $categories = (isset($categories) && $categories instanceof \Illuminate\Support\Collection)
+      ? $categories->loadMissing('brands')
+      : \App\Models\Category::with('brands')->get();
+
+  $userId    = auth()->id();
+  $cartItems = isset($cartItems)
+      ? ($cartItems instanceof \Illuminate\Support\Collection ? $cartItems : collect($cartItems))
+      : collect();
+
+  if ($cartItems->isEmpty() && $userId) {
+      $cartItems = \App\Models\Cart::where('users_id',$userId)->with('product')->get();
+  }
+
+  $count = isset($count) ? (int)$count : ($userId ? \App\Models\Cart::where('users_id',$userId)->count() : 0);
+@endphp
+
+{{-- ===================== TOP STRIP ===================== --}}
+<div class="bg-white border-b border-slate-200">
+  <div class="mx-auto max-w-7xl px-3 sm:px-4 py-2 flex items-center justify-between">
+    <a href="tel:+250780159059" class="inline-flex items-center text-[12px] sm:text-xs text-slate-600 hover:text-[var(--gold)]">
+      <i class="la la-phone mr-1 text-[var(--gold)]"></i> +250 780 159 059
+    </a>
+
+    <div class="flex items-center gap-5 text-[12px] sm:text-xs">
+      <a href="{{ route('about') }}" class="inline-flex items-center hover:text-[var(--gold)]">
+        <i class="la la-info-circle mr-1"></i> About
+      </a>
+      <a href="{{ route('contact') }}" class="inline-flex items-center hover:text-[var(--gold)]">
+        <i class="la la-envelope mr-1"></i> Contact
+      </a>
+
+      @guest
+        <button type="button"
+                @click="$dispatch('open-auth', {tab:'signin'})"
+                class="inline-flex items-center gap-2 border border-[var(--gold)] text-[var(--gold)] px-3 py-1.5 rounded-md font-semibold hover:bg-[var(--gold)] hover:text-white">
+          <i class="la la-user text-sm"></i> / Sign up
+        </button>
+      @else
+        <div x-data="{dd:false}" class="relative">
+          <button @click="dd=!dd" class="inline-flex items-center gap-1 hover:text-[var(--gold)]">
+            <i class="la la-user"></i>{{ Str::of(Auth::user()->name)->words(2,'') }} <i class="la la-angle-down text-xs"></i>
+          </button>
+          <div x-show="dd" x-transition @click.outside="dd=false"
+               class="absolute right-0 mt-2 w-44 rounded-md bg-white border border-slate-100 shadow-ring z-30">
+            <a class="block px-3 py-2 text-sm hover:bg-slate-50" href="{{ route('dashboard') }}">
+              <i class="la la-chart-pie mr-1"></i> Dashboard
+            </a>
+            <div class="h-px bg-slate-200"></div>
+            <a class="block px-3 py-2 text-sm hover:bg-slate-50"
+               href="{{ route('logout') }}"
+               onclick="event.preventDefault(); document.getElementById('logout-form-top').submit();">
+              <i class="la la-sign-out mr-1"></i> Logout
+            </a>
+            <form id="logout-form-top" method="POST" action="{{ route('logout') }}" class="hidden">@csrf</form>
+          </div>
+        </div>
+      @endguest
+    </div>
+  </div>
+</div>
+
+{{-- ===================== BAR 1: LOGO + SEARCH + CART ===================== --}}
+<section class="bg-white">
+  <div class="mx-auto max-w-7xl px-3 sm:px-4 py-3">
+    <div class="grid grid-cols-12 gap-3 items-center">
+      {{-- Logo --}}
+      <div class="col-span-6 md:col-span-2 flex items-center">
+        <a href="{{ route('home') }}" aria-label="Diva House Beauty">
+          <img src="{{ asset('assets/images/demos/demo-14/logo.png') }}" alt="DHB" class="h-8 w-auto">
+        </a>
+      </div>
+
+      {{-- Cart --}}
+      <div class="col-span-6 md:col-span-2 md:order-last flex items-center justify-end">
+        <a href="{{ route('cart') }}"
+           class="relative inline-flex items-center justify-center rounded-md border border-slate-200 bg-white p-2 hover:border-[var(--gold)]">
+          <i class="la la-shopping-cart text-lg"></i>
+          <span class="absolute -top-1 -right-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-[var(--gold)] px-1 text-[10px] font-bold text-white">{{ $count }}</span>
+          <span class="sr-only">Cart</span>
+        </a>
+      </div>
+
+      {{-- Search (submits ?category=<slug>&q=...) --}}
+      <div class="col-span-12 md:col-span-8">
+        <form action="{{ route('category') }}" method="GET"
+              class="flex w-full items-stretch rounded-md border border-slate-300 bg-white shadow-sm focus-within:border-[var(--gold)] focus-within:ring-2 focus-within:ring-[var(--gold)]/20">
+          <label class="sr-only" for="cat">Category</label>
+          <select id="cat" name="category"
+                  class="hidden lg:block w-56 border-0 border-r border-slate-200 bg-transparent px-3 text-sm text-slate-600 outline-none">
+            <option value="">All Departments</option>
+            @foreach($categories as $cat)
+              <option value="{{ $cat->slug }}" @selected(request('category') == $cat->slug)>{{ $cat->name }}</option>
+            @endforeach
+          </select>
+
+          <label class="sr-only" for="q">Search</label>
+          <input id="q" name="q" type="search" required placeholder="Search products…"
+                 value="{{ request('q') }}"
+                 class="w-full min-w-0 border-0 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 outline-none">
+
+          <button class="inline-flex items-center gap-2 rounded-r-md bg-[var(--gold)] px-4 text-sm font-semibold text-white hover:opacity-90">
+            <i class="la la-search text-base"></i><span class="hidden lg:inline">Search</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+{{-- ===================== BAR 2: MAIN NAV (desktop dropdown + mobile sheet) ===================== --}}
+<nav class="bg-[var(--black)] text-white sticky top-0 z-40"
+     x-data="{ mobileSheet:false, sheetCat:null }">
+    <div class="mx-auto max-w-7xl px-3 sm:px-4">
+        <ul class="flex flex-wrap sm:flex-nowrap items-center gap-1 sm:gap-2 overflow-x-visible sm:overflow-visible py-2">
+            <li>
+                <a href="{{ route('home') }}"
+                   class="nav-pill px-2 py-1 text-[11px] sm:px-3 sm:py-2 sm:text-sm whitespace-nowrap hover:bg-white/10 focus:bg-white/10">
+                    Home
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('category') }}"
+                   class="nav-pill px-2 py-1 text-[11px] sm:px-3 sm:py-2 sm:text-sm whitespace-nowrap hover:bg-white/10 focus:bg-white/10">
+                    Shop
+                </a>
+            </li>
+
+            @foreach($categories as $cat)
+                <li class="relative"
+                    x-data="{ open:false }"
+                    @mouseenter="if (window.innerWidth>=640) open=true"
+                    @mouseleave="if (window.innerWidth>=640) open=false"
+                    @click.outside="open=false">
+
+                    <div class="flex items-center">
+                        {{-- Category link --}}
+                        <a href="{{ route('category.show', $cat->slug) }}"
+                           class="nav-pill px-2 py-1 text-[11px] sm:px-3 sm:py-2 sm:text-sm whitespace-nowrap hover:bg-white/10 focus:bg-white/10">
+                            {{ $cat->name }}
+                        </a>
+
+                        {{-- Toggle brands --}}
+                        <button type="button"
+                                class="ml-1 nav-pill px-2 py-1 text-[11px] sm:px-2 sm:py-2 hover:bg-white/10 focus:bg-white/10"
+                                :aria-expanded="open"
+                                @click.stop="
+                                    if (window.innerWidth < 640) {
+                                        sheetCat = {{ $cat->id }};
+                                        mobileSheet = true;
+                                    } else {
+                                        open = !open;
+                                    }
+                                ">
+                            <i class="la" :class="open ? 'la-angle-up' : 'la-angle-down'"></i>
+                            <span class="sr-only">Toggle brands for {{ $cat->name }}</span>
+                        </button>
+                    </div>
+
+                    {{-- Desktop brands dropdown (sub-brand appears on hover of parent) --}}
+                    <div x-show="open" x-transition
+                         class="hidden sm:block absolute left-0 mt-2 w-[26rem] max-h-[70vh] overflow-y-auto
+                                bg-white text-slate-700 rounded-md border border-slate-100 shadow-ring z-50 p-3">
+
+                        @php
+                            $topBrands    = $cat->brands->whereNull('parent_id');
+                            $orphanBrands = $cat->brands->whereNotNull('parent_id')
+                                                       ->filter(fn($b) => !$topBrands->contains('id', $b->parent_id));
+                        @endphp
+
+                        <div class="space-y-1">
+                            {{-- Parent brands --}}
+                            @forelse($topBrands as $brand)
+                                <div class="group rounded-md px-2 py-1.5 hover:bg-slate-50 transition-colors">
+                                    <div class="flex items-center justify-between">
+                                        <a href="{{ route('brand.show', $brand->slug) }}"
+                                           class="text-sm font-medium text-slate-800">
+                                            {{ $brand->name }}
+                                        </a>
+
+                                        @if($brand->children && $brand->children->count())
+                                            <span class="text-[10px] text-slate-400 ml-2">
+                                                {{ $brand->children->count() }} sub-brand(s)
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    {{-- Sub-brands: only visible when hovering parent --}}
+                                    @if($brand->children && $brand->children->count())
+                                        <div class="mt-1 pl-3 space-y-0.5 hidden group-hover:block">
+                                            @foreach($brand->children as $sub)
+                                                <a href="{{ route('brand.show', $sub->slug) }}"
+                                                   class="flex items-center text-xs text-slate-600 hover:text-slate-900">
+                                                    <span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-300 mr-1.5"></span>
+                                                    {{ $sub->name }}
+                                                </a>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
+                            @empty
+                                <span class="block rounded px-2 py-1.5 text-sm text-slate-400">
+                                    No brands
+                                </span>
+                            @endforelse
+
+                            {{-- Orphan brands (no parent) --}}
+                            @foreach($orphanBrands as $brand)
+                                <a href="{{ route('brand.show', $brand->slug) }}"
+                                   class="block rounded-md px-2 py-1.5 text-sm hover:bg-slate-50">
+                                    {{ $brand->name }}
+                                </a>
+                            @endforeach
+                        </div>
+
+                        <div class="mt-3">
+                            <a href="{{ route('category.show', $cat->slug) }}"
+                               class="inline-flex items-center text-[12px] text-[var(--gold)] hover:underline">
+                                View all {{ $cat->name }}
+                                <i class="la la-arrow-right ml-1 text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+            @endforeach
+
+            <li>
+                <a href="{{ route('booking.create') }}"
+                   class="nav-pill px-2 py-1 text-[11px] sm:px-3 sm:py-2 sm:text-sm whitespace-nowrap hover:bg-white/10 focus:bg-white/10">
+                    Booking
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('blog') }}"
+                   class="nav-pill px-2 py-1 text-[11px] sm:px-3 sm:py-2 sm:text-sm whitespace-nowrap hover:bg-white/10 focus:bg-white/10">
+                    Blog
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    {{-- Mobile brands sheet --}}
+    <div x-show="mobileSheet" x-transition.opacity
+         class="fixed inset-0 z-40 bg-black/40 sm:hidden"></div>
+
+    <div x-show="mobileSheet" x-transition
+         class="fixed inset-x-0 bottom-0 z-50 sm:hidden rounded-t-2xl bg-white shadow-ring max-h-[70vh] overflow-y-auto">
+        @foreach($categories as $cat)
+            <section x-show="sheetCat === {{ $cat->id }}">
+                <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200">
+                    <h4 class="text-sm font-semibold">Brands — {{ $cat->name }}</h4>
+                    <button class="p-2 text-slate-500 hover:text-slate-700"
+                            @click="mobileSheet = false">
+                        <i class="la la-close text-xl"></i>
+                        <span class="sr-only">Close</span>
+                    </button>
+                </div>
+
+                @php
+                    $topBrands    = $cat->brands->whereNull('parent_id');
+                    $orphanBrands = $cat->brands->whereNotNull('parent_id')
+                                               ->filter(fn($b) => !$topBrands->contains('id', $b->parent_id));
+                @endphp
+
+                <div class="p-3 space-y-3">
+                    @forelse($topBrands as $brand)
+                        <div class="border border-slate-100 rounded-lg px-3 py-2">
+                            <a href="{{ route('brand.show', $brand->slug) }}"
+                               class="block text-sm font-semibold text-slate-800">
+                                {{ $brand->name }}
+                            </a>
+
+                            @if($brand->children && $brand->children->count())
+                                <div class="mt-1 grid grid-cols-2 gap-1">
+                                    @foreach($brand->children as $sub)
+                                        <a href="{{ route('brand.show', $sub->slug) }}"
+                                           class="flex items-center text-xs text-slate-600 hover:text-slate-900">
+                                            <span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-300 mr-1.5"></span>
+                                            {{ $sub->name }}
+                                        </a>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    @empty
+                        <div class="text-sm text-slate-400">No brands.</div>
+                    @endforelse
+
+                    @if($orphanBrands->count())
+                        <div class="border border-slate-100 rounded-lg px-3 py-2">
+                            <p class="text-xs font-semibold text-slate-500 mb-1">Other brands</p>
+                            <div class="grid grid-cols-2 gap-1">
+                                @foreach($orphanBrands as $brand)
+                                    <a href="{{ route('brand.show', $brand->slug) }}"
+                                       class="text-xs text-slate-700 hover:text-slate-900">
+                                        {{ $brand->name }}
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    <a href="{{ route('category.show', $cat->slug) }}"
+                       class="block mt-1 inline-flex items-center text-[12px] text-[var(--gold)] hover:underline px-1.5 py-1">
+                        View all {{ $cat->name }}
+                        <i class="la la-arrow-right ml-1 text-xs"></i>
+                    </a>
+                </div>
+            </section>
+        @endforeach
+    </div>
+</nav>
+
