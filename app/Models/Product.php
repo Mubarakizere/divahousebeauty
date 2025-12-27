@@ -222,9 +222,12 @@ class Product extends Model
 
     public function getIsNewAttribute(): bool
     {
-        return $this->created_at
-            ? $this->created_at->greaterThanOrEqualTo(now()->subDays(self::NEW_DAYS))
-            : false;
+        // Safe check: ensure it's a valid Carbon instance
+        if (!$this->created_at instanceof \Carbon\Carbon) {
+            return false;
+        }
+
+        return $this->created_at->greaterThanOrEqualTo(now()->subDays(self::NEW_DAYS));
     }
 
     // ── Reviews & Ratings ───────────────────────────────────────────
