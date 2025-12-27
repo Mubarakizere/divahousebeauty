@@ -16,29 +16,32 @@
 
 <div class="group relative bg-white border border-slate-100 hover:border-[var(--gold)] transition-colors duration-300">
     {{-- Image --}}
-    <a href="{{ route('product', $product->slug) }}" class="block relative aspect-[4/5] bg-[#F9FAFB] overflow-hidden">
-        @if($firstImage)
-            <img src="{{ asset('storage/' . $firstImage) }}" 
-                 alt="{{ $product->name }}"
-                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
-        @else
-            <div class="w-full h-full flex items-center justify-center text-slate-300">
-                <i class="la la-image text-4xl"></i>
-            </div>
-        @endif
-
-        {{-- Badges --}}
-        <div class="absolute top-3 left-3 flex flex-col gap-1 z-10">
-            @if($hasDiscount)
-                <span class="badge badge-sale">-{{ $promotion->discount_percentage }}%</span>
+    {{-- Image Container --}}
+    <div class="relative aspect-[4/5] bg-[#F9FAFB] overflow-hidden">
+        <a href="{{ route('product', $product->slug) }}" class="block w-full h-full">
+            @if($firstImage)
+                <img src="{{ asset('storage/' . $firstImage) }}" 
+                     alt="{{ $product->name }}"
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
+            @else
+                <div class="w-full h-full flex items-center justify-center text-slate-300">
+                    <i class="la la-image text-4xl"></i>
+                </div>
             @endif
+
+            {{-- Badges - Inside link is fine, just visual --}}
+            <div class="absolute top-3 left-3 flex flex-col gap-1 z-10">
+                @if($hasDiscount)
+                    <span class="badge badge-sale">-{{ $promotion->discount_percentage }}%</span>
+                @endif
                 @if($product->is_new)
                     <span class="product-label label-new">New</span>
                 @endif
-        </div>
+            </div>
+        </a>
 
-        {{-- Quick Actions (Fade in on Hover) --}}
-        <div class="absolute bottom-3 inset-x-3 flex items-center justify-center gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+        {{-- Quick Actions (Buttons) - OUTSIDE the link, z-index higher --}}
+        <div class="absolute bottom-3 inset-x-3 flex items-center justify-center gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 z-20">
             {{-- Wishlist --}}
              <div x-data="{ 
                 inWishlist: {{ $inWishlist ? 'true' : 'false' }}, 
@@ -91,7 +94,7 @@
                 }
              }">
                 <button type="button" 
-                        @click="toggleWishlist()" 
+                        @click.stop="toggleWishlist()" 
                         :disabled="loading"
                         class="w-10 h-10 bg-white text-slate-800 hover:scale-105 flex items-center justify-center transition shadow-sm border border-slate-100"
                         :class="inWishlist ? 'text-red-500' : 'hover:text-red-500'"
@@ -109,7 +112,7 @@
                 </button>
             </form>
         </div>
-    </a>
+    </div>
 
     {{-- Product Info --}}
     <div class="p-4 text-center">

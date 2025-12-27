@@ -44,9 +44,7 @@
         }
     }
 
-    $isNew = function ($p) {
-        return $p->created_at ? Carbon::parse($p->created_at)->gt(now()->subDays(14)) : false;
-    };
+
 
     // Helper to resolve image
     $resolveImg = function($p) {
@@ -156,24 +154,26 @@
                          }
                        }
                      }">
-              <a href="{{ route('product', $slugOrId) }}" class="block relative rounded-t-xl overflow-hidden">
-                <img src="{{ $img }}" alt="{{ $p->name }}" loading="lazy" class="w-full h-44 sm:h-52 object-cover">
-                @if($isNew($p))
-                  <span class="absolute right-2 top-2 inline-flex items-center rounded-md bg-[var(--gold)] px-2 py-0.5 text-[11px] font-semibold text-white">
-                    New
-                  </span>
-                @endif
+              <div class="relative rounded-t-xl overflow-hidden group">
+                <a href="{{ route('product', $slugOrId) }}" class="block">
+                  <img src="{{ $img }}" alt="{{ $p->name }}" loading="lazy" class="w-full h-44 sm:h-52 object-cover transition-transform duration-700 group-hover:scale-105">
+                  @if($p->is_new)
+                    <span class="absolute right-2 top-2 inline-flex items-center rounded-md bg-[var(--gold)] px-2 py-0.5 text-[11px] font-semibold text-white z-10">
+                      New
+                    </span>
+                  @endif
+                </a>
                 
                 {{-- Wishlist heart button --}}
                 <button type="button"
-                        @click.prevent="toggleWishlist()"
+                        @click.stop="toggleWishlist()"
                         :disabled="isProcessing"
-                        class="absolute top-2 left-2 rounded-full bg-white/90 backdrop-blur p-2 shadow-md hover:bg-white transition-all disabled:opacity-50"
+                        class="absolute top-2 left-2 rounded-full bg-white/90 backdrop-blur p-2 shadow-md hover:bg-white transition-all disabled:opacity-50 z-20"
                         :class="inWishlist ? 'text-rose-500' : 'text-slate-400 hover:text-rose-500'"
                         :title="inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'">
                   <i :class="inWishlist ? 'la-heart' : 'la-heart-o'" class="la text-lg"></i>
                 </button>
-              </a>
+              </div>
 
               <div class="p-3">
                 <a href="{{ route('product', $slugOrId) }}" class="block text-sm font-semibold text-slate-900 line-clamp-2">
