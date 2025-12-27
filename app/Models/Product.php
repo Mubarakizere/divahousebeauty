@@ -14,7 +14,7 @@ class Product extends Model
     use HasFactory;
 
     public const DEFAULT_IMAGE = 'assets/images/default-product.jpg';
-    public const NEW_DAYS      = 30;
+    public const NEW_DAYS      = 7;
 
     protected $fillable = [
         'name', 'slug', 'description', 'price', 'stock',

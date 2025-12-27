@@ -2,7 +2,7 @@
 <html lang="en">
 
 
-<!-- molla/login.html  22 Nov 2019 10:04:03 GMT -->
+<!-- molla/{{ route('login') }}  22 Nov 2019 10:04:03 GMT -->
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -71,14 +71,14 @@
                             <i class="icon-bars"></i>
                         </button>
 
-                        <a href="index.html" class="logo">
+                        <a href="{{ route('home') }}" class="logo">
                             <img src="assets/images/demos/demo-14/logo.png" alt="Molla Logo" width="105" height="25">
                         </a>
 
                         <nav class="main-nav">
                             <ul class="menu sf-arrows">
                                 <li class="megamenu-container">
-                                    <a href="index.html" class="sf-with-ul">Home</a>
+                                    <a href="{{ route('home') }}" class="sf-with-ul">Home</a>
                                 </li>
                                 <li>
                                     <a href="category.html" class="sf-with-ul">Shop</a>
@@ -138,7 +138,7 @@
                                                 <li><a href="contact-2.html">Contact 02</a></li>
                                             </ul>
                                         </li>
-                                        <li><a href="login.html">Login</a></li>
+                                        <li><a href="{{ route('login') }}">Login</a></li>
                                         <li><a href="faq.html">FAQs</a></li>
                                         <li><a href="404.html">Error 404</a></li>
                                         <li><a href="coming-soon.html">Coming Soon</a></li>
@@ -229,7 +229,7 @@
             <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
                 <div class="container">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Pages</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Login</li>
                     </ol>
@@ -394,7 +394,7 @@
                                     <li><a href="#">How to shop </a></li>
                                     <li><a href="faq.html">FAQ</a></li>
                                     <li><a href="contact.html">Contact us</a></li>
-                                    <li><a href="login.html">Log in</a></li>
+                                    <li><a href="{{ route('login') }}">Log in</a></li>
 	            				</ul><!-- End .widget-list -->
 	            			</div><!-- End .widget -->
 	            		</div><!-- End .col-sm-6 col-lg-3 -->
@@ -461,7 +461,7 @@
             <nav class="mobile-nav">
                 <ul class="mobile-menu">
                     <li class="active">
-                        <a href="index.html">Home</a>
+                        <a href="{{ route('home') }}">Home</a>
 
                         <ul>
                             <li><a href="index-1.html">01 - furniture store</a></li>
@@ -539,7 +539,7 @@
                                     <li><a href="contact-2.html">Contact 02</a></li>
                                 </ul>
                             </li>
-                            <li><a href="login.html">Login</a></li>
+                            <li><a href="{{ route('login') }}">Login</a></li>
                             <li><a href="faq.html">FAQs</a></li>
                             <li><a href="404.html">Error 404</a></li>
                             <li><a href="coming-soon.html">Coming Soon</a></li>

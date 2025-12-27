@@ -32,9 +32,9 @@
             @if($hasDiscount)
                 <span class="badge badge-sale">-{{ $promotion->discount_percentage }}%</span>
             @endif
-            @if($product->created_at->isAfter(now()->subDays(7)))
-                <span class="badge badge-new">NEW</span>
-            @endif
+                @if($product->is_new)
+                    <span class="product-label label-new">New</span>
+                @endif
         </div>
 
         {{-- Quick Actions (Fade in on Hover) --}}

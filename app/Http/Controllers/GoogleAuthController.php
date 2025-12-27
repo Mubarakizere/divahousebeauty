@@ -61,6 +61,12 @@ class GoogleAuthController extends Controller
                 return redirect()->intended(route('admin.dashboard'))->with('success', 'Welcome back, Admin ' . $user->name);
             }
 
+            // Prevent redirecting to static .html pages if they were stored in session
+            $intended = session('url.intended');
+            if ($intended && str_contains($intended, '.html')) {
+                session()->forget('url.intended');
+            }
+
             return redirect()->intended(route('dashboard'))->with('success', 'Welcome, ' . $user->name . '!');
 
         } catch (\Throwable $th) {
