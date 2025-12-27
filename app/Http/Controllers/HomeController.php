@@ -44,6 +44,53 @@ class HomeController extends Controller
     $products   = Product::with('category')->get();
     $promotions = Promotion::with('product')->get();
 
+    // --- Fetch Active Banners for all positions ---
+    $heroBanners = \App\Models\Banner::active()
+        ->position('hero_main')
+        ->ordered()
+        ->get();
+    
+    $heroSideBanners = \App\Models\Banner::active()
+        ->position('hero_side')
+        ->ordered()
+        ->get();
+    
+    $categoryTopBanners = \App\Models\Banner::active()
+        ->position('category_top')
+        ->ordered()
+        ->get();
+    
+    $midPageBanners = \App\Models\Banner::active()
+        ->position('mid_page')
+        ->ordered()
+        ->get();
+    
+    $footerAboveBanners = \App\Models\Banner::active()
+        ->position('footer_above')
+        ->ordered()
+        ->get();
+
+    // --- Featured Products: Best Sellers (by review count/rating) ---
+    $bestSellers = Product::with(['category', 'reviews'])
+        ->withCount('reviews')
+        ->orderBy('reviews_count', 'desc')
+        ->limit(8)
+        ->get();
+
+    // --- New Arrivals ---
+    $newArrivals = Product::with('category')
+        ->latest()
+        ->limit(8)
+        ->get();
+
+    // --- On Sale Products (with promotions) ---
+    $onSale = Product::with(['category', 'promotion'])
+        ->whereHas('promotion', function($q) {
+            $q->where('end_time', '>=', now());
+        })
+        ->limit(8)
+        ->get();
+
     // --- 1) newest product per brand (ALL brands) ---
     $brandLatestAll = Brand::with([
             'category',
@@ -90,11 +137,16 @@ class HomeController extends Controller
         $cartItems = Cart::where('users_id', $user->id)->with('product')->get();
     }
 
+    // SEO Meta Tags for homepage
+    $seo = \App\Helpers\SEOHelper::homeMeta();
+
     return view('home', compact(
         'categories', 'products', 'promotions',
         'count', 'cartItems',
+        'heroBanners', 'heroSideBanners', 'categoryTopBanners', 'midPageBanners', 'footerAboveBanners',
+        'bestSellers', 'newArrivals', 'onSale',
         'brandLatestAll', 'brandLatest5', 'brandLatest15',
-        'cat5', 'cat15'
+        'cat5', 'cat15', 'seo'
     ));
 }
     // Show login page

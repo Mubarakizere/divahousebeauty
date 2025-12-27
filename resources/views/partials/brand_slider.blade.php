@@ -110,7 +110,52 @@
               $price = (float)($p->price ?? 0);
             @endphp
 
-            <article class="snap-start w-64 sm:w-72 shrink-0 rounded-xl bg-white border border-slate-200 shadow-ring hover:shadow-lg transition-shadow">
+            <article class="snap-start w-64 sm:w-72 shrink-0 rounded-xl bg-white border border-slate-200 shadow-ring hover:shadow-lg transition-shadow"
+                     x-data="{ 
+                       inWishlist: {{ auth()->check() && \App\Models\Wishlist::where('user_id', auth()->id())->where('product_id', $p->id)->exists() ? 'true' : 'false' }},
+                       isProcessing: false,
+                       async toggleWishlist() {
+                         if (this.isProcessing) return;
+                         
+                         @guest
+                           window.dispatchEvent(new CustomEvent('open-auth', { detail: { tab: 'signin' } }));
+                           return;
+                         @endguest
+                         
+                         this.isProcessing = true;
+                         const productId = {{ $p->id }};
+                         const url = this.inWishlist 
+                           ? `/wishlist/remove/${productId}`
+                           : `/wishlist/add/${productId}`;
+                         const method = this.inWishlist ? 'DELETE' : 'POST';
+                         
+                         try {
+                           const response = await fetch(url, {
+                             method: method,
+                             headers: {
+                               'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                               'Accept': 'application/json',
+                               'Content-Type': 'application/json'
+                             }
+                           });
+                           
+                           const data = await response.json();
+                           
+                           if (data.success) {
+                             this.inWishlist = !this.inWishlist;
+                             const countEl = document.querySelector('[data-wishlist-count]');
+                             if (countEl && data.wishlistCount !== undefined) {
+                               countEl.textContent = data.wishlistCount;
+                               countEl.style.display = data.wishlistCount > 0 ? '' : 'none';
+                             }
+                           }
+                         } catch (error) {
+                           console.error('Wishlist error:', error);
+                         } finally {
+                           this.isProcessing = false;
+                         }
+                       }
+                     }">
               <a href="{{ route('product', $slugOrId) }}" class="block relative rounded-t-xl overflow-hidden">
                 <img src="{{ $img }}" alt="{{ $p->name }}" loading="lazy" class="w-full h-44 sm:h-52 object-cover">
                 @if($isNew($p))
@@ -118,6 +163,16 @@
                     New
                   </span>
                 @endif
+                
+                {{-- Wishlist heart button --}}
+                <button type="button"
+                        @click.prevent="toggleWishlist()"
+                        :disabled="isProcessing"
+                        class="absolute top-2 left-2 rounded-full bg-white/90 backdrop-blur p-2 shadow-md hover:bg-white transition-all disabled:opacity-50"
+                        :class="inWishlist ? 'text-rose-500' : 'text-slate-400 hover:text-rose-500'"
+                        :title="inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'">
+                  <i :class="inWishlist ? 'la-heart' : 'la-heart-o'" class="la text-lg"></i>
+                </button>
               </a>
 
               <div class="p-3">

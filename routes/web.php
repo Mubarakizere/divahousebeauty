@@ -15,19 +15,21 @@ use App\Http\Controllers\{
     PromotionController,
     OrderController,
     DashboardController,
-    BookingController,
-    ServiceProvider,
-    BlogController,
     ContactController,
     PaymentController,
     AddressController,
     NewsletterController,
-    PageController
+    PageController,
+    ReviewController,
+    CheckoutController,
+    CouponController,
+    WeflexfyWebhookController
 };
 
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\BrandController as AdminBrandController;
+
 
 // =========================
 // 🔐 Authentication Routes
@@ -72,8 +74,7 @@ Route::get('/brand/{id}', function ($id) {
     return redirect()->route('brand.show', ['brand' => $b->slug], 301);
 })->whereNumber('id');
 
-// Blog & Promotions
-Route::get('/blog', [BlogController::class, 'index'])->name('blog');
+// Promotions
 Route::get('/deals', [PromotionController::class, 'index'])->name('deals');
 
 // Contact
@@ -91,14 +92,6 @@ Route::redirect('/home', '/');
 
 // Test page: only top bar + auth modal
 Route::view('/home2', 'home2')->name('home2');
-
-// =========================
-// 📅 Booking (Public)
-// =========================
-Route::get('/booking/create', [BookingController::class, 'showBookingForm'])->name('booking.create');
-Route::post('/booking/store', [BookingController::class, 'store'])->name('booking.store');
-Route::get('/services/{serviceTypeId}', [BookingController::class, 'getServices']);
-Route::get('/providers/{serviceId}', [BookingController::class, 'getProviders']);
 
 // =========================
 // 🧪 DEBUG / DIAGNOSTIC ROUTES
@@ -174,6 +167,10 @@ Route::group(['prefix' => 'payment'], function () {
 // IMPORTANT: Webhook endpoint (must be accessible without CSRF protection)
 Route::post('/payment/webhook', [PaymentController::class, 'handleWebhook'])->name('payment.webhook');
 
+// Weflexfy Payment Gateway Webhook
+Route::post('/webhooks/weflexfy', [App\Http\Controllers\WeflexfyWebhookController::class, 'handle'])->name('webhooks.weflexfy');
+
+
 // =========================
 // 🔐 Authenticated User Routes
 // =========================
@@ -200,10 +197,40 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/cart-items', [CartController::class, 'getCartItems']);
     Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.applyCoupon');
+    Route::post('/cart/remove-coupon', [CartController::class, 'removeCoupon'])->name('cart.removeCoupon');
 
-    // Bookings (customer)
-    Route::get('/my-bookings', [BookingController::class, 'index'])->name('booking.index');
-    Route::get('/dashboard/my-bookings', [DashboardController::class, 'myBookings'])->name('booking.dashboard');
+    // Wishlist
+    Route::get('/wishlist', [App\Http\Controllers\WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/add/{product}', [App\Http\Controllers\WishlistController::class, 'add'])->name('wishlist.add');
+    Route::delete('/wishlist/remove/{product}', [App\Http\Controllers\WishlistController::class, 'remove'])->name('wishlist.remove');
+    Route::post('/wishlist/move-to-cart/{product}', [App\Http\Controllers\WishlistController::class, 'moveToCart'])->name('wishlist.moveToCart');
+    Route::get('/wishlist/count', [App\Http\Controllers\WishlistController::class, 'getCount'])->name('wishlist.count');
+    
+    // Checkout
+    Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout');
+    Route::post('/checkout/process', [App\Http\Controllers\CheckoutController::class, 'process'])->name('checkout.process');
+    
+    // Coupons
+    Route::post('/coupon/apply', [App\Http\Controllers\CouponController::class, 'apply'])->name('coupon.apply');
+    Route::delete('/coupon/remove', [App\Http\Controllers\CouponController::class, 'remove'])->name('coupon.remove');
+    
+    // Reviews
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
+    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+    
+    // Orders (Customer)
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    
+    // Payment
+    Route::post('/payment/initiate', [App\Http\Controllers\PaymentController::class, 'initiateCheckout'])->name('payment.initiate');
+    Route::get('/payment/success/{order}', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
+    Route::get('/payment/failed/{order}', [App\Http\Controllers\PaymentController::class, 'failed'])->name('payment.failed');
+
 
     // Address management routes
     Route::resource('my-addresses', AddressController::class)->names([
@@ -220,12 +247,21 @@ Route::middleware(['auth'])->group(function () {
     // Additional address routes
     Route::patch('my-addresses/{address}/set-default', [AddressController::class, 'setAsDefault'])
         ->name('address.set-default');
+
+    // Reviews
+    Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::get('/products/{product}/can-review', [ReviewController::class, 'canReview'])->name('reviews.canReview');
+
+    // Profile Management
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
 });
 
 // =========================
-// 🛠 Admin Routes (Spatie Role Protected)
+// 🛠 Admin Routes (Role Protected)
 // =========================
-Route::middleware(['auth', 'role:admin'])
+Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->group(function () {
 
@@ -252,6 +288,31 @@ Route::middleware(['auth', 'role:admin'])
         Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)
             ->names('admin.categories');
 
+        // Admin Coupons
+        Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class)
+            ->except(['show'])
+            ->names('admin.coupons');
+        
+        // Admin Banners
+        Route::resource('banners', \App\Http\Controllers\Admin\BannerController::class)
+            ->except(['show'])
+            ->names('admin.banners');
+        
+        // Admin Reviews  
+        Route::resource('reviews', \App\Http\Controllers\Admin\ReviewController::class)
+            ->only(['index', 'update', 'destroy'])
+            ->names('admin.reviews');
+
+        // Admin User Management
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
+            ->names('admin.users');
+
+        // Admin Newsletter
+        Route::get('/newsletter', [\App\Http\Controllers\Admin\NewsletterController::class, 'index'])->name('admin.newsletter.index');
+        Route::get('/newsletter/send', [\App\Http\Controllers\Admin\NewsletterController::class, 'create'])->name('admin.newsletter.create');
+        Route::post('/newsletter/send', [\App\Http\Controllers\Admin\NewsletterController::class, 'send'])->name('admin.newsletter.send');
+        Route::delete('/newsletter/{id}', [\App\Http\Controllers\Admin\NewsletterController::class, 'destroy'])->name('admin.newsletter.destroy');
+
         // Admin Orders Routes (names admin.orders.*)
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
         Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
@@ -266,7 +327,7 @@ Route::middleware(['auth', 'role:admin'])
             Route::get('/top-products/{limit?}', [DashboardController::class, 'getTopProducts'])->name('admin.api.top-products');
 
             Route::get('/customers-overview', function () {
-                if (!auth()->user()->hasRole('admin')) {
+                if (!auth()->user() || auth()->user()->role !== 'admin') {
                     abort(403);
                 }
 
@@ -289,6 +350,12 @@ Route::middleware(['auth', 'role:admin'])
                 ]);
             })->name('admin.api.customers-overview');
         });
+
+        // Admin Reviews
+        Route::get('/reviews', [\App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('admin.reviews.index');
+        Route::post('/reviews/{review}/approve', [\App\Http\Controllers\Admin\ReviewController::class, 'approve'])->name('admin.reviews.approve');
+        Route::post('/reviews/{review}/reject', [\App\Http\Controllers\Admin\ReviewController::class, 'reject'])->name('admin.reviews.reject');
+        Route::delete('/reviews/{review}', [\App\Http\Controllers\Admin\ReviewController::class, 'destroy'])->name('admin.reviews.destroy');
     });
 
 // =========================

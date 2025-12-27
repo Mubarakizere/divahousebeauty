@@ -126,4 +126,73 @@ class CartController extends Controller
 
         return back()->with('success', 'Cart updated successfully.');
     }
+
+    /**
+     * Apply a coupon code to the session
+     */
+    public function applyCoupon(Request $request)
+    {
+        if (!Auth::check()) {
+            return back()->with('error', 'Please login to use coupons.');
+        }
+
+        $request->validate([
+            'coupon_code' => 'required|string|max:50',
+        ]);
+
+        $code = strtoupper(trim($request->coupon_code));
+        
+        // Find the coupon
+        $coupon = \App\Models\Coupon::where('code', $code)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$coupon) {
+            return back()->with('error', 'Invalid coupon code.');
+        }
+
+        // Check if coupon has expired
+        if ($coupon->expires_at && $coupon->expires_at->isPast()) {
+            return back()->with('error', 'This coupon has expired.');
+        }
+
+        // Check if coupon has started
+        if ($coupon->starts_at && $coupon->starts_at->isFuture()) {
+            return back()->with('error', 'This coupon is not yet valid.');
+        }
+
+        // Check total usage limit
+        if ($coupon->usage_limit && $coupon->usages()->count() >= $coupon->usage_limit) {
+            return back()->with('error', 'This coupon has reached its usage limit.');
+        }
+
+        // Check per-user usage limit
+        $userUsageCount = $coupon->usages()->where('user_id', Auth::id())->count();
+        if ($userUsageCount >= $coupon->usage_limit_per_user) {
+            return back()->with('error', 'You have already used this coupon the maximum number of times.');
+        }
+
+        // Calculate cart total
+        $cartItems = \App\Models\Cart::where('users_id', Auth::id())->with('product')->get();
+        $subtotal = $cartItems->sum(fn($item) => $item->quantity * $item->price);
+
+        // Check minimum order amount
+        if ($coupon->min_order_amount && $subtotal < $coupon->min_order_amount) {
+            return back()->with('error', 'Your order must be at least RWF ' . number_format($coupon->min_order_amount, 0) . ' to use this coupon.');
+        }
+
+        // Store coupon in session
+        session(['coupon_code' => $code]);
+
+        return back()->with('success', 'Coupon applied successfully!');
+    }
+
+    /**
+     * Remove the applied coupon from session
+     */
+    public function removeCoupon()
+    {
+        session()->forget('coupon_code');
+        return back()->with('success', 'Coupon removed.');
+    }
 }

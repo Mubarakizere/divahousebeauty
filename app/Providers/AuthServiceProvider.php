@@ -28,7 +28,7 @@ class AuthServiceProvider extends ServiceProvider
 
         // ✅ Allow admins to bypass all gate/policy checks
         Gate::before(function ($user, $ability) {
-            return $user->hasRole('admin') ? true : null;
+            return $user->role === 'admin' ? true : null;
         });
     }
 }

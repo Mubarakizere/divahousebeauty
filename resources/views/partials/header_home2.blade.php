@@ -49,6 +49,9 @@
             <a class="block px-3 py-2 text-sm hover:bg-slate-50" href="{{ route('dashboard') }}">
               <i class="la la-chart-pie mr-1"></i> Dashboard
             </a>
+            <a class="block px-3 py-2 text-sm hover:bg-slate-50" href="{{ route('profile.edit') }}">
+              <i class="la la-user-cog mr-1"></i> My Profile
+            </a>
             <div class="h-px bg-slate-200"></div>
             <a class="block px-3 py-2 text-sm hover:bg-slate-50"
                href="{{ route('logout') }}"
@@ -58,7 +61,16 @@
             <form id="logout-form-top" method="POST" action="{{ route('logout') }}" class="hidden">@csrf</form>
           </div>
         </div>
-      @endguest
+        @endguest
+        
+        @auth
+          <form method="POST" action="{{ route('logout') }}" class="hidden sm:inline-block ml-2">
+            @csrf
+            <button type="submit" class="inline-flex items-center text-[var(--gold)] hover:text-slate-900 transition-colors" title="Logout">
+              <i class="la la-power-off text-lg"></i>
+            </button>
+          </form>
+        @endauth
     </div>
   </div>
 </div>
@@ -74,8 +86,27 @@
         </a>
       </div>
 
-      {{-- Cart --}}
-      <div class="col-span-6 md:col-span-2 md:order-last flex items-center justify-end">
+      {{-- Wishlist & Cart --}}
+      <div class="col-span-6 md:col-span-2 md:order-last flex items-center justify-end gap-2">
+        {{-- Wishlist --}}
+        @auth
+          @php
+            $wishlistCount = \App\Models\Wishlist::where('user_id', auth()->id())->count();
+          @endphp
+          <a href="{{ route('wishlist.index') }}"
+             x-data="{ count: {{ $wishlistCount }} }"
+             @wishlist-updated.window="count = $event.detail.count"
+             class="relative inline-flex items-center justify-center rounded-md border border-slate-200 bg-white p-2 hover:border-[var(--gold)]">
+            <i class="la la-heart text-lg"></i>
+            <span x-show="count > 0" 
+                  x-text="count"
+                  class="absolute -top-1 -right-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
+            </span>
+            <span class="sr-only">Wishlist</span>
+          </a>
+        @endauth
+        
+        {{-- Cart --}}
         <a href="{{ route('cart') }}"
            class="relative inline-flex items-center justify-center rounded-md border border-slate-200 bg-white p-2 hover:border-[var(--gold)]">
           <i class="la la-shopping-cart text-lg"></i>
@@ -226,19 +257,6 @@
                     </div>
                 </li>
             @endforeach
-
-            <li>
-                <a href="{{ route('booking.create') }}"
-                   class="nav-pill px-2 py-1 text-[11px] sm:px-3 sm:py-2 sm:text-sm whitespace-nowrap hover:bg-white/10 focus:bg-white/10">
-                    Booking
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('blog') }}"
-                   class="nav-pill px-2 py-1 text-[11px] sm:px-3 sm:py-2 sm:text-sm whitespace-nowrap hover:bg-white/10 focus:bg-white/10">
-                    Blog
-                </a>
-            </li>
         </ul>
     </div>
 

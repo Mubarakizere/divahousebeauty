@@ -11,17 +11,19 @@ class Address extends Model
 
     protected $fillable = [
         'user_id',
-        'label',
-        'type',
-        'recipient_name',
-        'street',
+        'name',
+        'phone',
+        'address_line_1',
+        'address_line_2',
         'city',
-        'district',
+        'state',
         'postal_code',
         'country',
-        'phone',
-        'notes',
-        'is_default'
+        'latitude',
+        'longitude',
+        'google_place_id',
+        'formatted_address',
+        'is_default',
     ];
 
     protected $casts = [

@@ -58,15 +58,28 @@ class OrderController extends Controller
     {
         $request->validate([
             'status' => 'required|string|max:255',
+            'notes' => 'nullable|string|max:500',
         ]);
 
         $order = Order::findOrFail($id);
-        $order->status = $request->input('status');
+        $oldStatus = $order->status;
+        $newStatus = $request->input('status');
+
+        // Update order status
+        $order->status = $newStatus;
         $order->save();
+
+        // Create status history record
+        $order->statusHistories()->create([
+            'status_from' => $oldStatus,
+            'status_to' => $newStatus,
+            'notes' => $request->input('notes'),
+            'updated_by' => auth()->id(),
+        ]);
 
         return redirect()
             ->route('admin.orders.show', $order->id)
-            ->with('success', 'Order status updated.');
+            ->with('success', 'Order status updated successfully.');
     }
 
     /**

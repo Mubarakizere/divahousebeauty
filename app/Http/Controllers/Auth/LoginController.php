@@ -27,7 +27,8 @@ class LoginController extends Controller
     protected function authenticated(Request $request, $user)
     {
         // Send everyone to the shared /dashboard route
-        return redirect()->route('dashboard');
+        // Redirect to intended page or dashboard
+        return redirect()->intended(route('dashboard'));
     }
 
     /**

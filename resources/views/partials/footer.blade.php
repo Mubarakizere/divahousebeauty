@@ -81,21 +81,13 @@
       <ul class="mt-4 space-y-2 text-sm text-white/75">
         <li><a class="hover:text-[var(--gold)]" href="{{ route('about') }}">About</a></li>
         <li><a class="hover:text-[var(--gold)]" href="{{ route('contact') }}">Contact</a></li>
-        <li><a class="hover:text-[var(--gold)]" href="{{ route('blog') }}">Services & Pricing</a></li>
         <li><a class="hover:text-[var(--gold)]" href="{{ route('about') }}">How to shop</a></li>
         <li><a class="hover:text-[var(--gold)]" href="{{ route('about') }}">FAQ</a></li>
       </ul>
     </div>
 
     {{-- Services quick links (to Booking) --}}
-    <div>
-      <h4 class="text-sm font-semibold text-white tracking-wide">Beauty Services</h4>
-      <ul class="mt-4 space-y-2 text-sm text-white/75">
-        @foreach (['Lashes','Massage','Aesthetic & Wellness','Hairstyle','Barber','MakeUp','Nails','Tattoo'] as $s)
-          <li><a class="hover:text-[var(--gold)]" href="{{ route('booking.create') }}">{{ $s }}</a></li>
-        @endforeach
-      </ul>
-    </div>
+   
 
     {{-- My account --}}
     <div>

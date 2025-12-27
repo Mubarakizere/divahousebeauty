@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\Product;
-use App\Models\Booking;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -14,25 +13,28 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $isAdmin = $user->hasRole('admin');
-        $isCustomer = $user->hasRole('customer');
+        
+        // Redirect admins to admin dashboard
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        
+        $isAdmin = $user->role === 'admin';
+        $isCustomer = $user->role === 'customer';
 
         // Admin logic
         if ($isAdmin) {
             // Total stats
             $totalOrders = Order::count();
             $totalRevenue = Order::sum('total');
-            $totalCustomers = User::whereHas('roles', function($query) {
-                $query->where('name', 'customer');
-            })->count();
+            $totalCustomers = User::where('role', 'customer')->count();
             $totalProducts = Product::count();
             
             // Today's stats
             $todayOrders = Order::whereDate('created_at', today())->count();
             $todayRevenue = Order::whereDate('created_at', today())->sum('total');
-            $todayCustomers = User::whereHas('roles', function($query) {
-                $query->where('name', 'customer');
-            })->whereDate('created_at', today())->count();
+            $todayCustomers = User::where('role', 'customer')
+                ->whereDate('created_at', today())->count();
             $pendingOrders = Order::where('status', 'pending_payment')->count();
             
             // Recent orders for admin view
@@ -54,7 +56,6 @@ class DashboardController extends Controller
                 'pendingOrders' => $pendingOrders,
                 'recentOrders' => $recentOrders,
                 'orders' => collect(), // Empty collection for blade compatibility
-                'bookings' => collect(), // Empty collection for blade compatibility
             ]);
         }
 
@@ -66,61 +67,18 @@ class DashboardController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get();
 
-            // Customer bookings - using customer_id as shown in your database structure
-            $bookings = collect(); // Default empty collection
-            
-            try {
-                // Get bookings using customer_id (based on your database structure)
-                $bookings = Booking::with(['services', 'provider'])
-                    ->where('customer_id', $user->id) // Using user->id as customer_id
-                    ->orderBy('created_at', 'desc')
-                    ->get();
-            } catch (\Exception $e) {
-                // If there's still an error, keep empty collection
-                \Log::warning('Bookings query failed: ' . $e->getMessage());
-                $bookings = collect();
-            }
-
-            return view('dashboard', [
+            return view('dashboard_client', [
                 'user' => $user,
                 'orders' => $orders,
-                'bookings' => $bookings,
                 'isCustomer' => true,
                 'isAdmin' => false,
-                // Add empty admin variables for blade compatibility
-                'totalOrders' => 0,
-                'totalRevenue' => 0,
-                'totalCustomers' => 0,
-                'totalProducts' => 0,
-                'todayOrders' => 0,
-                'todayRevenue' => 0,
-                'todayCustomers' => 0,
-                'pendingOrders' => 0,
-                'recentOrders' => collect(),
+                // Add empty admin variables for blade compatibility if strictly needed, 
+                // but dashboard_client shouldn't need them.
             ]);
         }
 
         // Fallback (guest or unassigned roles)
         return redirect('/')->with('error', 'Unauthorized access.');
-    }
-
-    // For customers only
-    public function myBookings()
-    {
-        $user = auth()->user();
-        
-        try {
-            // Based on your database structure, use customer_id with user->id
-            $bookings = Booking::with(['services', 'provider'])
-                ->where('customer_id', $user->id)
-                ->latest()
-                ->paginate(10);
-        } catch (\Exception $e) {
-            \Log::error('Bookings query failed: ' . $e->getMessage());
-            $bookings = collect()->paginate(10); // Empty paginated collection
-        }
-
-        return view('dashboard.my-bookings', compact('bookings'));
     }
 
     // Additional helper methods for dashboard widgets
@@ -130,7 +88,7 @@ class DashboardController extends Controller
      */
     public function getMonthlyRevenue()
     {
-        if (!auth()->user()->hasRole('admin')) {
+        if (!auth()->user() || auth()->user()->role !== 'admin') {
             abort(403);
         }
 
@@ -149,7 +107,7 @@ class DashboardController extends Controller
      */
     public function getOrderStatusDistribution()
     {
-        if (!auth()->user()->hasRole('admin')) {
+        if (!auth()->user() || auth()->user()->role !== 'admin') {
             abort(403);
         }
 
@@ -165,7 +123,7 @@ class DashboardController extends Controller
      */
     public function getTopProducts($limit = 5)
     {
-        if (!auth()->user()->hasRole('admin')) {
+        if (!auth()->user() || auth()->user()->role !== 'admin') {
             abort(403);
         }
 
@@ -186,7 +144,7 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         
-        if (!$user->hasRole('customer')) {
+        if ($user->role !== 'customer') {
             abort(403);
         }
 
@@ -196,21 +154,8 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        $recentBookings = collect();
-        try {
-            // Use customer_id with user->id based on your database structure
-            $recentBookings = Booking::with(['services'])
-                ->where('customer_id', $user->id)
-                ->orderBy('created_at', 'desc')
-                ->take(5)
-                ->get();
-        } catch (\Exception $e) {
-            \Log::warning('Recent bookings query failed: ' . $e->getMessage());
-        }
-
         return response()->json([
-            'orders' => $recentOrders,
-            'bookings' => $recentBookings
+            'orders' => $recentOrders
         ]);
     }
 }

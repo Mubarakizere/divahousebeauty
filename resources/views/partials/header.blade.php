@@ -20,7 +20,6 @@
                 </button>
                 <div class="absolute left-0 mt-2 hidden group-hover:block bg-white shadow-md rounded-md p-2 space-y-2 z-20">
                     <a href="{{ route('booking.create') }}" class="block hover:text-pink-600">Booking</a>
-                    <a href="{{ route('blog') }}" class="block hover:text-pink-600">Blog</a>
                 </div>
             </div>
             @guest
@@ -53,7 +52,6 @@
         <a href="{{ route('home') }}" class="block">Home</a>
         <a href="{{ route('category') }}" class="block">Shop</a>
         <a href="{{ route('booking.create') }}" class="block">Booking</a>
-        <a href="{{ route('blog') }}" class="block">Blog</a>
         @guest
             <a href="#signin-modal" class="block">Sign in / Sign up</a>
         @else

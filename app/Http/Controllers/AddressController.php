@@ -27,7 +27,7 @@ class AddressController extends Controller
      */
     public function create()
     {
-        return view('addresses.form');
+        return view('addresses.create');
     }
 
     /**
@@ -36,16 +36,18 @@ class AddressController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'label' => 'nullable|string|max:100',
-            'type' => 'nullable|in:home,work,other',
-            'recipient_name' => 'nullable|string|max:100',
-            'street' => 'required|string|max:255',
-            'city' => 'required|string|max:100',
-            'district' => 'nullable|string|max:100',
-            'postal_code' => 'nullable|string|max:20',
-            'country' => 'nullable|string|max:100',
+            'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'notes' => 'nullable|string|max:500',
+            'address_line_1' => 'required|string|max:255',
+            'address_line_2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'postal_code' => 'nullable|string|max:20',
+            'country' => 'required|string|max:100',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'google_place_id' => 'nullable|string|max:255',
+            'formatted_address' => 'nullable|string',
             'is_default' => 'sometimes|boolean',
         ]);
 
@@ -72,6 +74,15 @@ class AddressController extends Controller
             'is_default' => $address->is_default
         ]);
 
+        // Return JSON response for AJAX requests (modal form)
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Address saved successfully!',
+                'address' => $address
+            ]);
+        }
+
         return redirect()
             ->route('address.index')
             ->with('success', 'Address saved successfully!');
@@ -93,7 +104,7 @@ class AddressController extends Controller
         // Ensure the logged-in user owns this address
         $this->authorizeAddress($address);
 
-        return view('addresses.form', compact('address'));
+        return view('addresses.edit', compact('address'));
     }
 
     /**
@@ -117,16 +128,18 @@ class AddressController extends Controller
 
         // Regular update validation
         $validated = $request->validate([
-            'label' => 'nullable|string|max:100',
-            'type' => 'nullable|in:home,work,other',
-            'recipient_name' => 'nullable|string|max:100',
-            'street' => 'required|string|max:255',
-            'city' => 'required|string|max:100',
-            'district' => 'nullable|string|max:100',
-            'postal_code' => 'nullable|string|max:20',
-            'country' => 'nullable|string|max:100',
+            'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'notes' => 'nullable|string|max:500',
+            'address_line_1' => 'required|string|max:255',
+            'address_line_2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'postal_code' => 'nullable|string|max:20',
+            'country' => 'required|string|max:100',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'google_place_id' => 'nullable|string|max:255',
+            'formatted_address' => 'nullable|string',
             'is_default' => 'sometimes|boolean',
         ]);
 
@@ -394,7 +407,7 @@ class AddressController extends Controller
     public function fixAddressesWithoutUserId()
     {
         // This should only be accessible by admins or via artisan command
-        if (!auth()->check() || !auth()->user()->hasRole('admin')) {
+        if (!auth()->check() || auth()->user()->role !== 'admin') {
             abort(403);
         }
 

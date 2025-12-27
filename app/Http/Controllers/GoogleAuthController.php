@@ -14,6 +14,11 @@ class GoogleAuthController extends Controller
      */
     public function redirect()
     {
+        // Store the intended URL in the session if it's set
+        if (request()->has('previous_url')) {
+            session(['url.intended' => request('previous_url')]);
+        }
+        
         return Socialite::driver('google')->redirect(); 
     }
 
@@ -28,17 +33,20 @@ class GoogleAuthController extends Controller
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if ($user) {
-                // Update missing google_id if needed
-                if (!$user->google_id) {
-                    $user->google_id = $googleUser->getId();
-                    $user->save();
+                // Update missing google_id or avatar if needed
+                $user->google_id = $googleUser->getId();
+                // Update avatar if not present or changed (optional logic, here we just update if empty)
+                if (!$user->avatar) {
+                    $user->avatar = $googleUser->getAvatar();
                 }
+                $user->save();
             } else {
                 // Create new user with Google info
                 $user = User::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
                     'google_id' => $googleUser->getId(),
+                    'avatar' => $googleUser->getAvatar(),
                     'password' => bcrypt(str()->random(16)),
                 ]);
 
@@ -48,12 +56,12 @@ class GoogleAuthController extends Controller
 
             Auth::login($user);
 
-            // Redirect based on role
-            if ($user->hasRole('admin')) {
-                return redirect('/dashboard')->with('success', 'Welcome back, Admin ' . $user->name);
+            // Redirect based on role or intended
+            if ($user->role === 'admin') {
+                return redirect()->intended(route('admin.dashboard'))->with('success', 'Welcome back, Admin ' . $user->name);
             }
 
-            return redirect('/dashboard')->with('success', 'Welcome, ' . $user->name . '!');
+            return redirect()->intended(route('dashboard'))->with('success', 'Welcome, ' . $user->name . '!');
 
         } catch (\Throwable $th) {
             return redirect()->route('login')->with('error', 'Google login failed: ' . $th->getMessage());

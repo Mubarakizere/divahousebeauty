@@ -17,10 +17,12 @@ class CategoryController extends Controller
 
         $q           = trim((string) $request->input('q'));
         $categoryKey = $request->input('category'); // can be id or slug via query
-        $brandKey    = $request->input('brand');    // can be id or slug via query
+        $brandKey    = $request->input('brand');    // single brand (legacy)
+        $brandIds    = (array) $request->input('brands', []); // multi-brand
         $catIds      = (array) $request->input('categories', []);
         $minPrice    = $this->toInt($request->input('min_price'));
         $maxPrice    = $this->toInt($request->input('max_price'));
+        $inStockOnly = $request->boolean('in_stock', false);
         $sortby      = $request->input('sortby', 'date');
 
         $productsQuery = Product::with(['brand','category','promotion']);
@@ -39,10 +41,23 @@ class CategoryController extends Controller
             $productsQuery->whereIn('category_id', array_filter($catIds, 'is_numeric'));
         }
 
-        // brand from ?brand=... (accept id or slug)
+        // Single brand (legacy support)
         if ($brandKey) {
             $brandRec = Brand::where('id', $brandKey)->orWhere('slug', $brandKey)->first();
             if ($brandRec) $productsQuery->where('brand_id', $brandRec->id);
+        }
+        
+        // Multi-brand filtering
+        if (!empty($brandIds)) {
+            $brandIds = array_filter($brandIds, 'is_numeric');
+            if (!empty($brandIds)) {
+                $productsQuery->whereIn('brand_id', $brandIds);
+            }
+        }
+        
+        // Stock availability filter
+        if ($inStockOnly) {
+            $productsQuery->where('stock', '>', 0);
         }
 
         // price range
@@ -56,10 +71,34 @@ class CategoryController extends Controller
 
         // sorting
         switch ($sortby) {
-            case 'price_asc':  $productsQuery->orderBy('price', 'asc'); break;
-            case 'price_desc': $productsQuery->orderBy('price', 'desc'); break;
-            case 'name':       $productsQuery->orderBy('name', 'asc');   break;
-            default:           $productsQuery->orderBy('created_at', 'desc'); // newest
+            case 'price_asc':  
+                $productsQuery->orderBy('price', 'asc'); 
+                break;
+            case 'price_desc': 
+                $productsQuery->orderBy('price', 'desc'); 
+                break;
+            case 'name':       
+                $productsQuery->orderBy('name', 'asc');   
+                break;
+            case 'rating':
+                // Sort by average rating (requires reviews)
+                $productsQuery->leftJoin('reviews', function($join) {
+                    $join->on('products.id', '=', 'reviews.product_id')
+                         ->where('reviews.status', '=', 'approved');
+                })
+                ->select('products.*', \DB::raw('COALESCE(AVG(reviews.rating), 0) as avg_rating'))
+                ->groupBy('products.id')
+                ->orderByDesc('avg_rating');
+                break;
+            case 'popular':
+                // Sort by number of times ordered
+                $productsQuery->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
+                ->select('products.*', \DB::raw('COALESCE(SUM(order_items.quantity), 0) as total_sold'))
+                ->groupBy('products.id')
+                ->orderByDesc('total_sold');
+                break;
+            default:           
+                $productsQuery->orderBy('created_at', 'desc'); // newest
         }
 
         $totalProducts = (clone $productsQuery)->count();

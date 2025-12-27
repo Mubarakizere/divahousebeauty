@@ -8,28 +8,20 @@
     $product = $product ?? null;
 
     // ---------- IMAGES ----------
-    // Raw paths from DB (casted to array)
-    $imagesRaw = (array) ($product->images ?? []);
+    // ---------- IMAGES ----------
+    // Align with product_card.blade.php: manually decode and prepend 'storage/'
+    $rawImages = is_string($product->images) ? json_decode($product->images, true) : $product->images;
+    $rawImages = is_array($rawImages) ? $rawImages : [];
 
-    // First image URL (fallback to default)
-    $firstImageUrl = null;
-    if (count($imagesRaw)) {
-        $firstPath = $imagesRaw[0];
-        $firstImageUrl = Str::startsWith($firstPath, ['http://', 'https://'])
-            ? $firstPath
-            : asset('storage/' . ltrim($firstPath, '/'));
+    $firstImagePath = !empty($rawImages) ? $rawImages[0] : null;
+    $firstImageUrl  = $firstImagePath ? asset('storage/' . $firstImagePath) : asset('assets/images/default-product.jpg');
+
+    if (!empty($rawImages)) {
+        // Just use the first image, no gallery needed
+        // $imageGallery = array_map(fn($img) => asset('storage/' . $img), $rawImages);
     } else {
-        $firstImageUrl = asset('assets/images/default-product.jpg');
+        // $imageGallery = [$firstImageUrl];
     }
-
-    // Full gallery URLs
-    $imageGallery = count($imagesRaw)
-        ? collect($imagesRaw)->map(function ($path) {
-            return Str::startsWith($path, ['http://', 'https://'])
-                ? $path
-                : asset('storage/' . ltrim($path, '/'));
-        })->values()->all()
-        : [$firstImageUrl];
 
     // Meta
     $shortDesc   = Str::limit(strip_tags($product->description ?? ''), 160);
@@ -44,7 +36,7 @@
     $salePrice = $product->sale_price ?? $basePrice;
 
     // JSON-LD images
-    $jsonLdImages = count($imageGallery) ? $imageGallery : [$firstImageUrl];
+    $jsonLdImages = [$firstImageUrl];
 
     // Lists
     $relatedProducts = collect($relatedProducts ?? []);
@@ -115,14 +107,39 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-  {{-- Icons --}}
-  <link rel="stylesheet" href="{{ asset('assets/vendor/line-awesome/line-awesome/line-awesome/css/line-awesome.min.css') }}"/>
+  {{-- Icons: Line Awesome + Brand Icons --}}
+  <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css"/>
+
+  {{-- Google Fonts: Playfair Display + Inter --}}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
   <style>
-    :root{ --gold:#cc9966; --black:#111827; }
-    .shadow-ring{ box-shadow:0 0 0 1px rgba(0,0,0,.05),0 6px 20px rgba(0,0,0,.08) }
-    [x-cloak]{ display:none !important; }
-    .line-through{ text-decoration: line-through; }
+    /* Classic Luxury Palette */
+    :root { 
+      --gold: #C5A059; /* Muted, metallic gold */
+      --black: #0F172A; /* Deep navy-black */
+      --gray-light: #F9FAFB;
+    }
+    
+    body { font-family: 'Inter', sans-serif; color: #334155; }
+    h1, h2, h3, h4, h5, h6 { font-family: 'Playfair Display', serif; }
+
+    .shadow-ring { box-shadow: 0 0 0 1px rgba(0,0,0,.05); }
+    [x-cloak] { display: none !important; }
+    .line-through { text-decoration: line-through; }
+    
+    /* Button Reset for Luxury Feel */
+    .btn-gold {
+        background-color: var(--gold);
+        color: white;
+        transition: all 0.3s ease;
+    }
+    .btn-gold:hover {
+        background-color: #B08D4C;
+        transform: translateY(-1px);
+    }
   </style>
 </head>
 
@@ -133,15 +150,15 @@
   {{-- HEADER --}}
   @include('partials.header_home2')
 
-  {{-- Breadcrumb --}}
-  <section class="bg-white border-b border-slate-200">
-    <div class="mx-auto max-w-7xl px-3 sm:px-4 py-3">
-      <nav class="text-[12px] text-slate-500">
-        <a href="{{ route('home') }}" class="hover:text-[var(--gold)]">Home</a>
-        <span class="mx-1">/</span>
-        <a href="{{ url('/category') }}" class="hover:text-[var(--gold)]">Products</a>
-        <span class="mx-1">/</span>
-        <span class="text-slate-700">{{ $product->name }}</span>
+  {{-- Breadcrumb (Minimalist) --}}
+  <section class="bg-white border-b border-gray-100">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 py-4">
+      <nav class="text-xs uppercase tracking-widest text-slate-400 font-medium">
+        <a href="{{ route('home') }}" class="hover:text-[var(--gold)] transition-colors">Home</a>
+        <span class="mx-2">/</span>
+        <a href="{{ url('/category') }}" class="hover:text-[var(--gold)] transition-colors">Shop</a>
+        <span class="mx-2">/</span>
+        <span class="text-[var(--black)]">{{ $product->name }}</span>
       </nav>
     </div>
   </section>
@@ -155,141 +172,136 @@
         <section class="col-span-12 lg:col-span-9">
           <div class="grid grid-cols-12 gap-4">
 
-            {{-- GALLERY --}}
+            {{-- GALLERY (Clean Grid) --}}
             <div class="col-span-12 md:col-span-6">
-              <div class="bg-white border border-slate-200 rounded-lg shadow-ring p-3 md:p-4"
-                   x-data="{
-                     images: @json($imageGallery),
-                     index: 0,
-                     name: @js($product->name),
-                     set(i){
-                       if(!this.images.length) return;
-                       this.index = i;
-                       this.$refs.main.src = this.images[i] || this.$refs.main.dataset.fallback;
-                     },
-                     prev(){
-                       if(!this.images.length) return;
-                       this.index = (this.index - 1 + this.images.length) % this.images.length;
-                       this.$refs.main.src = this.images[this.index] || this.$refs.main.dataset.fallback;
-                     },
-                     next(){
-                       if(!this.images.length) return;
-                       this.index = (this.index + 1) % this.images.length;
-                       this.$refs.main.src = this.images[this.index] || this.$refs.main.dataset.fallback;
-                     }
-                   }"
-                   x-init="
-                     // initial image
-                     $refs.main.src = $refs.main.dataset.src || $refs.main.dataset.fallback;
-                     window.addEventListener('keydown', e => {
-                       if (e.key==='ArrowLeft')  prev();
-                       if (e.key==='ArrowRight') next();
-                     });
-                   ">
-
-                <div class="relative aspect-square overflow-hidden rounded-md border border-slate-200 bg-slate-50">
-                  {{-- main image (SSR src via data-src) --}}
-                  <img
-                    x-ref="main"
-                    data-src="{{ $firstImageUrl }}"
-                    data-fallback="{{ asset('assets/images/default-product.jpg') }}"
-                    alt="{{ $product->name }} image"
-                    class="h-full w-full object-cover transition-opacity duration-200"
-                    onerror="this.onerror=null; this.src=this.dataset.fallback">
-
-                  @if(count($imageGallery) > 1)
-                    <span class="absolute bottom-2 right-2 rounded-full bg-black/60 text-[11px] text-white px-2 py-0.5">
-                      <span x-text="(index+1) + ' / ' + images.length"></span>
-                    </span>
-                  @endif
+              <div class="sticky top-24">
+                
+                {{-- Main Image --}}
+                <div class="relative aspect-[4/5] overflow-hidden bg-gray-50 border border-slate-100">
+                   <img src="{{ $firstImageUrl }}"
+                        alt="{{ $product->name }}"
+                        class="absolute inset-0 w-full h-full object-cover"
+                        onerror="this.onerror=null; this.src='{{ asset('assets/images/default-product.jpg') }}'; this.style.objectFit='contain'; this.style.padding='2rem';">
                 </div>
 
-                {{-- Thumbnails --}}
-                @if(count($imageGallery) > 1)
-                  <div class="mt-3 grid grid-cols-5 gap-2" x-cloak>
-                    <template x-for="(img, idx) in images" :key="idx">
-                      <button type="button"
-                              @click="set(idx)"
-                              class="relative aspect-square rounded-md border overflow-hidden"
-                              :class="idx===index
-                                      ? 'border-[var(--gold)] ring-2 ring-[var(--gold)]/30'
-                                      : 'border-slate-200 hover:border-[var(--gold)]'">
-                        <img :src="img"
-                             class="h-full w-full object-cover rounded"
-                             :alt="`thumb ${idx+1}`"
-                             loading="lazy">
-                      </button>
-                    </template>
-                  </div>
-                @endif
-
-                @if(count($imageGallery) > 1)
-                  <div class="mt-2 flex items-center justify-between text-[12px] text-slate-500">
-                    <button type="button" class="hover:text-[var(--gold)]" @click="prev()">
-                      <i class="la la-angle-left"></i> Prev
-                    </button>
-                    <button type="button" class="hover:text-[var(--gold)]" @click="next()">
-                      Next <i class="la la-angle-right"></i>
-                    </button>
-                  </div>
-                @endif
               </div>
             </div>
 
-            {{-- DETAILS --}}
-            <div class="col-span-12 md:col-span-6">
-              <div class="bg-white border border-slate-200 rounded-lg shadow-ring p-4">
-                <h1 class="text-xl sm:text-2xl font-bold text-slate-900">{{ $product->name }}</h1>
 
-                <div class="mt-2 flex items-center gap-2 text-[12px]">
-                  <div class="relative h-3 w-24 bg-slate-200 rounded">
-                    <div class="absolute inset-y-0 left-0 bg-yellow-400 rounded" style="width:80%"></div>
+            {{-- DETAILS --}}
+            <div class="col-span-12 md:col-span-6 pl-0 md:pl-8">
+              <div>
+                <h1 class="text-3xl sm:text-4xl font-serif text-[var(--black)] leading-tight mb-4">{{ $product->name }}</h1>
+
+                <div class="flex items-center gap-4 mb-6">
+                  <div class="flex items-center gap-1">
+                     @include('partials.star_rating', ['rating' => $product->average_rating, 'size' => 'sm'])
                   </div>
-                  <a href="#reviews" class="text-slate-500 hover:text-[var(--gold)]">( {{ $product->review_count ?? 4 }} Reviews )</a>
+                  <a href="#reviews" class="text-xs uppercase tracking-wider text-slate-500 border-b border-transparent hover:border-slate-500 transition-colors">
+                    {{ $product->review_count }} Reviews
+                  </a>
                 </div>
 
-                <div class="mt-3">
+                <div class="mb-6">
                   @if($isOnSale)
-                    <div class="flex items-baseline gap-2">
-                      <span class="text-2xl font-extrabold text-rose-600">{{ number_format($salePrice, 0) }} RWF</span>
-                      <span class="text-sm text-slate-400 line-through">Was {{ number_format($basePrice, 0) }} RWF</span>
+                    <div class="flex items-baseline gap-3">
+                      <span class="text-3xl font-serif text-[var(--black)]">Rw {{ number_format($salePrice) }}</span>
+                      <span class="text-lg text-slate-400 line-through font-serif">Rw {{ number_format($basePrice) }}</span>
                     </div>
                   @else
-                    <div class="text-2xl font-extrabold text-slate-900">{{ number_format($basePrice, 0) }} RWF</div>
+                    <div class="text-3xl font-serif text-[var(--black)]">Rw {{ number_format($basePrice) }}</div>
                   @endif
-                  <div class="mt-1">
+                  
+                  <div class="mt-3">
                     @if($inStock)
-                      <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700 border border-emerald-200">
-                        <i class="la la-check mr-1"></i> In Stock
+                      <span class="inline-flex items-center text-xs uppercase tracking-widest text-emerald-700 font-bold">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2"></span> In Stock
                       </span>
                     @else
-                      <span class="inline-flex items-center rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-medium text-rose-700 border border-rose-200">
-                        <i class="la la-times mr-1"></i> Out of Stock
+                       <span class="inline-flex items-center text-xs uppercase tracking-widest text-rose-700 font-bold">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500 mr-2"></span> Out of Stock
                       </span>
                     @endif
                   </div>
                 </div>
 
-                <div class="mt-4 prose prose-sm max-w-none text-slate-700">
+                <div class="prose prose-sm prose-slate max-w-none mb-8 text-slate-600 leading-relaxed font-light">
                   {!! $product->description !!}
                 </div>
 
-                <div class="mt-5">
+                <div class="mt-5" 
+                     x-data="{ 
+                       inWishlist: {{ auth()->check() && \App\Models\Wishlist::where('user_id', auth()->id())->where('product_id', $product->id)->exists() ? 'true' : 'false' }},
+                       isProcessing: false,
+                       async toggleWishlist() {
+                         if (this.isProcessing) return;
+                         
+                         @guest
+                           window.dispatchEvent(new CustomEvent('open-auth', { detail: { tab: 'signin' } }));
+                           return;
+                         @endguest
+                         
+                         this.isProcessing = true;
+                         const productId = {{ $product->id }};
+                         const url = this.inWishlist 
+                           ? `/wishlist/remove/${productId}`
+                           : `/wishlist/add/${productId}`;
+                         const method = this.inWishlist ? 'DELETE' : 'POST';
+                         
+                         try {
+                           const response = await fetch(url, {
+                             method: method,
+                             headers: {
+                               'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                               'Accept': 'application/json',
+                               'Content-Type': 'application/json'
+                             }
+                           });
+                           
+                           const data = await response.json();
+                           
+                           if (data.success) {
+                             this.inWishlist = !this.inWishlist;
+                             // Update global count via event
+                             if (data.wishlistCount !== undefined) {
+                               window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { count: data.wishlistCount } }));
+                             }
+                           }
+                         } catch (error) {
+                           console.error('Wishlist error:', error);
+                         } finally {
+                           this.isProcessing = false;
+                         }
+                       }
+                     }">
                   <form action="{{ url('addcart', $product->id) }}" method="POST" class="flex flex-wrap items-center gap-3">
                     @csrf
-                    <label class="text-sm text-slate-600">Qty</label>
-                    <input type="number" name="quantity" min="1" max="10" value="1"
-                           class="w-24 rounded-md border border-slate-300 px-2 py-1 text-center outline-none focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold)]/20"/>
+                    <label class="text-xs uppercase tracking-wider font-bold text-[var(--black)] mr-3">Quantity</label>
+                    <div class="flex items-center border border-slate-300 px-2 h-10 w-24">
+                        <input type="number" name="quantity" min="1" max="10" value="1"
+                            class="w-full text-center outline-none bg-transparent border-none text-slate-800"/>
+                    </div>
 
-                    <button type="submit" class="inline-flex items-center gap-2 rounded-md bg-[var(--gold)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90">
-                      <i class="la la-shopping-cart text-lg"></i> Add to Cart
+                    <button type="submit" class="flex-1 h-10 inline-flex items-center justify-center gap-2 bg-[var(--black)] text-white text-xs uppercase tracking-widest font-bold hover:bg-[var(--gold)] transition-colors">
+                      Add to Cart
                     </button>
 
-                    @php
+                    <button type="button" 
+                            @click="toggleWishlist()"
+                            :disabled="isProcessing"
+                             class="h-10 w-10 border border-slate-300 flex items-center justify-center text-slate-500 hover:border-[var(--black)] hover:text-[var(--black)] transition-colors"
+                            :class="inWishlist ? 'text-rose-500 border-rose-500' : ''"
+                            title="Add to Wishlist">
+                      <i :class="inWishlist ? 'la-heart' : 'la-heart-o'" class="la text-xl"></i>
+                    </button>
+                  </form>
+                  
+                  <div class="mt-4">
+                   @php
                         $rawNumber = '250780159059';
                         $productMessage = "Hello, I'm interested in ordering:\n".
                             "Product: {$product->name}\n".
-                            "Price: " . number_format($basePrice, 0) . " RWF\n".
+                            "Price: Rw " . number_format($basePrice) . "\n".
                             "Link: " . url()->current();
                         $whatsappLink = "https://wa.me/{$rawNumber}?text=" . urlencode($productMessage);
                     @endphp
@@ -297,8 +309,8 @@
                        class="inline-flex items-center gap-2 rounded-md border border-emerald-300 bg-white px-4 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-50">
                       <i class="la la-whatsapp text-lg"></i> Quick Order on WhatsApp
                     </a>
-                  </form>
                 </div>
+            </div>
 
                 <div class="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4">
                   <div class="text-sm text-slate-600">
@@ -313,29 +325,33 @@
                     @endif
                   </div>
 
-                  <div class="flex items-center gap-2">
-                    <span class="text-sm text-slate-600">Share:</span>
-                    <a class="text-slate-500 hover:text-[var(--gold)]"
-                       href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}"
-                       target="_blank" rel="noopener" title="Facebook">
-                      <i class="lab la-facebook-f text-lg"></i>
-                    </a>
-                    <a class="text-slate-500 hover:text-[var(--gold)]"
-                       href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode($product->name) }}"
-                       target="_blank" rel="noopener" title="Twitter / X">
-                      <i class="lab la-twitter text-lg"></i>
-                    </a>
-                    <a class="text-slate-500 hover:text-[var(--gold)]"
-                       href="https://api.whatsapp.com/send?text={{ urlencode($product->name . ' ' . url()->current()) }}"
-                       target="_blank" rel="noopener" title="WhatsApp">
-                      <i class="lab la-whatsapp text-lg"></i>
-                    </a>
-                    <a class="text-slate-500 hover:text-[var(--gold)]"
-                       href="https://pinterest.com/pin/create/button/?url={{ urlencode(url()->current()) }}&description={{ urlencode($product->name) }}"
-                       target="_blank" rel="noopener" title="Pinterest">
-                      <i class="lab la-pinterest text-lg"></i>
-                    </a>
-                  </div>
+                   <div class="flex items-center gap-2">
+                     <span class="text-xs uppercase tracking-wider font-bold text-[var(--black)] mr-2">Share:</span>
+                     
+                     <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}" 
+                        target="_blank" rel="noopener" 
+                        class="w-8 h-8 flex items-center justify-center rounded-full bg-[#3b5998] text-white hover:opacity-90 transition-opacity" title="Facebook">
+                       <i class="lab la-facebook-f text-lg"></i>
+                     </a>
+                     
+                     <a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode($product->name) }}" 
+                        target="_blank" rel="noopener" 
+                        class="w-8 h-8 flex items-center justify-center rounded-full bg-[#1DA1F2] text-white hover:opacity-90 transition-opacity" title="Twitter">
+                       <i class="lab la-twitter text-lg"></i>
+                     </a>
+                     
+                     <a href="https://api.whatsapp.com/send?text={{ urlencode($product->name . ' ' . url()->current()) }}" 
+                        target="_blank" rel="noopener" 
+                        class="w-8 h-8 flex items-center justify-center rounded-full bg-[#25D366] text-white hover:opacity-90 transition-opacity" title="WhatsApp">
+                       <i class="lab la-whatsapp text-lg"></i>
+                     </a>
+                     
+                     <a href="https://pinterest.com/pin/create/button/?url={{ urlencode(url()->current()) }}&description={{ urlencode($product->name) }}" 
+                        target="_blank" rel="noopener" 
+                        class="w-8 h-8 flex items-center justify-center rounded-full bg-[#bd081c] text-white hover:opacity-90 transition-opacity" title="Pinterest">
+                       <i class="lab la-pinterest text-lg"></i>
+                     </a>
+                   </div>
                 </div>
 
                 @if($prevProduct || $nextProduct)
@@ -364,68 +380,171 @@
 
           {{-- YOU MAY ALSO LIKE --}}
           @if($alsoLike->count())
-            <div class="mt-6">
-              <h2 class="text-center text-lg sm:text-xl font-semibold text-slate-900">You May Also Like</h2>
-              <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div class="mt-24 pt-16 border-t border-slate-200">
+              <h2 class="text-center text-3xl font-serif text-[var(--black)] mb-12">You May Also Like</h2>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                 @foreach($alsoLike as $p)
-                  <div class="group bg-white border border-slate-200 rounded-lg shadow-ring overflow-hidden">
-                    <a href="{{ route('product', $p->slug ?? $p->id) }}" class="block">
-                      <div class="aspect-square overflow-hidden bg-slate-50">
-                        <img src="{{ $p->first_image_url }}"
-                             alt="{{ $p->name }}"
-                             class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"/>
-                      </div>
-                      <div class="p-3">
-                        <div class="text-[12px] text-slate-500">{{ $p->category->name ?? 'Category' }}</div>
-                        <div class="mt-0.5 line-clamp-2 text-sm font-medium text-slate-900">{{ $p->name }}</div>
-                        <div class="mt-1 text-[13px]">
-                          @if($p->is_on_sale ?? false)
-                            <span class="font-semibold text-rose-600">
-                              {{ number_format($p->sale_price ?? $p->price ?? 0, 0) }} RWF
-                            </span>
-                            <span class="ml-1 text-slate-400 line-through">
-                              {{ number_format($p->price ?? 0, 0) }} RWF
-                            </span>
-                          @else
-                            <span class="font-semibold text-slate-900">
-                              {{ number_format($p->price ?? 0, 0) }} RWF
-                            </span>
-                          @endif
-                        </div>
-                      </div>
-                    </a>
-                    <form action="{{ url('addcart', $p->id) }}" method="POST" class="p-3 pt-0">
-                      @csrf
-                      <input type="hidden" name="quantity" value="1">
-                      <button class="w-full inline-flex items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-[13px] font-semibold text-slate-700 hover:bg-slate-50">
-                        <i class="la la-shopping-bag"></i> Add to Cart
-                      </button>
-                    </form>
-                  </div>
+                   @include('partials.product_card', ['product' => $p])
                 @endforeach
               </div>
             </div>
           @endif
+
+          {{-- REVIEWS SECTION --}}
+          <div class="mt-16 w-full" id="reviews">
+            <div class="text-center mb-12">
+              <h2 class="text-3xl font-serif text-[var(--black)] mb-2">Customer Reviews</h2>
+              <div class="w-20 h-0.5 bg-[var(--gold)] mx-auto"></div>
+            </div>
+            
+            {{-- Rating Summary --}}
+            <div class="bg-white shadow-lg border border-slate-100 rounded-xl p-6 md:p-8 mb-8">
+              <div style="display: flex; flex-wrap: wrap; gap: 2rem; align-items: center;">
+                {{-- Average Rating --}}
+                <div style="text-align: center; min-width: 140px;">
+                  <div class="text-5xl font-serif text-[var(--black)]">{{ number_format($product->average_rating, 1) }}</div>
+                  <div style="margin-top: 0.5rem; display: flex; justify-content: center;">
+                    @include('partials.star_rating', [
+                      'rating' => $product->average_rating,
+                      'size' => 'lg'
+                    ])
+                  </div>
+                  <div class="mt-2 text-sm text-slate-500">
+                    {{ $product->review_count }} Reviews
+                  </div>
+                </div>
+                
+                {{-- Rating Distribution --}}
+                <div style="flex: 1; min-width: 200px;">
+                  @php
+                    $ratingCounts = $product->approvedReviews()->selectRaw('rating, COUNT(*) as count')->groupBy('rating')->pluck('count', 'rating')->toArray();
+                    $totalReviews = $product->review_count ?: 1;
+                  @endphp
+                  @for ($i = 5; $i >= 1; $i--)
+                    @php
+                      $count = $ratingCounts[$i] ?? 0;
+                      $percentage = ($count / $totalReviews) * 100;
+                    @endphp
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                      <span class="text-slate-700" style="width: 1.5rem; font-weight: 500;">{{ $i }}</span>
+                      <div style="flex: 1; height: 0.75rem; background: #f1f5f9; border-radius: 9999px; overflow: hidden;">
+                        <div style="height: 100%; background: var(--gold); border-radius: 9999px; width: {{ $percentage }}%;"></div>
+                      </div>
+                      <span class="text-slate-400" style="width: 2.5rem; text-align: right; font-size: 0.75rem;">{{ $count }}</span>
+                    </div>
+                  @endfor
+                </div>
+              </div>
+            </div>
+
+            {{-- Review Form --}}
+            @auth
+              @php
+                $existingReview = $product->reviews()->where('user_id', auth()->id())->first();
+                $hasPurchased = auth()->user()->hasPurchased($product->id);
+              @endphp
+              
+              @if(!$hasPurchased)
+                <div class="bg-gradient-to-r from-amber-50 to-yellow-50 border-l-4 border-amber-400 rounded-lg p-5 mb-8 shadow-sm">
+                  <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="la la-info-circle text-2xl text-amber-600"></i>
+                    <span class="text-sm font-medium text-amber-900">Purchase this product to leave a verified review</span>
+                  </div>
+                </div>
+              @endif
+              
+              @include('reviews._review_form', ['product' => $product, 'existingReview' => $existingReview])
+            @else
+              @include('reviews._review_form', ['product' => $product])
+            @endauth
+
+            {{-- Existing Reviews --}}
+            @php
+              $reviews = $product->approvedReviews()->with('user')->latest()->get();
+            @endphp
+            
+            @if($reviews->count() > 0)
+              <div style="margin-top: 2.5rem;">
+                <h3 class="text-xl font-serif text-[var(--black)]" style="padding-bottom: 0.75rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 1.5rem;">All Reviews ({{ $reviews->count() }})</h3>
+                
+                @foreach($reviews as $review)
+                  <div class="bg-white shadow-md border border-slate-100 rounded-xl" style="padding: 1.5rem; margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                      <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                          <div style="display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; border-radius: 9999px; background: var(--gold); color: white; font-weight: 600;">
+                            {{ strtoupper(substr($review->user->name ?? 'U', 0, 1)) }}
+                          </div>
+                          <div>
+                            <div class="font-semibold text-slate-900">{{ $review->user->name ?? 'Anonymous' }}</div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem;" class="text-slate-500">
+                              <span>{{ $review->created_at->format('M d, Y') }}</span>
+                              @if($review->verified_purchase)
+                                <span style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.125rem 0.5rem; border-radius: 9999px; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;">
+                                  <i class="la la-check-circle" style="font-size: 0.75rem;"></i>
+                                  Verified Purchase
+                                </span>
+                              @endif
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 0.5rem;">
+                          @include('partials.star_rating', [
+                            'rating' => $review->rating,
+                            'size' => 'sm'
+                          ])
+                        </div>
+                        
+                        @if($review->title)
+                          <h4 class="font-semibold text-slate-900" style="margin-bottom: 0.5rem;">{{ $review->title }}</h4>
+                        @endif
+                        
+                        @if($review->review)
+                          <p class="text-slate-700">{{ $review->review }}</p>
+                        @endif
+                      </div>
+                      
+                      @auth
+                        @if($review->user_id === auth()->id())
+                          <button type="button" 
+                                  class="text-sm text-slate-500 hover:text-[var(--gold)]">
+                            <i class="la la-edit"></i> Edit
+                          </button>
+                        @endif
+                      @endauth
+                    </div>
+                  </div>
+                @endforeach
+              </div>
+            @else
+              <div style="margin-top: 2.5rem; text-align: center; padding: 4rem 1rem; background: linear-gradient(to bottom right, #f8fafc, #f9fafb); border-radius: 0.75rem; border: 1px solid #e2e8f0;">
+                <i class="la la-comments" style="font-size: 3.5rem; color: #cbd5e1; margin-bottom: 1rem; display: block;"></i>
+                <p class="text-lg font-medium text-slate-700" style="margin-bottom: 0.5rem;">No reviews yet</p>
+                <p class="text-sm text-slate-500">Be the first to review this product!</p>
+              </div>
+            @endif
+          </div>
+
         </section>
 
         {{-- RIGHT --}}
         <aside class="col-span-12 lg:col-span-3">
-          <div class="bg-white border border-slate-200 rounded-lg shadow-ring p-4">
-            <h4 class="text-sm font-semibold text-slate-900">Related Products</h4>
-            <div class="mt-3 space-y-3">
+          <div class="sticky top-24">
+            <h4 class="text-xs font-bold uppercase tracking-widest text-[var(--black)] mb-6 pb-2 border-b border-gray-100">Related Products</h4>
+            <div class="space-y-6">
               @foreach ($relatedProducts as $related)
                 @php $relSlug = $related->slug ?? $related->id; @endphp
-                <a href="{{ route('product', $relSlug) }}"
-                   class="flex items-center gap-3 rounded-md border border-slate-200 p-2 hover:border-[var(--gold)]">
-                  <img src="{{ $related->first_image_url }}"
-                       class="h-16 w-16 flex-shrink-0 rounded object-cover"
-                       alt="{{ $related->name }}">
-                  <div class="min-w-0">
-                    <div class="truncate text-sm font-medium text-slate-900">
+                <a href="{{ route('product', $relSlug) }}" class="flex gap-4 group">
+                  <div class="w-16 h-20 bg-gray-100 overflow-hidden">
+                     <img src="{{ $related->first_image_url }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $related->name }}">
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-serif text-[var(--black)] group-hover:text-[var(--gold)] transition-colors line-clamp-2 leading-snug">
                       {{ $related->name }}
                     </div>
-                    <div class="text-[12px] text-slate-600">
-                      {{ number_format($related->price ?? 0, 0) }} RWF
+                    <div class="text-xs text-slate-500 mt-1">
+                      Rw {{ number_format($related->price ?? 0) }}
                     </div>
                   </div>
                 </a>
@@ -434,9 +553,8 @@
 
             @if(!empty($product->category?->slug))
               <a href="{{ url('/category/'.$product->category->slug) }}"
-                 class="mt-3 w-full inline-flex items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-[13px] font-semibold text-slate-700 hover:bg-slate-50">
-                View more in {{ $product->category->name ?? 'Category' }}
-                <i class="la la-arrow-right text-sm"></i>
+                 class="mt-8 block w-full py-3 border border-[var(--black)] text-center text-xs uppercase tracking-widest hover:bg-[var(--black)] hover:text-white transition-all">
+                View All in {{ $product->category->name }}
               </a>
             @endif
           </div>

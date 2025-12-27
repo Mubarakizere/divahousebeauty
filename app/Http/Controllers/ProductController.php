@@ -62,29 +62,100 @@ class ProductController extends Controller
     {
         $product = Product::where('slug', $slug)->firstOrFail();
 
-        // Sidebar & carousel datasets
-        $relatedProducts = Product::where('category_id', $product->category_id)
-            ->where('id', '!=', $product->id)
-            ->latest()->limit(4)->get();
+        // Track this product view for "Recently Viewed" (with error handling)
+        try {
+            $product->trackView();
+        } catch (\Exception $e) {
+            \Log::warning('Failed to track product view: ' . $e->getMessage());
+        }
 
-        $alsoLike = Product::inRandomOrder()->take(6)->get();
+        // Smart related products (same category, prefer same brand)
+        try {
+            $relatedProducts = $product->getRelatedProducts(6);
+        } catch (\Exception $e) {
+            $relatedProducts = collect();
+            \Log::warning('Failed to get related products: ' . $e->getMessage());
+        }
+        
+        // Frequently bought together
+        try {
+            $frequentlyBoughtTogether = $product->getFrequentlyBoughtTogether(3);
+        } catch (\Exception $e) {
+            $frequentlyBoughtTogether = collect();
+            \Log::warning('Failed to get frequently bought together: ' . $e->getMessage());
+        }
+        
+        // Customers also bought (collaborative filtering)
+        try {
+            $customersAlsoBought = $product->getCustomersAlsoBought(6);
+        } catch (\Exception $e) {
+            $customersAlsoBought = collect();
+            \Log::warning('Failed to get customers also bought: ' . $e->getMessage());
+        }
+        
+        // Recently viewed products (exclude current)
+        try {
+            $recentlyViewed = Product::getRecentlyViewed(6, $product->id);
+        } catch (\Exception $e) {
+            $recentlyViewed = collect();
+            \Log::warning('Failed to get recently viewed: ' . $e->getMessage());
+        }
+        
+        // Best sellers in this category
+        try {
+            $bestSellers = Product::getBestSellersInCategory($product->category_id, 4);
+        } catch (\Exception $e) {
+            $bestSellers = collect();
+            \Log::warning('Failed to get best sellers: ' . $e->getMessage());
+        }
+
+        // Fallback: Random products if others are empty
+        $alsoLike = Product::where('id', '!=', $product->id)
+            ->inRandomOrder()
+            ->take(6)
+            ->get();
 
         // If your Blade needs these:
         $categories = Category::orderBy('name')->get();
 
-        // Cart variables (adapt to your implementation)
-        $cartItems = collect(); // replace with your real cart items
+        // Cart variables
+        $cartItems = collect();
         $count     = $cartItems->count();
 
-        // Use a dedicated detail view
-        return view('product', compact('product', 'relatedProducts', 'alsoLike', 'categories', 'cartItems', 'count'));
+        // SEO Meta Tags
+        try {
+            $seo = \App\Helpers\SEOHelper::productMeta($product);
+        } catch (\Exception $e) {
+            $seo = [
+                'title' => $product->name . ' | Diva House Beauty',
+                'description' => substr($product->description ?? '', 0, 155),
+            ];
+            \Log::warning('Failed to generate SEO meta: ' . $e->getMessage());
+        }
+
+        return view('product', compact(
+            'product',
+            'relatedProducts',
+            'frequentlyBoughtTogether',
+            'customersAlsoBought',
+            'recentlyViewed',
+            'bestSellers',
+            'alsoLike',
+            'categories',
+            'cartItems',
+            'count',
+            'seo'
+        ));
     }
 
     public function category($id)
     {
         $category = Category::findOrFail($id);
         $products = Product::where('category_id', $id)->latest()->paginate(10);
+        
+        // SEO Meta Tags
+        $seo = \App\Helpers\SEOHelper::categoryMeta($category, $products);
 
-        return view('category', compact('products', 'category'));
+        return view('category', compact('products', 'category', 'seo'));
     }
 }

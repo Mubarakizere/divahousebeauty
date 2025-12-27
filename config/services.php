@@ -33,7 +33,7 @@ return [
     'google' => [
     'client_id' => env('GOOGLE_CLIENT_ID'),
     'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-    'redirect' => 'https://divahousebeauty.com/auth/google/call-back',
+    'redirect' => env('GOOGLE_REDIRECT_URL', '/auth/google/call-back'),
 ],
 'momo' => [
         'environment' => env('MOMO_ENV', 'sandbox'),
@@ -45,12 +45,16 @@ return [
     'brevo' => [
     'api_key' => env('BREVO_API_KEY'),
 ],
-'weflexfy' => [
-    'access_key' => env('WEFLEXFY_ACCESS_KEY'),
-    'secret_key' => env('WEFLEXFY_SECRET_KEY'),
-    'business_number' => env('WEFLEXFY_BUSINESS_NUMBER'),
-],
+    'weflexfy' => [
+        'access_key' => env('WEFLEXFY_ACCESS_KEY'),
+        'secret_key' => env('WEFLEXFY_SECRET_KEY'),
+        'business_number' => env('WEFLEXFY_BUSINESS_NUMBER'),
+        'recipient_number' => env('WEFLEXFY_BUSINESS_NUMBER'),
+    ],
 
+'google_maps' => [
+    'api_key' => env('GOOGLE_MAPS_API_KEY'),
+],
 
 
 ];

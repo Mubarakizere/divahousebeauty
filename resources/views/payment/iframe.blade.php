@@ -227,7 +227,7 @@
               {{-- iframe --}}
               <iframe
                 id="payment-iframe"
-                src="{{ $iframeUrl }}"
+                src="{{ $payment->iframe_url }}"
                 class="w-full h-[600px] border-0 transition-opacity duration-500"
                 :class="{'opacity-0': loading, 'opacity-100': !loading}"
                 @load="handleIframeLoad"

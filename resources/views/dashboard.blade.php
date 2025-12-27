@@ -20,7 +20,7 @@
                         Welcome back, {{ $user->name }} 
                     </h1>
 
-                    @if(auth()->user()->hasRole('admin'))
+                    @if(auth()->user()->role === 'admin')
                         <span class="inline-flex items-center rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-medium text-white ring-1 ring-white/30 backdrop-blur-sm">
                             <i class="fa-solid fa-shield-halved mr-1 text-xs"></i> Admin
                         </span>
@@ -32,8 +32,8 @@
                 </div>
 
                 <p class="mt-3 text-amber-100 text-base/relaxed max-w-xl">
-                    @if(auth()->user()->hasRole('admin'))
-                        Manage your business operations, monitor sales, and keep things running smoothly.
+                    @if(auth()->user()->role === 'admin')
+                        Manage your e-commerce business, monitor sales, inventory, and customer orders.
                     @else
                         Here's a snapshot of your beauty journey with us 
                     @endif
@@ -60,7 +60,7 @@
     {{-- ========================= --}}
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
-        @if(auth()->user()->hasRole('admin'))
+        @if(auth()->user()->role === 'admin')
 
             {{-- Total Orders --}}
             <div class="rounded-2xl bg-white border border-gray-100 p-6 shadow-card transition hover:shadow-xl/50 hover:-translate-y-[1px] duration-200">
@@ -266,27 +266,27 @@
                 </div>
             </div>
 
-            {{-- Bookings --}}
+            {{-- Wishlist --}}
             <div class="rounded-2xl bg-white border border-gray-100 p-6 shadow-card transition hover:shadow-xl/50 hover:-translate-y-[1px] duration-200">
                 <div class="flex items-start justify-between">
                     <div class="flex items-center">
-                        <div class="p-3 rounded-xl bg-purple-500 text-white shadow-inner shadow-purple-900/30 ring-1 ring-white/20">
-                            <i class="fa-solid fa-spa text-lg"></i>
+                        <div class="p-3 rounded-xl bg-pink-500 text-white shadow-inner shadow-pink-900/30 ring-1 ring-white/20">
+                            <i class="fa-solid fa-heart text-lg"></i>
                         </div>
                         <div class="ml-4">
-                            <p class="text-[13px] text-gray-500 font-medium">Bookings</p>
-                            <p class="text-2xl font-bold text-gray-900 leading-tight">{{ $bookings->count() ?? 0 }}</p>
+                            <p class="text-[13px] text-gray-500 font-medium">Wishlist Items</p>
+                            <p class="text-2xl font-bold text-gray-900 leading-tight">{{ auth()->user()->wishlists()->count() }}</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-5">
                     <div class="flex justify-between text-[11px] text-gray-500 font-medium mb-1.5">
-                        <span>Loyalty vibes</span>
-                        <span>65%</span>
+                        <span>Saved for later</span>
+                        <span>100%</span>
                     </div>
                     <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div class="h-full bg-purple-500 rounded-full" style="width: 65%"></div>
+                        <div class="h-full bg-pink-500 rounded-full" style="width: 100%"></div>
                     </div>
                 </div>
             </div>
@@ -307,14 +307,14 @@
                     <div>
                         <h2 class="text-lg font-semibold text-gray-900 flex items-center">
                             <i class="fa-solid fa-bag-shopping text-blue-500 mr-2 text-base"></i>
-                            @if(auth()->user()->hasRole('admin'))
+                            @if(auth()->user()->role === 'admin')
                                 Recent Orders
                             @else
                                 My Orders
                             @endif
                         </h2>
                         <p class="text-xs text-gray-500 mt-1">
-                            @if(auth()->user()->hasRole('admin'))
+                            @if(auth()->user()->role === 'admin')
                                 Latest activity across the store
                             @else
                                 Your most recent purchases and payment status
@@ -322,7 +322,7 @@
                         </p>
                     </div>
 
-                    @if(auth()->user()->hasRole('admin'))
+                    @if(auth()->user()->role === 'admin')
                         <a href="{{ route('admin.orders.index') }}"
                            class="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center">
                             View All
@@ -340,7 +340,7 @@
                 </div>
 
                 <div class="p-6">
-                    @if(auth()->user()->hasRole('admin'))
+                    @if(auth()->user()->role === 'admin')
                         @if(isset($recentOrders) && $recentOrders->count())
                             {{-- Admin table (recent orders) --}}
                             <div class="overflow-x-auto -mx-4 sm:mx-0">
@@ -500,7 +500,7 @@
                 <div class="p-6">
                     <div class="space-y-3 text-sm">
 
-                        @if(auth()->user()->hasRole('admin'))
+                        @if(auth()->user()->role === 'admin')
 
                             {{-- Manage Products --}}
                             <a href="{{ route('admin.products.index') }}"
@@ -555,15 +555,15 @@
                                 <i class="fa-solid fa-chevron-right text-gray-400 text-xs group-hover:text-gray-600"></i>
                             </a>
 
-                            {{-- My Bookings --}}
-                            <a href="{{ route('booking.index') }}"
+                            {{-- My Wishlist --}}
+                            <a href="{{ route('wishlist.index') }}"
                                class="group flex items-start rounded-xl border border-gray-200/70 bg-gray-50 p-3 hover:bg-white hover:shadow-card hover:border-gray-300 transition">
-                                <div class="p-2 rounded-lg bg-green-500 text-white shadow-inner shadow-green-900/30 ring-1 ring-white/20 group-hover:scale-105 transition">
-                                    <i class="fa-solid fa-calendar-check text-sm"></i>
+                                <div class="p-2 rounded-lg bg-pink-500 text-white shadow-inner shadow-pink-900/30 ring-1 ring-white/20 group-hover:scale-105 transition">
+                                    <i class="fa-solid fa-heart text-sm"></i>
                                 </div>
                                 <div class="ml-3 flex-1">
-                                    <div class="font-medium text-gray-900 leading-tight">My Bookings</div>
-                                    <div class="text-[12px] text-gray-600 leading-tight">View appointment history</div>
+                                    <div class="font-medium text-gray-900 leading-tight">My Wishlist</div>
+                                    <div class="text-[12px] text-gray-600 leading-tight">Saved products & favorites</div>
                                 </div>
                                 <i class="fa-solid fa-chevron-right text-gray-400 text-xs group-hover:text-gray-600"></i>
                             </a>
@@ -615,7 +615,7 @@
                             </span>
                         </div>
 
-                        @if(auth()->user()->hasRole('admin'))
+                        @if(auth()->user()->role === 'admin')
                         <div class="flex justify-between items-center">
                             <span class="text-gray-600">Role</span>
                             <span class="inline-flex items-center rounded-full bg-blue-100 text-blue-800 px-2 py-0.5 text-[11px] font-medium">
@@ -637,7 +637,7 @@
             </div>
 
             {{-- TODAY OVERVIEW (ADMIN ONLY) --}}
-            @if(auth()->user()->hasRole('admin'))
+            @if(auth()->user()->role === 'admin')
             <div class="rounded-2xl bg-white border border-gray-100 shadow-card overflow-hidden">
                 <div class="p-6 border-b border-gray-100">
                     <h2 class="text-lg font-semibold text-gray-900 flex items-center">

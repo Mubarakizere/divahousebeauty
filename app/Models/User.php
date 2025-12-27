@@ -20,6 +20,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'google_id',
+        'avatar',
+        'role',
     ];
 
     /**
@@ -53,4 +56,37 @@ class User extends Authenticatable
         return $this->hasOne(Address::class)->where('is_default', true);
     }
 
+    /**
+     * Reviews written by this user
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Orders placed by this user
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    /**
+     * Check if user has purchased a specific product
+     */
+    public function hasPurchased(int $productId): bool
+    {
+        return $this->orders()
+            ->where('payment_status', 'completed')
+            ->whereHas('items', function ($query) use ($productId) {
+                $query->where('product_id', $productId);
+            })
+            ->exists();
+    }
 }

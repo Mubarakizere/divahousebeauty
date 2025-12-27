@@ -92,7 +92,7 @@
                         <span>Dashboard</span>
                     </a>
 
-                    @if(auth()->user()->hasRole('admin'))
+                    @if(auth()->user()->role === 'admin')
                         <div class="pt-4">
                             <p class="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Admin</p>
 
@@ -116,7 +116,7 @@
                         </div>
                     @endif
 
-                    @if(auth()->user()->hasRole('customer'))
+                    @if(auth()->user()->role === 'customer')
                         <div class="pt-6">
                             <p class="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">My Account</p>
                             <a href="{{ route('booking.index') }}"
@@ -189,7 +189,7 @@
                             <span>Dashboard</span>
                         </a>
 
-                        @if(auth()->user()->hasRole('admin'))
+                        @if(auth()->user()->role === 'admin')
                             <div class="pt-4 pb-1">
                                 <p class="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Admin</p>
 
@@ -213,7 +213,7 @@
                             </div>
                         @endif
 
-                        @if(auth()->user()->hasRole('customer'))
+                        @if(auth()->user()->role === 'customer')
                             <div class="pt-6 pb-1">
                                 <p class="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">My Account</p>
                                 <a href="{{ route('booking.index') }}"
@@ -270,8 +270,8 @@
                             {{ auth()->user()->name }}
                         </div>
                         <div class="text-[11px] text-gray-500">
-                            @if(auth()->user()->hasRole('admin')) Admin
-                            @elseif(auth()->user()->hasRole('customer')) Customer
+                            @if(auth()->user()->role === 'admin') Admin
+                            @elseif(auth()->user()->role === 'customer') Customer
                             @else User
                             @endif
                         </div>
@@ -280,7 +280,7 @@
                         <div class="h-10 w-10 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-gray-700 text-xs font-semibold uppercase shadow-inner ring-1 ring-white/60">
                             {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                         </div>
-                        @if(auth()->user()->hasRole('admin'))
+                        @if(auth()->user()->role === 'admin')
                             <span class="absolute -bottom-1 -right-1 inline-flex items-center rounded-full bg-blue-600 px-1.5 py-0.5 text-[10px] font-medium text-white shadow ring-2 ring-white">
                                 Admin
                             </span>

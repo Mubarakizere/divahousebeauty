@@ -1,2 +1,10 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin/
+Disallow: /cart
+Disallow: /checkout
+Disallow: /my-addresses
+Disallow: /dashboard
+Disallow: /payment/
+
+Sitemap: https://divahousebeauty.com/sitemap.xml

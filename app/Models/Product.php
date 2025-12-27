@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\TracksRecentlyViewed;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,7 @@ use Illuminate\Support\Str;
 
 class Product extends Model
 {
+    use TracksRecentlyViewed;
     use HasFactory;
 
     public const DEFAULT_IMAGE = 'assets/images/default-product.jpg';
@@ -39,6 +41,8 @@ class Product extends Model
         'image_urls',
         'in_stock',
         'is_new',
+        'average_rating',
+        'review_count',
     ];
 
     // If you later switch to {product:slug} binding, this makes it seamless
@@ -89,6 +93,21 @@ class Product extends Model
     public function promotion()
     {
         return $this->hasOne(Promotion::class, 'product_id');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function approvedReviews()
+    {
+        return $this->hasMany(Review::class)->where('status', 'approved');
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
     }
 
     // ── Images helpers ───────────────────────────────────────────────
@@ -208,6 +227,17 @@ class Product extends Model
             : false;
     }
 
+    // ── Reviews & Ratings ───────────────────────────────────────────
+    public function getAverageRatingAttribute(): float
+    {
+        return round($this->approvedReviews()->avg('rating') ?? 0, 1);
+    }
+
+    public function getReviewCountAttribute(): int
+    {
+        return $this->approvedReviews()->count();
+    }
+
     // ── Scopes ──────────────────────────────────────────────────────
     public function scopeAvailable($q)       { return $q->where('stock', '>', 0); }
     public function scopeInCategory($q, $id) { return $q->where('category_id', $id); }
@@ -221,5 +251,83 @@ class Product extends Model
                ->orWhere('description', 'like', $t)
                ->orWhere('slug', 'like', $t)
         );
+    }
+
+    // ── Smart Recommendations ──────────────────────────────────────
+    
+    /**
+     * Get related products in same category, preferring same brand
+     */
+    public function getRelatedProducts(int $limit = 6)
+    {
+        $query = static::where('category_id', $this->category_id)
+            ->where('id', '!=', $this->id)
+            ->where('stock', '>', 0);
+        
+        // Try to get same brand first
+        if ($this->brand_id) {
+            $sameBrand = (clone $query)
+                ->where('brand_id', $this->brand_id)
+                ->limit($limit)
+                ->get();
+            
+            if ($sameBrand->count() >= $limit) {
+                return $sameBrand;
+            }
+        }
+        
+        // Otherwise get any products in category, sorted by popularity
+        return $query
+            ->withCount('orderItems')
+            ->orderByDesc('order_items_count')
+            ->limit($limit)
+            ->get();
+    }
+    
+    /**
+     * Get frequently bought together products
+     */
+    public function getFrequentlyBoughtTogether(int $limit = 3)
+    {
+        // Placeholder - requires order history analysis
+        return collect();
+    }
+    
+    /**
+     * Get products that customers also bought
+     */
+    public function getCustomersAlsoBought(int $limit = 6)
+    {
+        $orderIds = $this->orderItems()->pluck('order_id');
+        
+        if ($orderIds->isEmpty()) {
+            return collect();
+        }
+        
+        return static::select('products.*')
+            ->join('order_items', 'products.id', '=', 'order_items.product_id')
+            ->whereIn('order_items.order_id', $orderIds)
+            ->where('products.id', '!=', $this->id)
+            ->where('products.stock', '>', 0)
+            ->distinct()
+            ->limit($limit)
+            ->get();
+    }
+    
+    /**
+     * Get best sellers in a category
+     */
+    public static function getBestSellersInCategory(?int $categoryId, int $limit = 4)
+    {
+        if (!$categoryId) {
+            return collect();
+        }
+        
+        return static::where('category_id', $categoryId)
+            ->where('stock', '>', 0)
+            ->withCount('orderItems')
+            ->orderByDesc('order_items_count')
+            ->limit($limit)
+            ->get();
     }
 }

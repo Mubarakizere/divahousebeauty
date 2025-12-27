@@ -1,59 +1,44 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-gray-50">
+<html lang="en" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title', 'Dashboard') - Diva House Beauty</title>
+    <title>@yield('title', 'Admin Dashboard') - Diva House Beauty</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    {{-- Inter font (clean, modern dashboard look) --}}
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600&display=swap" rel="stylesheet" />
+    {{-- Fonts --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     {{-- Tailwind CSS --}}
     <script src="https://cdn.tailwindcss.com"></script>
-
-    {{-- Tailwind custom config (brand colors etc.) --}}
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'system-ui', 'Avenir', 'Helvetica', 'Arial', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
                     },
                     colors: {
-                        primary: {
-                            50: '#fef7ee',
-                            500: '#f97316',
-                            600: '#ea580c',
-                            700: '#c2410c',
-                            900: '#9a3412'
-                        },
-                        diva: {
-                            primary: '#cc9966',
-                            dark: '#b8845a'
-                        }
+                        'diva-black': '#0F172A',
+                        'diva-gold': '#C5A059',
+                        'diva-gold-hover': '#B08D4C',
                     },
                     boxShadow: {
-                        card: '0 10px 24px -4px rgba(0,0,0,0.12)',
-                    },
-                    borderRadius: {
-                        'xl': '0.75rem',
-                        '2xl': '1rem',
+                        'ring': '0 0 0 1px rgba(0,0,0,0.05), 0 2px 8px rgba(0,0,0,0.05)',
                     }
                 }
             }
         }
     </script>
 
-    {{-- Alpine.js (for sidebar toggle + modals) --}}
+    {{-- Alpine.js --}}
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    {{-- Font Awesome for icons --}}
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-          integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    {{-- Font Awesome --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <style>[x-cloak]{display:none!important}</style>
 
@@ -108,7 +93,7 @@
                     </a>
 
                     {{-- ADMIN SECTION --}}
-                    @if(auth()->user()->hasRole('admin'))
+                    @if(auth()->user()->role === 'admin')
                         <div class="pt-4">
                             <p class="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
                                 Admin
@@ -153,6 +138,71 @@
                                 <span>Brands</span>
                             </a>
 
+                            {{-- Coupons --}}
+                            <a href="{{ route('admin.coupons.index') }}"
+                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
+                                      {{ request()->is('admin/coupons*')
+                                            ? 'bg-gray-800 text-white'
+                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                                <i class="fas fa-ticket-alt mr-3 h-5 w-5 flex-shrink-0
+                                          {{ request()->is('admin/coupons*')
+                                                ? 'text-white'
+                                                : 'text-gray-400 group-hover:text-gray-300' }}"></i>
+                                <span>Coupons</span>
+                            </a>
+                            
+                            {{-- Banners --}}
+                            <a href="{{ route('admin.banners.index') }}"
+                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
+                                      {{ request()->is('admin/banners*')
+                                            ? 'bg-gray-800 text-white'
+                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                                <i class="fas fa-images mr-3 h-5 w-5 flex-shrink-0
+                                          {{ request()->is('admin/banners*')
+                                                ? 'text-white'
+                                                : 'text-gray-400 group-hover:text-gray-300' }}"></i>
+                                <span>Banners</span>
+                            </a>
+
+                            {{-- Users --}}
+                            <a href="{{ route('admin.users.index') }}"
+                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
+                                      {{ request()->is('admin/users*')
+                                            ? 'bg-gray-800 text-white'
+                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                             <i class="fas fa-users-cog mr-3 h-5 w-5 flex-shrink-0
+                                       {{ request()->is('admin/users*')
+                                             ? 'text-white'
+                                             : 'text-gray-400 group-hover:text-gray-300' }}"></i>
+                             <span>Users</span>
+                         </a>
+
+                            {{-- Newsletter --}}
+                            <a href="{{ route('admin.newsletter.index') }}"
+                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
+                                      {{ request()->is('admin/newsletter*')
+                                            ? 'bg-gray-800 text-white'
+                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                             <i class="fas fa-envelope mr-3 h-5 w-5 flex-shrink-0
+                                       {{ request()->is('admin/newsletter*')
+                                             ? 'text-white'
+                                             : 'text-gray-400 group-hover:text-gray-300' }}"></i>
+                             <span>Newsletter</span>
+                         </a>
+
+                            {{-- Reviews --}}
+                            <a href="{{ route('admin.reviews.index') }}"
+                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
+                                      {{ request()->is('admin/reviews*')
+                                            ? 'bg-gray-800 text-white'
+                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                                <i class="fas fa-star mr-3 h-5 w-5 flex-shrink-0
+                                          {{ request()->is('admin/reviews*')
+                                                ? 'text-white'
+                                                : 'text-gray-400 group-hover:text-gray-300' }}"></i>
+                                <span>Reviews</span>
+                            </a>
+
                             {{-- Orders --}}
                             <a href="{{ route('admin.orders.index') }}"
                                class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
@@ -169,23 +219,23 @@
                     @endif
 
                     {{-- CUSTOMER SECTION --}}
-                    @if(auth()->user()->hasRole('customer'))
+                    @if(auth()->user()->role === 'customer')
                         <div class="pt-6">
                             <p class="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
                                 My Account
                             </p>
 
-                            {{-- My Bookings --}}
-                            <a href="{{ route('booking.index') }}"
+                            {{-- My Orders --}}
+                            <a href="{{ route('orders.index') }}"
                                class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                      {{ request()->routeIs('booking.*')
+                                      {{ request()->routeIs('orders.*')
                                             ? 'bg-gray-800 text-white'
                                             : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                <i class="fas fa-calendar-alt mr-3 h-5 w-5 flex-shrink-0
-                                          {{ request()->routeIs('booking.*')
+                                <i class="fas fa-shopping-bag mr-3 h-5 w-5 flex-shrink-0
+                                          {{ request()->routeIs('orders.*')
                                                 ? 'text-white'
                                                 : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                <span>My Bookings</span>
+                                <span>My Orders</span>
                             </a>
 
                             {{-- My Addresses --}}
@@ -280,7 +330,7 @@
                             <span>Dashboard</span>
                         </a>
 
-                        @if(auth()->user()->hasRole('admin'))
+                        @if(auth()->user()->role === 'admin')
                             <div class="pt-4 pb-1">
                                 <p class="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
                                     Admin
@@ -325,6 +375,45 @@
                                     <span>Brands</span>
                                 </a>
 
+                                {{-- Coupons --}}
+                                <a href="{{ route('admin.coupons.index') }}"
+                                   class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
+                                          {{ request()->is('admin/coupons*')
+                                                ? 'bg-gray-800 text-white'
+                                                : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                                    <i class="fas fa-ticket-alt mr-3 h-5 w-5 flex-shrink-0
+                                              {{ request()->is('admin/coupons*')
+                                                    ? 'text-white'
+                                                    : 'text-gray-400 group-hover:text-gray-300' }}"></i>
+                                    <span>Coupons</span>
+                                </a>
+                                
+                                {{-- Banners --}}
+                                <a href="{{ route('admin.banners.index') }}"
+                                   class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
+                                          {{ request()->is('admin/banners*')
+                                                ? 'bg-gray-800 text-white'
+                                                : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                                    <i class="fas fa-images mr-3 h-5 w-5 flex-shrink-0
+                                              {{ request()->is('admin/banners*')
+                                                    ? 'text-white'
+                                                    : 'text-gray-400 group-hover:text-gray-300' }}"></i>
+                                    <span>Banners</span>
+                                </a>
+
+                                {{-- Reviews --}}
+                                <a href="{{ route('admin.reviews.index') }}"
+                                   class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
+                                          {{ request()->is('admin/reviews*')
+                                                ? 'bg-gray-800 text-white'
+                                                : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                                    <i class="fas fa-star mr-3 h-5 w-5 flex-shrink-0
+                                              {{ request()->is('admin/reviews*')
+                                                    ? 'text-white'
+                                                    : 'text-gray-400 group-hover:text-gray-300' }}"></i>
+                                    <span>Reviews</span>
+                                </a>
+
                                 {{-- Orders --}}
                                 <a href="{{ route('admin.orders.index') }}"
                                    class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
@@ -340,22 +429,22 @@
                             </div>
                         @endif
 
-                        @if(auth()->user()->hasRole('customer'))
+                        @if(auth()->user()->role === 'customer')
                             <div class="pt-6 pb-1">
                                 <p class="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
                                     My Account
                                 </p>
 
-                                <a href="{{ route('booking.index') }}"
+                                <a href="{{ route('orders.index') }}"
                                    class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                          {{ request()->routeIs('booking.*')
+                                          {{ request()->routeIs('orders.*')
                                                 ? 'bg-gray-800 text-white'
                                                 : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                    <i class="fas fa-calendar-alt mr-3 h-6 w-6 flex-shrink-0
-                                              {{ request()->routeIs('booking.*')
+                                    <i class="fas fa-shopping-bag mr-3 h-6 w-6 flex-shrink-0
+                                              {{ request()->routeIs('orders.*')
                                                     ? 'text-white'
                                                     : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                    <span>My Bookings</span>
+                                    <span>My Orders</span>
                                 </a>
 
                                 <a href="{{ route('address.index') }}"
@@ -423,9 +512,9 @@
                             {{ auth()->user()->name }}
                         </div>
                         <div class="text-[11px] text-gray-500">
-                            @if(auth()->user()->hasRole('admin'))
+                            @if(auth()->user()->role === 'admin')
                                 Admin
-                            @elseif(auth()->user()->hasRole('customer'))
+                            @elseif(auth()->user()->role === 'customer')
                                 Customer
                             @else
                                 User
@@ -439,7 +528,7 @@
                             {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                         </div>
 
-                        @if(auth()->user()->hasRole('admin'))
+                        @if(auth()->user()->role === 'admin')
                             <span class="absolute -bottom-1 -right-1 inline-flex items-center rounded-full bg-blue-600 px-1.5 py-0.5 text-[10px] font-medium text-white shadow ring-2 ring-white">
                                 Admin
                             </span>
