@@ -207,12 +207,12 @@
 
                 <div class="mb-6">
                   @if($isOnSale)
-                    <div class="flex items-baseline gap-3">
-                      <span class="text-3xl font-serif text-[var(--black)]">Rw {{ number_format($salePrice) }}</span>
-                      <span class="text-lg text-slate-400 line-through font-serif">Rw {{ number_format($basePrice) }}</span>
+                    <div class="flex items-baseline gap-3 bg-red-50 px-3 py-1 rounded-lg">
+                      <span class="text-3xl font-serif text-rose-700 convertible-price" data-price-rwf="{{ $salePrice }}">Rw {{ number_format($salePrice) }}</span>
+                      <span class="text-lg text-slate-400 line-through font-serif convertible-price" data-price-rwf="{{ $basePrice }}">Rw {{ number_format($basePrice) }}</span>
                     </div>
                   @else
-                    <div class="text-3xl font-serif text-[var(--black)]">Rw {{ number_format($basePrice) }}</div>
+                    <div class="text-3xl font-serif text-[var(--black)] convertible-price" data-price-rwf="{{ $basePrice }}">Rw {{ number_format($basePrice) }}</div>
                   @endif
                   
                   <div class="mt-3">
@@ -546,7 +546,7 @@
                     <div class="text-sm font-serif text-[var(--black)] group-hover:text-[var(--gold)] transition-colors line-clamp-2 leading-snug">
                       {{ $related->name }}
                     </div>
-                    <div class="text-xs text-slate-500 mt-1">
+                    <div class="text-xs text-slate-500 mt-1 convertible-price" data-price-rwf="{{ $related->price ?? 0 }}">
                       Rw {{ number_format($related->price ?? 0) }}
                     </div>
                   </div>
