@@ -29,49 +29,114 @@ class SitemapController extends Controller
      */
     private function generateSitemap()
     {
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>';
-        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" ';
-        $xml .= 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">';
+        try {
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" ';
+            $xml .= 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">';
 
-        // Homepage - highest priority
-        $xml .= $this->addUrl(route('home'), now(), 'daily', '1.0');
+            // Homepage - highest priority
+            $xml .= $this->addUrl(route('home'), now(), 'daily', '1.0');
 
-        // Static pages
-        $xml .= $this->addUrl(route('about'), now()->subDays(30), 'monthly', '0.7');
-        $xml .= $this->addUrl(route('contact'), now()->subDays(30), 'monthly', '0.6');
-        $xml .= $this->addUrl(route('deals'), now(), 'daily', '0.8');
+            // Static pages (with error handling)
+            try {
+                if (\Route::has('about')) {
+                    $xml .= $this->addUrl(route('about'), now()->subDays(30), 'monthly', '0.7');
+                }
+                if (\Route::has('contact')) {
+                    $xml .= $this->addUrl(route('contact'), now()->subDays(30), 'monthly', '0.6');
+                }
+                if (\Route::has('deals')) {
+                    $xml .= $this->addUrl(route('deals'), now(), 'daily', '0.8');
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Sitemap: Error adding static pages: ' . $e->getMessage());
+            }
 
-        // Categories - high priority
-        Category::where('is_active', true)->each(function ($category) use (&$xml) {
-            $xml .= $this->addUrl(
-                route('category.show', $category->slug),
-                $category->updated_at,
-                'weekly',
-                '0.9'
-            );
-        });
+            // Categories - high priority
+            try {
+                $categoryQuery = Category::query();
+                
+                // Check if is_active column exists
+                if (\Schema::hasColumn('categories', 'is_active')) {
+                    $categoryQuery->where('is_active', true);
+                }
+                
+                $categoryQuery->each(function ($category) use (&$xml) {
+                    try {
+                        $xml .= $this->addUrl(
+                            route('category.show', $category->slug),
+                            $category->updated_at ?? now(),
+                            'weekly',
+                            '0.9'
+                        );
+                    } catch (\Exception $e) {
+                        \Log::warning('Sitemap: Error adding category ' . $category->id . ': ' . $e->getMessage());
+                    }
+                });
+            } catch (\Exception $e) {
+                \Log::warning('Sitemap: Error processing categories: ' . $e->getMessage());
+            }
 
-        // Brands - medium-high priority
-        Brand::whereHas('products')->each(function ($brand) use (&$xml) {
-            $xml .= $this->addUrl(
-                route('brand.show', $brand->slug),
-                $brand->updated_at,
-                'weekly',
-                '0.8'
-            );
-        });
+            // Brands - medium-high priority
+            try {
+                Brand::whereHas('products')->each(function ($brand) use (&$xml) {
+                    try {
+                        $xml .= $this->addUrl(
+                            route('brand.show', $brand->slug),
+                            $brand->updated_at ?? now(),
+                            'weekly',
+                            '0.8'
+                        );
+                    } catch (\Exception $e) {
+                        \Log::warning('Sitemap: Error adding brand ' . $brand->id . ': ' . $e->getMessage());
+                    }
+                });
+            } catch (\Exception $e) {
+                \Log::warning('Sitemap: Error processing brands: ' . $e->getMessage());
+            }
 
-        // Products - medium priority, with images
-        Product::where('is_active', true)
-            ->where('in_stock', true)
-            ->orderBy('updated_at', 'desc')
-            ->each(function ($product) use (&$xml) {
-                $xml .= $this->addProductUrl($product);
-            });
+            // Products - medium priority
+            try {
+                $productQuery = Product::query();
+                
+                // Only add filters if columns exist
+                if (\Schema::hasColumn('products', 'is_active')) {
+                    $productQuery->where('is_active', true);
+                }
+                if (\Schema::hasColumn('products', 'in_stock')) {
+                    $productQuery->where('in_stock', true);
+                } elseif (\Schema::hasColumn('products', 'stock')) {
+                    $productQuery->where('stock', '>', 0);
+                }
+                
+                $productQuery->orderBy('updated_at', 'desc')
+                    ->limit(500) // Limit to prevent memory issues
+                    ->each(function ($product) use (&$xml) {
+                        try {
+                            $xml .= $this->addProductUrl($product);
+                        } catch (\Exception $e) {
+                            \Log::warning('Sitemap: Error adding product ' . $product->id . ': ' . $e->getMessage());
+                        }
+                    });
+            } catch (\Exception $e) {
+                \Log::warning('Sitemap: Error processing products: ' . $e->getMessage());
+            }
 
-        $xml .= '</urlset>';
+            $xml .= '</urlset>';
 
-        return $xml;
+            return $xml;
+            
+        } catch (\Exception $e) {
+            \Log::error('Sitemap generation failed: ' . $e->getMessage());
+            
+            // Return minimal valid sitemap on error
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+            $xml .= '<url><loc>' . route('home') . '</loc><changefreq>daily</changefreq><priority>1.0</priority></url>';
+            $xml .= '</urlset>';
+            
+            return $xml;
+        }
     }
 
     /**
