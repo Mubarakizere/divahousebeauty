@@ -1,0 +1,223 @@
+/**
+ * Currency Selector Styles
+ * Beautiful, professional currency dropdown with smooth animations
+ */
+
+.currency-selector {
+    position: relative;
+    display: inline-block;
+}
+
+.currency-selected {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #475569;
+    user-select: none;
+}
+
+.currency-selected:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.currency-flag {
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.currency-code {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.currency-arrow {
+    margin-left: 0.25rem;
+    font-size: 0.75rem;
+    transition: transform 0.3s ease;
+}
+
+.currency-selector.active .currency-arrow {
+    transform: rotate(180deg);
+}
+
+/* Dropdown */
+.currency-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    min-width: 220px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.currency-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.currency-dropdown-header {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+}
+
+.currency-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #475569;
+    text-decoration: none !important;
+}
+
+.currency-item:hover {
+    background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+    padding-left: 1.25rem;
+}
+
+.currency-item.active {
+    background: linear-gradient(90deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #1e40af;
+    font-weight: 600;
+}
+
+.currency-item.active::after {
+    content: '✓';
+    margin-left: auto;
+    color: #1e40af;
+    font-weight: bold;
+}
+
+.currency-item-flag {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.currency-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    flex: 1;
+}
+
+.currency-item-code {
+    font-weight: 600;
+    font-size: 0.9375rem;
+}
+
+.currency-item-name {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+/* Price transition animations */
+.convertible-price,
+[data-price-rwf] {
+    transition: opacity 0.15s ease-in-out;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .currency-selected {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8125rem;
+    }
+
+    .currency-dropdown {
+        min-width: 200px;
+        right: -1rem;
+    }
+
+    .currency-item {
+        padding: 0.75rem 1rem;
+    }
+
+    .currency-flag {
+        font-size: 1.125rem;
+    }
+}
+
+/* Dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+    .currency-selected {
+        background: #1e293b;
+        border-color: #334155;
+        color: #cbd5e1;
+    }
+
+    .currency-selected:hover {
+        background: #334155;
+        border-color: #475569;
+    }
+
+    .currency-code {
+        color: #e2e8f0;
+    }
+
+    .currency-dropdown {
+        background: #1e293b;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .currency-dropdown-header {
+        border-color: #334155;
+        color: #94a3b8;
+    }
+
+    .currency-item {
+        color: #cbd5e1;
+    }
+
+    .currency-item:hover {
+        background: linear-gradient(90deg, #334155 0%, #475569 100%);
+    }
+
+    .currency-item.active {
+        background: linear-gradient(90deg, #1e40af 0%, #1d4ed8 100%);
+        color: #dbeafe;
+    }
+
+    .currency-item-name {
+        color: #94a3b8;
+    }
+}
+
+/* Loading state */
+.currency-loading {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #e2e8f0;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

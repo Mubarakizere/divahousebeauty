@@ -56,5 +56,9 @@ return [
     'api_key' => env('GOOGLE_MAPS_API_KEY'),
 ],
 
+'exchange_rate' => [
+    'api_key' => env('EXCHANGE_RATE_API_KEY'),
+    'base_currency' => env('EXCHANGE_RATE_BASE_CURRENCY', 'RWF'),
+],
 
 ];

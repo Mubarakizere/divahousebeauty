@@ -38,6 +38,47 @@
                     </div>
                 </div>
             @endguest
+            
+            <!-- Currency Selector -->
+            <div class="currency-selector">
+                <div class="currency-selected" onclick="toggleCurrencyDropdown()">
+                    <span class="currency-flag">🇺🇸</span>
+                    <span class="currency-code">USD</span>
+                    <span class="currency-arrow">▼</span>
+                </div>
+                <div class="currency-dropdown">
+                    <div class="currency-dropdown-header">Select Currency</div>
+                    <a href="#" class="currency-item" data-currency="USD">
+                        <span class="currency-item-flag">🇺🇸</span>
+                        <div class="currency-item-info">
+                            <span class="currency-item-code">USD</span>
+                            <span class="currency-item-name">US Dollar</span>
+                        </div>
+                    </a>
+                    <a href="#" class="currency-item" data-currency="EUR">
+                        <span class="currency-item-flag">🇪🇺</span>
+                        <div class="currency-item-info">
+                            <span class="currency-item-code">EUR</span>
+                            <span class="currency-item-name">Euro</span>
+                        </div>
+                    </a>
+                    <a href="#" class="currency-item" data-currency="GBP">
+                        <span class="currency-item-flag">🇬🇧</span>
+                        <div class="currency-item-info">
+                            <span class="currency-item-code">GBP</span>
+                            <span class="currency-item-name">British Pound</span>
+                        </div>
+                    </a>
+                    <a href="#" class="currency-item" data-currency="RWF">
+                        <span class="currency-item-flag">🇷🇼</span>
+                        <div class="currency-item-info">
+                            <span class="currency-item-code">RWF</span>
+                            <span class="currency-item-name">Rwandan Franc</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            
             <a href="{{ route('cart') }}" class="relative hover:text-pink-600">
                 <i class="ph ph-shopping-cart text-xl"></i>
                 @if($count > 0)

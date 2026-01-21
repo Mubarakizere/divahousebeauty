@@ -13,6 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
 {
     $schedule->command('emails:fetch')->everyFiveMinutes();
+    $schedule->command('currency:update')->daily();
 }
 
 

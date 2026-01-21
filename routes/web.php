@@ -44,6 +44,10 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // SEO: Sitemap for search engines
 Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
 
+// Currency Conversion API
+Route::get('/api/currency/rates', [App\Http\Controllers\CurrencyController::class, 'getRates'])->name('currency.rates');
+Route::get('/api/currency/convert', [App\Http\Controllers\CurrencyController::class, 'convert'])->name('currency.convert');
+
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
     ->name('newsletter.subscribe');
 

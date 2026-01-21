@@ -38,7 +38,13 @@
 
     <!-- Custom App CSS (optional, if you add custom styles) -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    
+    <!-- Currency Converter Styles -->
+    <link rel="stylesheet" href="{{ asset('css/currency-styles.css') }}">
 
     <!-- Alpine.js (for mobile toggle, dropdowns etc.) -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Currency Converter Script -->
+    <script src="{{ asset('js/currency-converter.js') }}"></script>
 </head>

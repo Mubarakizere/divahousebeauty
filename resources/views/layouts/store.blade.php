@@ -53,6 +53,10 @@
         transform: translateY(-1px);
     }
   </style>
+  
+  <!-- Currency Converter Styles -->
+  <link rel="stylesheet" href="{{ asset('css/currency-styles.css') }}">
+  
   @stack('head')
 </head>
 
@@ -83,6 +87,9 @@
   
   {{-- AUTH MODAL --}}
   @includeIf('partials.auth_modal')
+
+  <!-- Currency Converter Script -->
+  <script src="{{ asset('js/currency-converter.js') }}"></script>
 
   @stack('scripts')
 </body>
