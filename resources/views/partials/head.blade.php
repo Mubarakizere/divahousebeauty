@@ -4,6 +4,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     
+    <!-- Google Search Console Verification -->
+    <meta name="google-site-verification" content="42_XUFLKGXoph33K7-fbfNzwRUFnFvInTzPQCuIJLYM" />
+    
     <title>Diva House Beauty</title>
     <meta name="description" content="Diva House Beauty  Your destination for luxury beauty services.">
     <meta name="keywords" content="beauty, ecommerce, diva house, nails, skincare, booking, salon, Kigali, Rwanda">
@@ -17,7 +20,6 @@
     <meta property="og:image:height" content="630" />
     <meta property="og:url" content="{{ url()->current() }}" />
     <meta property="og:type" content="website" />
-    <meta name="google-site-verification" content="42_XUFLKGXoph33K7-fbfNzwRUFnFvInTzPQCuIJLYM" />
     <!-- Theme Color -->
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-title" content="Diva House Beauty">
