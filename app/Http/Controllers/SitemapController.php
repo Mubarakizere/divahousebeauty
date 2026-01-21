@@ -169,9 +169,15 @@ class SitemapController extends Controller
         $xml .= '<changefreq>weekly</changefreq>';
         $xml .= '<priority>0.7</priority>';
 
-        // Add product images to sitemap
+        // Add product images to sitemap (convert to absolute URLs)
         if ($product->image_urls && is_array($product->image_urls)) {
             foreach (array_slice($product->image_urls, 0, 5) as $imageUrl) {
+                // Convert relative URLs to absolute URLs
+                if (!filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+                    // If it's a relative URL, make it absolute
+                    $imageUrl = url($imageUrl);
+                }
+                
                 $xml .= '<image:image>';
                 $xml .= '<image:loc>' . htmlspecialchars($imageUrl) . '</image:loc>';
                 $xml .= '<image:title>' . htmlspecialchars($product->name) . '</image:title>';
