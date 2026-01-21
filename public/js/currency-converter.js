@@ -63,8 +63,8 @@ class CurrencyConverter {
             this.rates = JSON.parse(cachedRates);
             this.currencies = JSON.parse(cachedData);
         } else {
-            // Hardcoded fallback rates
-            this.rates = { USD: 0.00076, EUR: 0.00071, GBP: 0.00061, RWF: 1 };
+            // Hardcoded fallback rates (use your actual rates from API)
+            this.rates = { USD: 0.0006848, EUR: 0.00058567, GBP: 0.00050969, RWF: 1 };
             this.currencies = {
                 USD: { code: 'USD', symbol: '$', name: 'US Dollar', flag: '🇺🇸', decimals: 2 },
                 EUR: { code: 'EUR', symbol: '€', name: 'Euro', flag: '🇪🇺', decimals: 2 },
@@ -124,6 +124,8 @@ class CurrencyConverter {
     updateAllPrices() {
         const priceElements = document.querySelectorAll('.convertible-price, [data-price-rwf]');
 
+        console.log(`Found ${priceElements.length} price elements to convert to ${this.currentCurrency}`);
+
         priceElements.forEach(element => {
             const rwfAmount = parseFloat(element.getAttribute('data-price-rwf'));
 
@@ -136,11 +138,7 @@ class CurrencyConverter {
                     const formatted = this.formatPrice(converted);
 
                     // Update the price text
-                    if (element.classList.contains('convertible-price')) {
-                        element.textContent = formatted;
-                    } else {
-                        element.innerHTML = formatted;
-                    }
+                    element.textContent = formatted;
 
                     // Update currency attribute
                     element.setAttribute('data-currency', this.currentCurrency);
@@ -156,22 +154,16 @@ class CurrencyConverter {
      * Attach event listeners
      */
     attachEventListeners() {
-        // Currency selector dropdown
+        // Currency selector dropdown items
         const currencyItems = document.querySelectorAll('.currency-item');
 
         currencyItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 const selectedCurrency = item.getAttribute('data-currency');
                 this.changeCurrency(selectedCurrency);
             });
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.currency-selector')) {
-                this.closeDropdown();
-            }
         });
     }
 
@@ -179,48 +171,62 @@ class CurrencyConverter {
      * Change active currency
      */
     changeCurrency(currency) {
+        console.log('Changing currency from', this.currentCurrency, 'to', currency);
         this.saveCurrency(currency);
-        this.updateAllPrices();
         this.updateSelectorUI();
-        this.closeDropdown();
+        this.updateAllPrices();
     }
 
     /**
-     * Update currency selector UI
+     * Update currency selector UI (Tailwind version)
      */
     updateSelectorUI() {
-        const selectedDisplay = document.querySelector('.currency-selected');
-        const currencyItems = document.querySelectorAll('.currency-item');
-
-        if (selectedDisplay && this.currencies[this.currentCurrency]) {
-            const current = this.currencies[this.currentCurrency];
-            selectedDisplay.innerHTML = `
-                <span class="currency-flag">${current.flag}</span>
-                <span class="currency-code">${current.code}</span>
-                <span class="currency-arrow">▼</span>
-            `;
+        if (!this.currencies[this.currentCurrency]) {
+            console.error('Currency data not found for:', this.currentCurrency);
+            return;
         }
 
-        // Update active state
-        currencyItems.forEach(item => {
-            if (item.getAttribute('data-currency') === this.currentCurrency) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
+        const current = this.currencies[this.currentCurrency];
+        console.log('Updating selector to:', current);
+
+        // Find and update all currency selector buttons
+        const buttons = document.querySelectorAll('button');
+
+        buttons.forEach(button => {
+            // Check if this is a currency button by looking for flag and code spans
+            const flagSpan = button.querySelector('.text-lg.leading-none');
+            const codeSpan = button.querySelector('.font-semibold');
+            const svgIcon = button.querySelector('svg');
+
+            // If it has all three elements, it's probably our currency button
+            if (flagSpan && codeSpan && svgIcon) {
+                flagSpan.textContent = current.flag;
+                codeSpan.textContent = current.code;
             }
         });
 
-        console.log('Currency selector updated to:', this.currentCurrency);
-    }
+        // Update active state on dropdown items
+        const currencyItems = document.querySelectorAll('.currency-item');
+        currencyItems.forEach(item => {
+            const itemCurrency = item.getAttribute('data-currency');
+            if (itemCurrency === this.currentCurrency) {
+                item.classList.add('bg-blue-50');
+                // Add checkmark if not present
+                if (!item.querySelector('.checkmark-icon')) {
+                    const check = document.createElement('span');
+                    check.className = 'checkmark-icon ml-auto text-blue-600 font-bold';
+                    check.textContent = '✓';
+                    item.appendChild(check);
+                }
+            } else {
+                item.classList.remove('bg-blue-50');
+                // Remove checkmark
+                const check = item.querySelector('.checkmark-icon');
+                if (check) check.remove();
+            }
+        });
 
-    /**
-     * Close dropdown
-     */
-    closeDropdown() {
-        const dropdown = document.querySelector('.currency-dropdown');
-        if (dropdown) {
-            dropdown.classList.remove('show');
-        }
+        console.log('Currency selector UI updated to:', this.currentCurrency);
     }
 }
 
@@ -231,12 +237,4 @@ if (document.readyState === 'loading') {
     });
 } else {
     window.currencyConverter = new CurrencyConverter();
-}
-
-// Toggle dropdown function (called from HTML)
-function toggleCurrencyDropdown() {
-    const dropdown = document.querySelector('.currency-dropdown');
-    if (dropdown) {
-        dropdown.classList.toggle('show');
-    }
 }
