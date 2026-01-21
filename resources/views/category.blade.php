@@ -326,5 +326,8 @@
       }
     });
   </script>
+  
+  <!-- Currency Converter Script -->
+  <script src="{{ asset('js/currency-converter.js') }}"></script>
 </body>
 </html>
