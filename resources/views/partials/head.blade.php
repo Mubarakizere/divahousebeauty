@@ -17,7 +17,7 @@
     <meta property="og:image:height" content="630" />
     <meta property="og:url" content="{{ url()->current() }}" />
     <meta property="og:type" content="website" />
-
+    <meta name="google-site-verification" content="42_XUFLKGXoph33K7-fbfNzwRUFnFvInTzPQCuIJLYM" />
     <!-- Theme Color -->
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-title" content="Diva House Beauty">
