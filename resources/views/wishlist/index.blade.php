@@ -37,9 +37,11 @@
     /* Small helpers */
     .badge { display: inline-flex; align-items: center; font-weight: 600; line-height: 1; padding: .35rem .65rem; font-size: .65rem; letter-spacing: 0.05em; text-transform: uppercase; }
     .badge-new { background: var(--black); color: #fff; }
-    .badge-sale { background: #9F1239; color: #fff; }
     .line-through { text-decoration: line-through; }
   </style>
+
+  <!-- Currency Converter Styles -->
+  <link rel="stylesheet" href="{{ asset('css/currency-styles.css') }}">
 </head>
 
 <body class="bg-[#fafafa] text-slate-700 antialiased"
@@ -180,5 +182,9 @@
       {{ session('message') ?? session('error') }}
     </div>
   @endif
+
+
+  <!-- Currency Converter Script -->
+  <script src="{{ asset('js/currency-converter.js') }}"></script>
 </body>
 </html>

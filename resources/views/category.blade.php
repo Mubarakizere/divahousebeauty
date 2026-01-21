@@ -62,6 +62,9 @@
         transform: translateY(-1px);
     }
   </style>
+
+  <!-- Currency Converter Styles -->
+  <link rel="stylesheet" href="{{ asset('css/currency-styles.css') }}">
 </head>
 
 <body class="bg-[#fafafa] text-slate-700 antialiased"

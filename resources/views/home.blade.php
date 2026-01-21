@@ -68,6 +68,9 @@
         transform: translateY(-1px);
     }
   </style>
+
+  <!-- Currency Converter Styles -->
+  <link rel="stylesheet" href="{{ asset('css/currency-styles.css') }}">
 </head>
 
 <body class="bg-[#fafafa] text-slate-700 antialiased"
@@ -385,5 +388,7 @@
   @include('partials.footer')
   @includeIf('partials.auth_modal')
 
+  <!-- Currency Converter Script -->
+  <script src="{{ asset('js/currency-converter.js') }}"></script>
 </body>
 </html>

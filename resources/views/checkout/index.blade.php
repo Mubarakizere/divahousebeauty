@@ -15,6 +15,9 @@
     :root{ --gold:#cc9966; --black:#111827; }
     .shadow-ring{ box-shadow:0 0 0 1px rgba(0,0,0,.05),0 6px 20px rgba(0,0,0,.08) }
   </style>
+
+  <!-- Currency Converter Styles -->
+  <link rel="stylesheet" href="{{ asset('css/currency-styles.css') }}">
 </head>
 
 <body class="bg-[#fafafa] text-slate-700 antialiased">
@@ -130,5 +133,8 @@
   </main>
   
   @include('partials.footer')
+
+  <!-- Currency Converter Script -->
+  <script src="{{ asset('js/currency-converter.js') }}"></script>
 </body>
 </html>
