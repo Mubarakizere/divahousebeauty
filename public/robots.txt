@@ -1,10 +1,32 @@
+# Diva House Beauty - Rwanda's #1 Cosmetics & Beauty E-commerce Store
+# Robots.txt - Optimized for Search Engine Crawling
+
 User-agent: *
 Allow: /
+Allow: /product/*
+Allow: /category/*
+Allow: /brand/*
+Allow: /deals
+Allow: /about
+Allow: /contact
+
+# Disallow private/system areas
 Disallow: /admin/
 Disallow: /cart
 Disallow: /checkout
 Disallow: /my-addresses
 Disallow: /dashboard
 Disallow: /payment/
+Disallow: /orders/
+Disallow: /wishlist
 
+# Allow CSS and JS for better rendering
+Allow: /css/
+Allow: /js/
+Allow: /assets/
+
+# Sitemap location
 Sitemap: https://divahousebeauty.com/sitemap.xml
+
+# Crawl delay (optional - prevents server overload)
+Crawl-delay: 1

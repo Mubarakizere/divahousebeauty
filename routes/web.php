@@ -41,6 +41,9 @@ Auth::routes();
 // =========================
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// SEO: Sitemap for search engines
+Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
     ->name('newsletter.subscribe');
 

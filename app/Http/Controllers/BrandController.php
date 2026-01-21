@@ -52,8 +52,22 @@ class BrandController extends Controller
         $products      = $productsQuery->paginate(12)->withQueryString();
         $shownProducts = $products->count();
 
+        // SEO Meta Tags for Brand
+        $seo = [
+            'title' => "Buy {$brand->name} in Rwanda - Authentic Products | Diva House Beauty",
+            'description' => "Shop authentic {$brand->name} products in Rwanda ✓ {$totalProducts}+ Products ✓ Fast Kigali Delivery ✓ 100% Genuine ✓ MTN & Airtel Money ✓ Rwanda's #1 Cosmetics Store",
+            'keywords' => "{$brand->name} Rwanda, buy {$brand->name} Kigali, {$brand->name} online Rwanda, authentic {$brand->name}, cosmetics Rwanda, beauty products Kigali",
+            'canonical' => route('brand.show', $brand->slug),
+            'og' => [
+                'title' => "{$brand->name} - Rwanda's Premier Beauty Store",
+                'description' => "Shop authentic {$brand->name} products in Rwanda. Fast Kigali delivery, trusted quality.",
+                'url' => route('brand.show', $brand->slug),
+                'type' => 'website',
+            ],
+        ];
+
         // Reuse the same page; pass $brand for header context
-        return view('category', compact('categories','brands','products','totalProducts','shownProducts','brand'))
+        return view('category', compact('categories','brands','products','totalProducts','shownProducts','brand','seo'))
                ->with('category', null);
     }
 

@@ -105,8 +105,22 @@ class CategoryController extends Controller
         $products      = $productsQuery->paginate(12)->withQueryString();
         $shownProducts = $products->count();
 
+        // SEO Meta Tags
+        $seo = null;
+        if ($category) {
+            $seo = \App\Helpers\SEOHelper::categoryMeta($category, $products);
+        } else {
+            // Generic category/shop page SEO
+            $seo = [
+                'title' => 'Shop All Products - Rwanda\'s #1 Cosmetics Store | Diva House Beauty',
+                'description' => 'Shop authentic beauty products and cosmetics in Rwanda ✓ 100+ Products ✓ Fast Kigali Delivery ✓ MTN & Airtel Money ✓ Trusted Quality ✓ Best Prices',
+                'keywords' => 'shop cosmetics Rwanda, beauty products Kigali, buy makeup online Rwanda, skincare Rwanda, Diva House Beauty',
+                'canonical' => route('category'),
+            ];
+        }
+
         return view('category', compact(
-            'category','categories','brands','products','totalProducts','shownProducts'
+            'category','categories','brands','products','totalProducts','shownProducts','seo'
         ))->with('brand', null);
     }
 
