@@ -4,6 +4,10 @@
   <meta charset="UTF-8"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  
+  {{-- Google Search Console Verification --}}
+  <meta name="google-site-verification" content="42_XUFLKGXoph33K7-fbfNzwRUFnFvInTzPQCuIJLYM" />
+  
   <title>Diva House Beauty - Premium Cosmetics & Fashion</title>
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
