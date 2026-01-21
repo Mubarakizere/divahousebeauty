@@ -100,6 +100,9 @@ Route::redirect('/home', '/');
 // Test page: only top bar + auth modal
 Route::view('/home2', 'home2')->name('home2');
 
+// Currency converter test page
+Route::view('/currency-test', 'currency-test')->name('currency.test');
+
 // =========================
 // 🧪 DEBUG / DIAGNOSTIC ROUTES
 // (keep or remove as needed)

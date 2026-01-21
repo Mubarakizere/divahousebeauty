@@ -18,11 +18,14 @@ class CurrencyConverter {
      * Initialize the currency converter
      */
     async init() {
+        console.log('Currency Converter initializing...');
         await this.fetchRates();
+        console.log('Rates loaded:', this.rates);
         this.attachEventListeners();
         this.updateAllPrices();
         this.updateSelectorUI();
         this.initialized = true;
+        console.log('Currency Converter initialized! Current currency:', this.currentCurrency);
     }
 
     /**
@@ -101,7 +104,7 @@ class CurrencyConverter {
     formatPrice(amount, currency = null) {
         const curr = currency || this.currentCurrency;
         const currencyData = this.currencies[curr] || { symbol: curr, decimals: 2 };
-        
+
         const decimals = currencyData.decimals;
         const formatted = amount.toLocaleString('en-US', {
             minimumFractionDigits: decimals,
@@ -120,28 +123,28 @@ class CurrencyConverter {
      */
     updateAllPrices() {
         const priceElements = document.querySelectorAll('.convertible-price, [data-price-rwf]');
-        
+
         priceElements.forEach(element => {
             const rwfAmount = parseFloat(element.getAttribute('data-price-rwf'));
-            
+
             if (!isNaN(rwfAmount)) {
                 // Add fade-out animation
                 element.style.opacity = '0.5';
-                
+
                 setTimeout(() => {
                     const converted = this.convert(rwfAmount);
                     const formatted = this.formatPrice(converted);
-                    
+
                     // Update the price text
                     if (element.classList.contains('convertible-price')) {
                         element.textContent = formatted;
                     } else {
                         element.innerHTML = formatted;
                     }
-                    
+
                     // Update currency attribute
                     element.setAttribute('data-currency', this.currentCurrency);
-                    
+
                     // Fade back in
                     element.style.opacity = '1';
                 }, 150);
@@ -155,7 +158,7 @@ class CurrencyConverter {
     attachEventListeners() {
         // Currency selector dropdown
         const currencyItems = document.querySelectorAll('.currency-item');
-        
+
         currencyItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -188,12 +191,13 @@ class CurrencyConverter {
     updateSelectorUI() {
         const selectedDisplay = document.querySelector('.currency-selected');
         const currencyItems = document.querySelectorAll('.currency-item');
-        
+
         if (selectedDisplay && this.currencies[this.currentCurrency]) {
             const current = this.currencies[this.currentCurrency];
             selectedDisplay.innerHTML = `
                 <span class="currency-flag">${current.flag}</span>
                 <span class="currency-code">${current.code}</span>
+                <span class="currency-arrow">▼</span>
             `;
         }
 
@@ -205,6 +209,8 @@ class CurrencyConverter {
                 item.classList.remove('active');
             }
         });
+
+        console.log('Currency selector updated to:', this.currentCurrency);
     }
 
     /**

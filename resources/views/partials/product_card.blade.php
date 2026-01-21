@@ -128,10 +128,10 @@
 
         <div class="flex items-center justify-center gap-3">
             @if($hasDiscount)
-                <span class="text-xs text-slate-400 line-through convertible-price" data-price-rwf="{{ $product->price }}" data-currency="USD"></span>
-                <span class="text-sm font-semibold text-[var(--black)] convertible-price" data-price-rwf="{{ $discountedPrice }}" data-currency="USD"></span>
+                <span class="text-xs text-slate-400 line-through convertible-price" data-price-rwf="{{ $product->price }}" data-currency="USD">Rw {{ number_format($product->price) }}</span>
+                <span class="text-sm font-semibold text-[var(--black)] convertible-price" data-price-rwf="{{ $discountedPrice }}" data-currency="USD">Rw {{ number_format($discountedPrice) }}</span>
             @else
-                <span class="text-sm font-semibold text-[var(--black)] convertible-price" data-price-rwf="{{ $product->price }}" data-currency="USD"></span>
+                <span class="text-sm font-semibold text-[var(--black)] convertible-price" data-price-rwf="{{ $product->price }}" data-currency="USD">Rw {{ number_format($product->price) }}</span>
             @endif
         </div>
     </div>
