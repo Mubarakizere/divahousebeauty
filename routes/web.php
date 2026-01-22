@@ -41,6 +41,9 @@ Auth::routes();
 // =========================
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// PWA Offline Page
+Route::view('/offline', 'offline')->name('offline');
+
 // SEO: Sitemap for search engines
 Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
 
