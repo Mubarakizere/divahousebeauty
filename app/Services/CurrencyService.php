@@ -145,6 +145,11 @@ class CurrencyService
             }
             
             $rates[self::BASE_CURRENCY] = 1.0;
+
+            // Fallback for KES if not in DB/API
+            if (empty($rates['KES'])) {
+                $rates['KES'] = 0.10; // Approx 1 RWF = 0.10 KES (1 KES = 10 RWF)
+            }
             
             return $rates;
         });
