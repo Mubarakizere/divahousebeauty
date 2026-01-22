@@ -190,7 +190,7 @@
                 </div>
 
                 <div class="mt-2 flex items-center justify-between">
-                  <div class="text-base font-bold text-slate-900">RWF {{ number_format($price, 0) }}</div>
+                  <div class="text-base font-bold text-slate-900 convertible-price" data-price-rwf="{{ $price }}" data-currency="USD">RWF {{ number_format($price, 0) }}</div>
                   <a href="{{ route('product', $slugOrId) }}"
                      class="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 text-[12px] font-semibold text-slate-700 hover:bg-slate-50">
                     View <i class="la la-arrow-right text-sm"></i>
