@@ -150,7 +150,7 @@
                             </div>
                           </div>
                         </td>
-                        <td class="px-6 py-4 text-right font-medium text-slate-600">Rw {{ number_format($item->price, 0) }}</td>
+                        <td class="px-6 py-4 text-right font-medium text-slate-600 convertible-price" data-price-rwf="{{ $item->price }}" data-currency="RWF">Rw {{ number_format($item->price, 0) }}</td>
                         <td class="px-6 py-4 text-center">
                           <input type="number" min="1"
                                  name="quantities[{{ $item->id }}]"
@@ -158,7 +158,7 @@
                                  class="qty-desktop w-16 text-center border-b border-slate-300 bg-transparent py-1 focus:outline-none focus:border-[var(--black)] transition-colors text-slate-700">
                         </td>
                         <td class="px-6 py-4 text-right font-bold text-[var(--black)]">
-                          Rw {{ number_format($rowTotal, 0) }}
+                          <span class="convertible-price" data-price-rwf="{{ $rowTotal }}" data-currency="RWF">Rw {{ number_format($rowTotal, 0) }}</span>
                         </td>
                         <td class="px-4 py-4 text-right">
                           <button type="button"
@@ -213,13 +213,13 @@
                         
                         <div class="flex items-end justify-between mt-3">
                            <div>
-                               <div class="text-xs text-slate-500 mb-1">Price: Rw {{ number_format($item->price, 0) }}</div>
+                               <div class="text-xs text-slate-500 mb-1 convertible-price" data-price-rwf="{{ $item->price }}" data-currency="RWF">Price: Rw {{ number_format($item->price, 0) }}</div>
                                <input type="number" min="1"
                                       name="quantities[{{ $item->id }}]"
                                       value="{{ (int)$item->quantity }}"
                                       class="qty-mobile w-16 text-center border border-slate-200 rounded py-1 text-sm bg-slate-50 focus:outline-none focus:border-[var(--black)]">
                            </div>
-                           <div class="text-sm font-bold text-[var(--black)]">
+                           <div class="text-sm font-bold text-[var(--black)] convertible-price" data-price-rwf="{{ $rowTotal }}" data-currency="RWF">
                                Rw {{ number_format($rowTotal, 0) }}
                            </div>
                         </div>
