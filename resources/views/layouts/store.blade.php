@@ -7,6 +7,28 @@
   <title>@yield('title', 'Diva House Beauty')</title>
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
+  {{-- PWA Meta Tags --}}
+  <meta name="theme-color" content="#C5A059">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Diva House Beauty">
+  
+  {{-- Manifest & Icons --}}
+  <link rel="manifest" href="{{ asset('manifest.json') }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/images/logo-loader.jpg') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon.ico') }}">
+
+  {{-- Service Worker Registration --}}
+  <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('✅ PWA Service Worker Registered!', reg.scope))
+                .catch(err => console.log('❌ PWA Service Worker Registration Failed:', err));
+        });
+    }
+  </script>
+
   {{-- Tailwind + Alpine --}}
   <script>
     tailwind = { config: { corePlugins: { preflight: false } } }
