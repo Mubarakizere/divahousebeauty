@@ -5,7 +5,7 @@ const CACHED_URLS = [
     OFFLINE_URL,
     '/',
     '/assets/images/logo-loader.jpg',
-    '/css/app.css',
+    '/css/currency-styles.css',
     '/js/currency-converter.js'
 ];
 

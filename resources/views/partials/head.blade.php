@@ -50,7 +50,7 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <!-- Custom App CSS (optional, if you add custom styles) -->
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('css/app.css') }}"> --}}
     
     <!-- Currency Converter Styles -->
     <link rel="stylesheet" href="{{ asset('css/currency-styles.css') }}">
