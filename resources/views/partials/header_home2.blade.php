@@ -18,6 +18,9 @@
   $count = isset($count) ? (int)$count : ($userId ? \App\Models\Cart::where('users_id',$userId)->count() : 0);
 @endphp
 
+{{-- ===================== GLOBAL LOADER ===================== --}}
+@include('partials.loader')
+
 {{-- ===================== TOP STRIP ===================== --}}
 <div class="bg-white border-b border-slate-200">
   <div class="mx-auto max-w-7xl px-3 sm:px-4 py-2 flex items-center justify-between">
