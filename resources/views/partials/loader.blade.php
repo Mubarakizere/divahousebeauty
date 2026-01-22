@@ -1,16 +1,17 @@
 <div id="global-loader" 
-     class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center transition-opacity duration-500 ease-in-out">
+     class="fixed inset-0 z-[9999] bg-white w-screen h-screen flex flex-col items-center justify-center transition-opacity duration-500 ease-in-out">
     
     {{-- Logo Container with Pulse Animation --}}
-    <div class="relative mb-8 animate-pulse">
-        <img src="{{ asset('assets/images/demos/demo-14/logo.png') }}" 
+    <div class="relative animate-pulse mb-6">
+        <img src="{{ asset('assets/images/logo-loader.jpg') }}" 
              alt="Loading..." 
-             class="h-12 w-auto object-contain">
+             style="max-height: 80px; width: auto;"
+             class="object-contain">
     </div>
 
     {{-- Progress Bar --}}
-    <div class="w-48 h-1 bg-slate-100 rounded-full overflow-hidden">
-        <div class="h-full bg-[var(--gold)] animate-[progress_1.5s_ease-in-out_infinite] w-full origin-left scale-x-0"></div>
+    <div class="w-16 h-0.5 bg-slate-100 rounded-full overflow-hidden">
+        <div class="h-full bg-[var(--gold)] animate-[progress_1s_ease-in-out_infinite] w-full origin-left scale-x-0"></div>
     </div>
 </div>
 
