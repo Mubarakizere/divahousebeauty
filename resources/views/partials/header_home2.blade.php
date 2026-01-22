@@ -134,13 +134,13 @@
               </div>
             </a>
             
-            <a href="#" @click.prevent="window.currencyConverter?.changeCurrency('GBP'); currOpen = false" 
+            <a href="#" @click.prevent="window.currencyConverter?.changeCurrency('KES'); currOpen = false" 
                class="currency-item flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors duration-150" 
-               data-currency="GBP">
-              <span class="text-2xl leading-none">🇬🇧</span>
+               data-currency="KES">
+              <span class="text-2xl leading-none">🇰🇪</span>
               <div class="flex-1">
-                <div class="font-semibold text-gray-900 text-sm">GBP</div>
-                <div class="text-xs text-gray-500">British Pound</div>
+                <div class="font-semibold text-gray-900 text-sm">KES</div>
+                <div class="text-xs text-gray-500">Kenyan Shilling</div>
               </div>
             </a>
             

@@ -385,6 +385,7 @@
 
   {{-- FOOTER & AUTH MODAL --}}
 
+  @include('partials.currency_modal')
   @include('partials.footer')
   @includeIf('partials.auth_modal')
 

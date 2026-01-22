@@ -64,11 +64,11 @@ class CurrencyConverter {
             this.currencies = JSON.parse(cachedData);
         } else {
             // Hardcoded fallback rates (use your actual rates from API)
-            this.rates = { USD: 0.0006848, EUR: 0.00058567, GBP: 0.00050969, RWF: 1 };
+            this.rates = { USD: 0.0006848, EUR: 0.00058567, KES: 0.11, RWF: 1 };
             this.currencies = {
                 USD: { code: 'USD', symbol: '$', name: 'US Dollar', flag: '🇺🇸', decimals: 2 },
                 EUR: { code: 'EUR', symbol: '€', name: 'Euro', flag: '🇪🇺', decimals: 2 },
-                GBP: { code: 'GBP', symbol: '£', name: 'British Pound', flag: '🇬🇧', decimals: 2 },
+                KES: { code: 'KES', symbol: 'KSh', name: 'Kenyan Shilling', flag: '🇰🇪', decimals: 0 },
                 RWF: { code: 'RWF', symbol: 'RWF', name: 'Rwandan Franc', flag: '🇷🇼', decimals: 0 }
             };
         }

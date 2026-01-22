@@ -233,6 +233,7 @@
 
 @include('partials.services_grid')
 @include('partials.whyus')
+@include('partials.currency_modal')
 @include('partials.footer')
 {{-- ===================== AUTH MODAL (Sign In / Register) ===================== --}}
 <div x-show="authOpen" x-transition.opacity class="fixed inset-0 z-40 bg-black/40"></div>
