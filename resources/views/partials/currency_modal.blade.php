@@ -48,11 +48,11 @@ style="display: none;">
                 <span class="text-xs text-slate-500">US Dollar</span>
             </button>
 
-            <button @click="selectCurrency('KES')" 
+            <button @click="selectCurrency('GBP')" 
                     class="flex flex-col items-center justify-center p-4 rounded-lg border border-slate-200 hover:border-[var(--gold)] hover:bg-yellow-50/30 transition-all group">
-                <span class="text-4xl mb-2 grayscale group-hover:grayscale-0 transition-all">🇰🇪</span>
-                <span class="font-bold text-slate-800">KES</span>
-                <span class="text-xs text-slate-500">Kenyan Shilling</span>
+                <span class="text-4xl mb-2 grayscale group-hover:grayscale-0 transition-all">🇬🇧</span>
+                <span class="font-bold text-slate-800">GBP</span>
+                <span class="text-xs text-slate-500">British Pound</span>
             </button>
 
             <button @click="selectCurrency('EUR')" 

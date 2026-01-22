@@ -64,11 +64,11 @@ class CurrencyConverter {
             this.currencies = JSON.parse(cachedData);
         } else {
             // Hardcoded fallback rates (use your actual rates from API)
-            this.rates = { USD: 0.0006848, EUR: 0.00058567, KES: 0.11, RWF: 1 };
+            this.rates = { USD: 0.0006848, EUR: 0.00058567, GBP: 0.00050969, RWF: 1 };
             this.currencies = {
                 USD: { code: 'USD', symbol: '$', name: 'US Dollar', flag: '🇺🇸', decimals: 2 },
                 EUR: { code: 'EUR', symbol: '€', name: 'Euro', flag: '🇪🇺', decimals: 2 },
-                KES: { code: 'KES', symbol: 'KSh', name: 'Kenyan Shilling', flag: '🇰🇪', decimals: 0 },
+                GBP: { code: 'GBP', symbol: '£', name: 'British Pound', flag: '🇬🇧', decimals: 2 },
                 RWF: { code: 'RWF', symbol: 'RWF', name: 'Rwandan Franc', flag: '🇷🇼', decimals: 0 }
             };
         }
@@ -138,7 +138,18 @@ class CurrencyConverter {
                     const formatted = this.formatPrice(converted);
 
                     // Update the price text
-                    element.textContent = formatted;
+                    if (this.currentCurrency === 'RWF') {
+                        element.textContent = formatted;
+                    } else {
+                        // Dual Price Display: Converted Price + Original RWF Price underneath
+                        const rwfFormatted = this.formatPrice(rwfAmount, 'RWF');
+                        element.innerHTML = `
+                            <div>${formatted}</div>
+                            <div class="text-[10px] sm:text-xs font-normal text-slate-400 mt-0.5 line-through decoration-slate-300 decoration-1 opacity-70">
+                                ${rwfFormatted}
+                            </div>
+                        `;
+                    }
 
                     // Update currency attribute
                     element.setAttribute('data-currency', this.currentCurrency);

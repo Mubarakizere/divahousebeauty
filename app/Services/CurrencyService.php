@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Cache;
 class CurrencyService
 {
     private const API_URL = 'https://v6.exchangerate-api.com/v6/';
-    private const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'KES', 'RWF'];
+    private const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'RWF'];
     private const BASE_CURRENCY = 'RWF';
 
     /**
@@ -175,12 +175,12 @@ class CurrencyService
                 'flag' => '🇪🇺',
                 'decimals' => 2,
             ],
-            'KES' => [
-                'code' => 'KES',
-                'symbol' => 'KSh',
-                'name' => 'Kenyan Shilling',
-                'flag' => '🇰🇪',
-                'decimals' => 0,
+            'GBP' => [
+                'code' => 'GBP',
+                'symbol' => '£',
+                'name' => 'British Pound',
+                'flag' => '🇬🇧',
+                'decimals' => 2,
             ],
             'RWF' => [
                 'code' => 'RWF',
