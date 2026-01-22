@@ -101,6 +101,7 @@ Route::redirect('/home', '/');
 Route::view('/home2', 'home2')->name('home2');
 
 Route::view('/currency-test', 'currency-test')->name('currency.test');
+Route::view('/offline', 'offline')->name('offline');
 
 // =========================
 // 🧪 DEBUG / DIAGNOSTIC ROUTES
