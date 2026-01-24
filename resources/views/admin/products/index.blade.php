@@ -355,11 +355,18 @@
                         </div>
 
                         <div class="shrink-0 w-full sm:w-auto flex flex-col items-stretch sm:items-end gap-3">
-                            <a href="{{ route('admin.products.create') }}"
-                               class="inline-flex items-center justify-center rounded-lg bg-white/90 px-4 py-2 text-sm font-medium text-gray-900 shadow-card hover:bg-white focus:outline-none focus:ring-2 focus:ring-white/60 focus:ring-offset-2 focus:ring-offset-indigo-700 transition">
-                                <i class="fa-solid fa-plus mr-2 text-[12px]"></i>
-                                Add Product
-                            </a>
+                            <div class="flex gap-2">
+                                <a href="{{ route('admin.products.import') }}"
+                                   class="inline-flex items-center justify-center rounded-lg bg-green-500/90 px-4 py-2 text-sm font-medium text-white shadow-card hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-white/60 focus:ring-offset-2 focus:ring-offset-indigo-700 transition">
+                                    <i class="fa-solid fa-file-excel mr-2 text-[12px]"></i>
+                                    Import
+                                </a>
+                                <a href="{{ route('admin.products.create') }}"
+                                   class="inline-flex items-center justify-center rounded-lg bg-white/90 px-4 py-2 text-sm font-medium text-gray-900 shadow-card hover:bg-white focus:outline-none focus:ring-2 focus:ring-white/60 focus:ring-offset-2 focus:ring-offset-indigo-700 transition">
+                                    <i class="fa-solid fa-plus mr-2 text-[12px]"></i>
+                                    Add Product
+                                </a>
+                            </div>
                             <p class="text-[11px] text-white/70 leading-tight text-center sm:text-right">
                                 Keep catalog fresh, updated and accurate ✨
                             </p>

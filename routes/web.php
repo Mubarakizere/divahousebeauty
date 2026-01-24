@@ -291,6 +291,14 @@ Route::middleware(['auth', 'admin'])
         Route::delete('/products/{product}/images/{index}', [AdminProductController::class, 'deleteImage'])
             ->name('admin.products.deleteImage');
 
+        // Product Import Routes
+        Route::get('/products-import', [\App\Http\Controllers\Admin\ProductImportController::class, 'showForm'])
+            ->name('admin.products.import');
+        Route::post('/products-import', [\App\Http\Controllers\Admin\ProductImportController::class, 'import'])
+            ->name('admin.products.import.process');
+        Route::get('/products-import/template', [\App\Http\Controllers\Admin\ProductImportController::class, 'downloadTemplate'])
+            ->name('admin.products.import.template');
+
         // Admin Brands (slug-based, no show)
         Route::resource('brands', AdminBrandController::class)
             ->scoped(['brand' => 'slug'])
