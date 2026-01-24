@@ -479,8 +479,17 @@
                                             <div class="text-[11px] text-gray-500">ID: {{ $product->id }}</div>
                                         </div>
 
-                                        <div class="text-center font-semibold text-gray-900">
-                                            {{ number_format($product->price) }}
+                                        <div class="text-center">
+                                            @if($product->shipping_type === 'both')
+                                                <div class="text-[11px] text-blue-600 font-medium"><i class="fa-solid fa-bolt text-[9px]"></i> {{ number_format($product->express_price) }}</div>
+                                                <div class="text-[11px] text-green-600 font-medium"><i class="fa-solid fa-clock text-[9px]"></i> {{ number_format($product->standard_price ?? 0) }}</div>
+                                            @elseif($product->shipping_type === 'standard_only')
+                                                <div class="font-semibold text-gray-900">{{ number_format($product->standard_price ?? 0) }}</div>
+                                                <span class="text-[10px] text-green-600"><i class="fa-solid fa-clock"></i> Std</span>
+                                            @else
+                                                <div class="font-semibold text-gray-900">{{ number_format($product->express_price) }}</div>
+                                                <span class="text-[10px] text-blue-600"><i class="fa-solid fa-bolt"></i> Exp</span>
+                                            @endif
                                         </div>
 
                                         <div class="text-center">
@@ -546,7 +555,20 @@
                                                 </div>
 
                                                 <div class="mt-1 flex flex-wrap text-[12px] text-gray-600 gap-x-4 gap-y-1">
-                                                    <span><span class="text-gray-500">Price:</span> <span class="font-semibold text-gray-900">{{ number_format($product->price) }} RWF</span></span>
+                                                    <span class="flex items-center gap-1">
+                                                        <span class="text-gray-500">Price:</span>
+                                                        @if($product->shipping_type === 'both')
+                                                            <span class="text-blue-600 font-semibold"><i class="fa-solid fa-bolt text-[9px]"></i> {{ number_format($product->express_price) }}</span>
+                                                            <span class="text-gray-400">/</span>
+                                                            <span class="text-green-600 font-semibold"><i class="fa-solid fa-clock text-[9px]"></i> {{ number_format($product->standard_price ?? 0) }}</span>
+                                                        @elseif($product->shipping_type === 'standard_only')
+                                                            <span class="font-semibold text-gray-900">{{ number_format($product->standard_price ?? 0) }} RWF</span>
+                                                            <span class="text-green-600 text-[10px]"><i class="fa-solid fa-clock"></i></span>
+                                                        @else
+                                                            <span class="font-semibold text-gray-900">{{ number_format($product->express_price) }} RWF</span>
+                                                            <span class="text-blue-600 text-[10px]"><i class="fa-solid fa-bolt"></i></span>
+                                                        @endif
+                                                    </span>
                                                     <span class="flex items-center gap-1">
                                                         <span class="text-gray-500">Stock:</span>
                                                         <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[11px] font-semibold

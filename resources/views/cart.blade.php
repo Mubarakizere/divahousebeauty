@@ -147,6 +147,12 @@
                               <a href="{{ route('product', $p->slug) }}" class="font-serif text-lg text-[var(--black)] hover:text-[var(--gold)] transition-colors leading-tight block mb-1">
                                 {{ $p->name }}
                               </a>
+                              @if($item->shipping_type)
+                                <span class="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full {{ $item->shipping_type === 'express' ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700' }}">
+                                  <i class="la {{ $item->shipping_type === 'express' ? 'la-bolt' : 'la-clock' }} mr-0.5"></i>
+                                  {{ $item->shipping_type === 'express' ? 'Express' : 'Standard' }}
+                                </span>
+                              @endif
                             </div>
                           </div>
                         </td>
@@ -205,6 +211,12 @@
                                 <a href="{{ route('product', $p->slug) }}" class="font-serif text-base text-[var(--black)] leading-tight block">
                                   {{ $p->name }}
                                 </a>
+                                @if($item->shipping_type)
+                                  <span class="inline-flex items-center text-[9px] px-1.5 py-0.5 rounded-full mt-1 {{ $item->shipping_type === 'express' ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700' }}">
+                                    <i class="la {{ $item->shipping_type === 'express' ? 'la-bolt' : 'la-clock' }} mr-0.5"></i>
+                                    {{ $item->shipping_type === 'express' ? 'Express' : 'Standard' }}
+                                  </span>
+                                @endif
                             </div>
                             <button type="button" class="text-slate-300 hover:text-rose-500" @click="removeId={{ $item->id }}; removeOpen=true">
                                 <i class="la la-times text-xl"></i>
