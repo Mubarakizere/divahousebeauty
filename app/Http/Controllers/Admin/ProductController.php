@@ -59,15 +59,24 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'        => ['required', 'string', 'max:255'],
-            'price'       => ['required', 'numeric'],
-            'stock'       => ['required', 'integer'],
-            'category_id' => ['required', 'exists:categories,id'],
-            'brand_id'    => ['nullable', 'exists:brands,id'],
-            'description' => ['nullable', 'string'],
+            'name'           => ['required', 'string', 'max:255'],
+            'express_price'  => ['required', 'numeric', 'min:0'],
+            'standard_price' => ['nullable', 'numeric', 'min:0'],
+            'shipping_type'  => ['required', 'in:both,express_only,standard_only'],
+            'stock'          => ['required', 'integer'],
+            'category_id'    => ['required', 'exists:categories,id'],
+            'brand_id'       => ['nullable', 'exists:brands,id'],
+            'description'    => ['nullable', 'string'],
             // 30MB per image (Laravel uses KB)
-            'images.*'    => ['nullable', 'image', 'max:30720'],
+            'images.*'       => ['nullable', 'image', 'max:30720'],
         ]);
+
+        // Validate standard_price is required when shipping_type is 'both' or 'standard_only'
+        if (in_array($validated['shipping_type'], ['both', 'standard_only']) && empty($validated['standard_price'])) {
+            return back()
+                ->withInput()
+                ->withErrors(['standard_price' => 'Standard price is required for this shipping type.']);
+        }
 
         // ✅ Defensive check: brand must belong to same category
         if (!empty($validated['brand_id'])) {
@@ -156,14 +165,23 @@ class ProductController extends Controller
 
         // ✅ STEP 2: normal update
         $validated = $request->validate([
-            'name'        => ['required', 'string', 'max:255'],
-            'price'       => ['required', 'numeric'],
-            'stock'       => ['required', 'integer'],
-            'category_id' => ['required', 'exists:categories,id'],
-            'brand_id'    => ['nullable', 'exists:brands,id'],
-            'description' => ['nullable', 'string'],
-            'images.*'    => ['nullable', 'image', 'max:30720'], // 30MB
+            'name'           => ['required', 'string', 'max:255'],
+            'express_price'  => ['required', 'numeric', 'min:0'],
+            'standard_price' => ['nullable', 'numeric', 'min:0'],
+            'shipping_type'  => ['required', 'in:both,express_only,standard_only'],
+            'stock'          => ['required', 'integer'],
+            'category_id'    => ['required', 'exists:categories,id'],
+            'brand_id'       => ['nullable', 'exists:brands,id'],
+            'description'    => ['nullable', 'string'],
+            'images.*'       => ['nullable', 'image', 'max:30720'], // 30MB
         ]);
+
+        // Validate standard_price is required when shipping_type is 'both' or 'standard_only'
+        if (in_array($validated['shipping_type'], ['both', 'standard_only']) && empty($validated['standard_price'])) {
+            return back()
+                ->withInput()
+                ->withErrors(['standard_price' => 'Standard price is required for this shipping type.']);
+        }
 
         // Defensive brand/category check
         if (!empty($validated['brand_id'])) {

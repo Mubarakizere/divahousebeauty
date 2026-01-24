@@ -69,7 +69,8 @@
                     Basic Information
                 </h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" x-data="{ shippingType: '{{ old('shipping_type', 'express_only') }}' }">
                     {{-- Product Name --}}
                     <div class="md:col-span-2">
                         <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
@@ -91,10 +92,37 @@
                         @enderror
                     </div>
 
-                    {{-- Price --}}
-                    <div>
-                        <label for="price" class="block text-sm font-medium text-gray-700 mb-2">
-                            Price (RWF) <span class="text-red-500">*</span>
+                    {{-- Shipping Type --}}
+                    <div class="md:col-span-2">
+                        <label for="shipping_type" class="block text-sm font-medium text-gray-700 mb-2">
+                            Shipping Options <span class="text-red-500">*</span>
+                        </label>
+                        <select
+                            name="shipping_type"
+                            id="shipping_type"
+                            x-model="shippingType"
+                            class="block w-full px-3 py-2 border {{ $errors->has('shipping_type') ? 'border-red-300 ring-red-500' : 'border-gray-300' }} rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required>
+                            <option value="express_only" {{ old('shipping_type') === 'express_only' ? 'selected' : '' }}>Express Only (Fast Delivery)</option>
+                            <option value="standard_only" {{ old('shipping_type') === 'standard_only' ? 'selected' : '' }}>Standard Only (7+ Days)</option>
+                            <option value="both" {{ old('shipping_type') === 'both' ? 'selected' : '' }}>Both Options (Customer Chooses)</option>
+                        </select>
+                        <p class="mt-1 text-xs text-gray-500">
+                            Choose which shipping/pricing options are available for this product.
+                        </p>
+                        @error('shipping_type')
+                            <p class="mt-2 text-sm text-red-600 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
+                    {{-- Express Price (Fast Delivery) --}}
+                    <div x-show="shippingType === 'express_only' || shippingType === 'both'">
+                        <label for="express_price" class="block text-sm font-medium text-gray-700 mb-2">
+                            Express Price (RWF) <span class="text-red-500">*</span>
+                            <span class="text-xs text-blue-600 font-normal ml-1">Fast Delivery</span>
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -102,16 +130,46 @@
                             </div>
                             <input
                                 type="number"
-                                name="price"
-                                id="price"
-                                class="block w-full pl-12 pr-3 py-2 border {{ $errors->has('price') ? 'border-red-300 ring-red-500' : 'border-gray-300' }} rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                value="{{ old('price') }}"
-                                required
+                                name="express_price"
+                                id="express_price"
+                                class="block w-full pl-12 pr-3 py-2 border {{ $errors->has('express_price') ? 'border-red-300 ring-red-500' : 'border-gray-300' }} rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                value="{{ old('express_price') }}"
+                                :required="shippingType === 'express_only' || shippingType === 'both'"
                                 min="0"
                                 step="1"
                                 placeholder="0">
                         </div>
-                        @error('price')
+                        @error('express_price')
+                            <p class="mt-2 text-sm text-red-600 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
+                    {{-- Standard Price (7+ Days) --}}
+                    <div x-show="shippingType === 'standard_only' || shippingType === 'both'">
+                        <label for="standard_price" class="block text-sm font-medium text-gray-700 mb-2">
+                            Standard Price (RWF) <span class="text-red-500">*</span>
+                            <span class="text-xs text-green-600 font-normal ml-1">7+ Days Delivery</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500 text-sm">RWF</span>
+                            </div>
+                            <input
+                                type="number"
+                                name="standard_price"
+                                id="standard_price"
+                                class="block w-full pl-12 pr-3 py-2 border {{ $errors->has('standard_price') ? 'border-red-300 ring-red-500' : 'border-gray-300' }} rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                value="{{ old('standard_price') }}"
+                                :required="shippingType === 'standard_only' || shippingType === 'both'"
+                                min="0"
+                                step="1"
+                                placeholder="0">
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Lower price for customers willing to wait.</p>
+                        @error('standard_price')
                             <p class="mt-2 text-sm text-red-600 flex items-center">
                                 <i class="fas fa-exclamation-circle mr-1"></i>
                                 {{ $message }}

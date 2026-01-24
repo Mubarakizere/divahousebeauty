@@ -158,45 +158,61 @@ class HomeController extends Controller
 
     // Add product to cart
     public function addcart(Request $request, $id)
-{
-    if (Auth::check()) {
-        $user = auth()->user();
-        $product = Product::find($id);
+    {
+        if (Auth::check()) {
+            $user = auth()->user();
+            $product = Product::find($id);
 
-        if (!$product) {
-            return redirect()->back()->with('error', 'Product not found');
+            if (!$product) {
+                return redirect()->back()->with('error', 'Product not found');
+            }
+
+            // Get shipping type from request (default to 'express')
+            $shippingType = $request->input('shipping_type', 'express');
+            
+            // Validate shipping type against product's available options
+            if ($shippingType === 'standard' && !$product->has_standard) {
+                $shippingType = 'express';
+            } elseif ($shippingType === 'express' && !$product->has_express) {
+                $shippingType = 'standard';
+            }
+
+            // Get the base price based on shipping type
+            $basePrice = $product->getEffectivePrice($shippingType);
+
+            // Check for active promotions (apply to the selected price)
+            $promotion = $product->promotion()
+                ->where('end_time', '>=', now())
+                ->first();
+
+            $discountedPrice = $promotion
+                ? $basePrice * (1 - $promotion->discount_percentage / 100)
+                : $basePrice;
+
+            // Log applied price for debugging
+            \Log::info('Applied Price:', [
+                'price' => $discountedPrice, 
+                'shipping_type' => $shippingType,
+                'base_price' => $basePrice
+            ]);
+
+            // Create new cart entry
+            $cart = new Cart;
+            $cart->users_id = $user->id;
+            $cart->product_id = $product->id;
+            $cart->product_title = $product->name;
+            $cart->price = $discountedPrice;
+            $cart->shipping_type = $shippingType;
+            $cart->quantity = $request->quantity ?? 1;
+            $cart->image = json_encode($product->images);
+            $cart->save();
+
+            return redirect()->back()->with('message', 'Product Added Successfully');
+        } else {
+            // Instead of redirecting to the login route, set the error message in the session
+            return redirect()->back()->with('error', 'You must log in first to add items to the cart');
         }
-
-        // Check for active promotions
-        $promotion = $product->promotion()
-    ->where('end_time', '>=', now())
-    ->first();
-
-        $discountedPrice = $promotion
-            ? $product->price * (1 - $promotion->discount_percentage / 100)
-            : $product->price;
-
-        // Log applied price for debugging
-        \Log::info('Applied Price:', ['price' => $discountedPrice]);
-
-        // Create new cart entry
-        $cart = new Cart;
-        $cart->users_id = $user->id;
-        $cart->product_id = $product->id;
-        $cart->product_title = $product->name;
-        $cart->price = $discountedPrice;
-        $cart->quantity = $request->quantity ?? 1;
-        $cart->image = json_encode($product->images);
-        $cart->save();
-
-        return redirect()->back()->with('message', 'Product Added Successfully');
-    } else {
-        // Instead of redirecting to the login route, set the error message in the session
-        return redirect()->back()->with('error', 'You must log in first to add items to the cart');
     }
-}
-
-
     // Show product details
     public function showProduct($id)
     {

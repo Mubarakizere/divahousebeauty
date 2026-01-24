@@ -17,16 +17,17 @@ class Product extends Model
     public const NEW_DAYS      = 7;
 
     protected $fillable = [
-        'name', 'slug', 'description', 'price', 'stock',
-        'category_id', 'brand_id', 'images',
+        'name', 'slug', 'description', 'express_price', 'standard_price', 
+        'shipping_type', 'stock', 'category_id', 'brand_id', 'images',
     ];
 
     protected $casts = [
-        'images'     => 'array',
-        'price'      => 'float',
-        'stock'      => 'int',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+        'images'         => 'array',
+        'express_price'  => 'float',
+        'standard_price' => 'float',
+        'stock'          => 'int',
+        'created_at'     => 'datetime',
+        'updated_at'     => 'datetime',
     ];
 
     protected $attributes = [
@@ -35,6 +36,8 @@ class Product extends Model
 
     protected $appends = [
         'formatted_price',
+        'formatted_express_price',
+        'formatted_standard_price',
         'is_on_sale',
         'sale_price',
         'first_image_url',
@@ -43,6 +46,8 @@ class Product extends Model
         'is_new',
         'average_rating',
         'review_count',
+        'has_express',
+        'has_standard',
     ];
 
     // If you later switch to {product:slug} binding, this makes it seamless
@@ -189,10 +194,59 @@ class Product extends Model
     public function firstImageUrl(): string { return $this->first_image_url; }
 
     // ── Pricing / Promotion ──────────────────────────────────────────
+    
+    /**
+     * Backward compatibility: 'price' now returns express_price
+     */
+    public function getPriceAttribute(): float
+    {
+        return (float) ($this->express_price ?? 0);
+    }
+
+    /**
+     * Check if product supports express shipping
+     */
+    public function getHasExpressAttribute(): bool
+    {
+        return in_array($this->shipping_type, ['both', 'express_only']);
+    }
+
+    /**
+     * Check if product supports standard shipping (7+ days)
+     */
+    public function getHasStandardAttribute(): bool
+    {
+        return in_array($this->shipping_type, ['both', 'standard_only']);
+    }
+
     public function getFormattedPriceAttribute(): string
     {
-        // RWF generally shown without decimals
-        return number_format((float) $this->price, 0) . ' RWF';
+        // RWF generally shown without decimals - returns express price
+        return number_format((float) $this->express_price, 0) . ' RWF';
+    }
+
+    public function getFormattedExpressPriceAttribute(): string
+    {
+        return number_format((float) ($this->express_price ?? 0), 0) . ' RWF';
+    }
+
+    public function getFormattedStandardPriceAttribute(): ?string
+    {
+        if (!$this->has_standard || $this->standard_price === null) {
+            return null;
+        }
+        return number_format((float) $this->standard_price, 0) . ' RWF';
+    }
+
+    /**
+     * Get the effective price based on shipping type selection
+     */
+    public function getEffectivePrice(string $shippingType = 'express'): float
+    {
+        if ($shippingType === 'standard' && $this->has_standard) {
+            return (float) ($this->standard_price ?? $this->express_price);
+        }
+        return (float) $this->express_price;
     }
 
     public function getIsOnSaleAttribute(): bool
@@ -212,7 +266,7 @@ class Product extends Model
         if (!$this->is_on_sale) return null;
 
         $discount = (float) ($this->promotion->discount_percentage ?? 0);
-        return round(((float) $this->price) * (1 - $discount / 100), 0);
+        return round(((float) $this->express_price) * (1 - $discount / 100), 0);
     }
 
     public function getInStockAttribute(): bool
