@@ -185,6 +185,12 @@
                         alt="{{ $product->name }}"
                         class="absolute inset-0 w-full h-full object-cover"
                         onerror="this.onerror=null; this.src='{{ asset('assets/images/default-product.jpg') }}'; this.style.objectFit='contain'; this.style.padding='2rem';">
+                   
+                   @if($product->is_new)
+                     <span class="absolute top-4 left-4 inline-flex items-center justify-center rounded-sm bg-[var(--gold)] px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-white shadow-sm z-10">
+                       New
+                     </span>
+                   @endif
                 </div>
 
               </div>
