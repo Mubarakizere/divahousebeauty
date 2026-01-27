@@ -35,7 +35,9 @@
                     <span class="badge badge-sale">-{{ $promotion->discount_percentage }}%</span>
                 @endif
                 @if($product->is_new)
-                    <span class="product-label label-new">New</span>
+                    <span class="inline-flex items-center justify-center rounded-sm bg-[var(--gold)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm">
+                        New
+                    </span>
                 @endif
             </div>
         </a>

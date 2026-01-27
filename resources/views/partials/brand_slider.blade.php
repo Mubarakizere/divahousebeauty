@@ -158,7 +158,7 @@
                 <a href="{{ route('product', $slugOrId) }}" class="block">
                   <img src="{{ $img }}" alt="{{ $p->name }}" loading="lazy" class="w-full h-44 sm:h-52 object-cover transition-transform duration-700 group-hover:scale-105">
                   @if($p->is_new)
-                    <span class="absolute right-2 top-2 inline-flex items-center rounded-md bg-[var(--gold)] px-2 py-0.5 text-[11px] font-semibold text-white z-10">
+                    <span class="absolute right-2 top-2 inline-flex items-center justify-center rounded-sm bg-[var(--gold)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm z-10">
                       New
                     </span>
                   @endif
