@@ -62,20 +62,20 @@ class CategoryController extends Controller
 
         // price range
         if ($minPrice !== null && $maxPrice !== null && $minPrice <= $maxPrice) {
-            $productsQuery->whereBetween('price', [$minPrice, $maxPrice]);
+            $productsQuery->whereBetween('express_price', [$minPrice, $maxPrice]);
         } elseif ($minPrice !== null) {
-            $productsQuery->where('price', '>=', $minPrice);
+            $productsQuery->where('express_price', '>=', $minPrice);
         } elseif ($maxPrice !== null) {
-            $productsQuery->where('price', '<=', $maxPrice);
+            $productsQuery->where('express_price', '<=', $maxPrice);
         }
 
         // sorting
         switch ($sortby) {
             case 'price_asc':  
-                $productsQuery->orderBy('price', 'asc'); 
+                $productsQuery->orderBy('express_price', 'asc'); 
                 break;
             case 'price_desc': 
-                $productsQuery->orderBy('price', 'desc'); 
+                $productsQuery->orderBy('express_price', 'desc'); 
                 break;
             case 'name':       
                 $productsQuery->orderBy('name', 'asc');   
