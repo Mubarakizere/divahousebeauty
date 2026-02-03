@@ -2,6 +2,7 @@
 <div x-show="authOpen" x-transition.opacity class="fixed inset-0 z-40 bg-black/40"></div>
 
 <section x-show="authOpen" x-transition
+         x-data="{ showPwdIn: false, showPwdUp: false }"
          role="dialog" aria-modal="true" aria-labelledby="authModalTitle"
          class="fixed inset-0 z-50 grid place-items-end md:place-items-center p-0 md:p-4">
   <div class="w-full md:max-w-lg bg-white border border-slate-100 shadow-ring rounded-t-2xl md:rounded-xl
@@ -39,7 +40,7 @@
           <input type="hidden" name="_tab" value="signin">
           <div>
             <label for="signin-email" class="block text-sm font-medium text-slate-700">Email *</label>
-            <input id="signin-email" name="email" type="email" autocomplete="email" required
+            <input id="signin-email" name="email" type="email" autocomplete="username" required
                    value="{{ old('email') }}"
                    class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none
                           focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold)]/30
@@ -50,7 +51,7 @@
           <div>
             <label for="signin-password" class="block text-sm font-medium text-slate-700">Password *</label>
             <div class="mt-1 relative">
-              <input :type="showPwdIn ? 'text':'password'"
+              <input :type="showPwdIn ? 'text':'password'" type="password"
                      id="signin-password" name="password" autocomplete="current-password" required
                      class="w-full rounded-md border border-slate-300 px-3 py-2 pr-10 text-sm outline-none
                             focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold)]/30
@@ -127,7 +128,7 @@
           <div>
             <label for="register-password-2" class="block text-sm font-medium text-slate-700">Password *</label>
             <div class="mt-1 relative">
-              <input :type="showPwdUp ? 'text':'password'"
+              <input :type="showPwdUp ? 'text':'password'" type="password"
                      id="register-password-2" name="password" autocomplete="new-password" required
                      class="w-full rounded-md border border-slate-300 px-3 py-2 pr-10 text-sm outline-none
                             focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold)]/30
