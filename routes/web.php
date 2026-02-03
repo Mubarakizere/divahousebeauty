@@ -161,7 +161,7 @@ Route::get('/test-order-lookup/{token}', function($token) {
 // =========================
 Route::group(['prefix' => 'payment'], function () {
     // Payment initiation
-    Route::post('/initiate', [PaymentController::class, 'initiate'])->name('payment.initiate');
+    Route::post('/initiate', [PaymentController::class, 'initiate'])->name('payment.public.initiate');
 
     // Payment iframe display
     Route::get('/iframe', [PaymentController::class, 'showIframe'])->name('payment.iframe');
@@ -170,8 +170,8 @@ Route::group(['prefix' => 'payment'], function () {
     Route::get('/status/{id}', [PaymentController::class, 'checkOrderStatus'])->name('payment.status');
 
     // Payment success/failure pages
-    Route::get('/success', [PaymentController::class, 'success'])->name('payment.success');
-    Route::get('/failed', [PaymentController::class, 'failed'])->name('payment.failed');
+    Route::get('/success', [PaymentController::class, 'success'])->name('payment.public.success');
+    Route::get('/failed', [PaymentController::class, 'failed'])->name('payment.public.failed');
 
     // Payment retry
     Route::get('/retry/{order}', [PaymentController::class, 'retryPayment'])->name('payment.retry');
