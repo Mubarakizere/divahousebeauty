@@ -230,6 +230,12 @@
                     Shop
                 </a>
             </li>
+            <li>
+                <a href="https://ihuriro.divahousebeauty.com/" target="_blank"
+                   class="nav-pill px-2 py-1 text-[11px] sm:px-3 sm:py-2 sm:text-sm whitespace-nowrap hover:bg-white/10 focus:bg-white/10">
+                    Ihuriro (Book Appointment)
+                </a>
+            </li>
 
             @foreach($categories as $cat)
                 <li class="relative"
