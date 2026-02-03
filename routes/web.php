@@ -262,8 +262,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('address.set-default');
 
     // Reviews
-    Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
-    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.product.store');
     Route::get('/products/{product}/can-review', [ReviewController::class, 'canReview'])->name('reviews.canReview');
 
     // Profile Management
