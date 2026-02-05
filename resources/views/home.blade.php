@@ -225,28 +225,7 @@
     </section>
     @endif
 
-    {{-- BEST SELLERS --}}
-    @if($bestSellers && $bestSellers->count() > 0)
-    <section class="py-12 bg-white">
-      <div class="mx-auto max-w-7xl px-3 sm:px-4">
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Best Sellers</h2>
-            <p class="text-sm text-slate-500 mt-1">Top-rated products loved by customers</p>
-          </div>
-          <a href="{{ route('category') }}" class="text-[var(--gold)] hover:underline text-sm font-medium">
-            View All <i class="la la-arrow-right"></i>
-          </a>
-        </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          @foreach($bestSellers as $product)
-          @include('partials.product_card', ['product' => $product])
-          @endforeach
-        </div>
-      </div>
-    </section>
-    @endif
 
     {{-- NEW ARRIVALS --}}
     @if($newArrivals && $newArrivals->count() > 0)

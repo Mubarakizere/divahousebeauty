@@ -105,7 +105,9 @@
               $brandName = $card['brandName'];
               $img = $resolveImg($p);
               $slugOrId = $p->slug ?? $p->id;
-              $price = (float)($p->price ?? 0);
+              $price = (float)$p->express_price > 0 
+                  ? (float)$p->express_price 
+                  : ((float)$p->standard_price > 0 ? (float)$p->standard_price : 0);
             @endphp
 
             <article class="snap-start w-64 sm:w-72 shrink-0 rounded-xl bg-white border border-slate-200 shadow-ring hover:shadow-lg transition-shadow"
@@ -190,7 +192,7 @@
                 </div>
 
                 <div class="mt-2 flex items-center justify-between">
-                  <div class="text-base font-bold text-slate-900 convertible-price" data-price-rwf="{{ $price }}" data-currency="USD">RWF {{ number_format($price, 0) }}</div>
+                  <div class="text-base font-bold text-slate-900 convertible-price" data-price-rwf="{{ $price }}" data-currency="RWF">RWF {{ number_format($price, 0) }}</div>
                   <a href="{{ route('product', $slugOrId) }}"
                      class="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 text-[12px] font-semibold text-slate-700 hover:bg-slate-50">
                     View <i class="la la-arrow-right text-sm"></i>

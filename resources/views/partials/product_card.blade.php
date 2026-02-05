@@ -5,9 +5,15 @@
     
     // Check for active promotion
     $promotion = $product->promotion()->where('end_time', '>=', now())->first();
+
+    // Fix for 0 prices: Use express_price if available, else standard_price
+    $displayPrice = (float)$product->express_price > 0 
+        ? (float)$product->express_price 
+        : ((float)$product->standard_price > 0 ? (float)$product->standard_price : 0);
+
     $discountedPrice = $promotion 
-        ? $product->price * (1 - $promotion->discount_percentage / 100) 
-        : $product->price;
+        ? $displayPrice * (1 - $promotion->discount_percentage / 100) 
+        : $displayPrice;
     $hasDiscount = $promotion && $promotion->discount_percentage > 0;
     
     // Check if in wishlist
@@ -130,10 +136,10 @@
 
         <div class="flex items-center justify-center gap-3">
             @if($hasDiscount)
-                <span class="text-xs text-slate-400 line-through convertible-price" data-price-rwf="{{ $product->price }}" data-currency="RWF">Rw {{ number_format($product->price) }}</span>
+                <span class="text-xs text-slate-400 line-through convertible-price" data-price-rwf="{{ $displayPrice }}" data-currency="RWF">Rw {{ number_format($displayPrice) }}</span>
                 <span class="text-sm font-semibold text-[var(--black)] convertible-price" data-price-rwf="{{ $discountedPrice }}" data-currency="RWF">Rw {{ number_format($discountedPrice) }}</span>
             @else
-                <span class="text-sm font-semibold text-[var(--black)] convertible-price" data-price-rwf="{{ $product->price }}" data-currency="RWF">Rw {{ number_format($product->price) }}</span>
+                <span class="text-sm font-semibold text-[var(--black)] convertible-price" data-price-rwf="{{ $displayPrice }}" data-currency="RWF">Rw {{ number_format($displayPrice) }}</span>
             @endif
         </div>
     </div>
