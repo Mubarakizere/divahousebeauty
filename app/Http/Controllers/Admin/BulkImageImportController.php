@@ -80,6 +80,8 @@ class BulkImageImportController extends Controller
      */
     public function saveCrop(Request $request)
     {
+        Log::info("saveCrop called for item_id: " . $request->item_id); // DEBUG LOG
+        
         $request->validate([
             'item_id' => 'required|exists:bulk_import_items,id',
             'crop_data' => 'required|string', // Base64 image data
