@@ -8,9 +8,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use thiagoalessio\TesseractOCR\TesseractOCR;
 
 class ProcessBulkImageJob implements ShouldQueue
 {
@@ -44,14 +44,13 @@ class ProcessBulkImageJob implements ShouldQueue
                 throw new \Exception("Image file not found: {$imagePath}");
             }
 
-            // Run Tesseract OCR
-            $ocr = new TesseractOCR($imagePath);
+            // Try Google Cloud Vision API first, then fallback to Tesseract
+            $text = $this->runGoogleVisionOCR($imagePath);
             
-            // Configure Tesseract for better accuracy
-            $ocr->psm(6); // Assume uniform block of text
-            $ocr->lang('eng'); // English language
-            
-            $text = $ocr->run();
+            if (empty($text)) {
+                // Fallback to Tesseract if available
+                $text = $this->runTesseractOCR($imagePath);
+            }
 
             Log::info("OCR Result for item {$this->item->id}: {$text}");
 
@@ -75,6 +74,123 @@ class ProcessBulkImageJob implements ShouldQueue
             $this->item->markAsFailed($e->getMessage());
             $this->item->batch->incrementProcessed(false);
         }
+    }
+
+    /**
+     * Run OCR using Google Cloud Vision API
+     */
+    protected function runGoogleVisionOCR(string $imagePath): ?string
+    {
+        $apiKey = config('services.google_vision.api_key');
+        
+        if (empty($apiKey)) {
+            Log::warning("Google Vision API key not configured");
+            return null;
+        }
+
+        try {
+            $imageContent = base64_encode(file_get_contents($imagePath));
+
+            $response = Http::timeout(30)->post(
+                "https://vision.googleapis.com/v1/images:annotate?key={$apiKey}",
+                [
+                    'requests' => [
+                        [
+                            'image' => [
+                                'content' => $imageContent,
+                            ],
+                            'features' => [
+                                [
+                                    'type' => 'TEXT_DETECTION',
+                                    'maxResults' => 10,
+                                ],
+                            ],
+                        ],
+                    ],
+                ]
+            );
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $textAnnotations = $data['responses'][0]['textAnnotations'] ?? [];
+                
+                if (!empty($textAnnotations)) {
+                    // First annotation contains the full text
+                    return $textAnnotations[0]['description'] ?? '';
+                }
+            } else {
+                Log::warning("Google Vision API error: " . $response->body());
+            }
+
+        } catch (\Exception $e) {
+            Log::error("Google Vision API exception: " . $e->getMessage());
+        }
+
+        return null;
+    }
+
+    /**
+     * Run OCR using Tesseract (fallback)
+     */
+    protected function runTesseractOCR(string $imagePath): string
+    {
+        // Check if Tesseract is available
+        $tesseractPath = $this->findTesseract();
+        
+        if (!$tesseractPath) {
+            Log::warning("Tesseract OCR not available on this system");
+            return '';
+        }
+
+        try {
+            $outputFile = sys_get_temp_dir() . '/' . uniqid('ocr_') . '.txt';
+            $outputBase = substr($outputFile, 0, -4); // Remove .txt extension
+            
+            $command = "\"{$tesseractPath}\" \"{$imagePath}\" \"{$outputBase}\" -l eng 2>&1";
+            exec($command, $output, $returnCode);
+
+            if ($returnCode === 0 && file_exists($outputFile)) {
+                $text = file_get_contents($outputFile);
+                unlink($outputFile);
+                return trim($text);
+            }
+
+            Log::warning("Tesseract command failed with code {$returnCode}: " . implode("\n", $output));
+            
+        } catch (\Exception $e) {
+            Log::error("Tesseract exception: " . $e->getMessage());
+        }
+
+        return '';
+    }
+
+    /**
+     * Find Tesseract executable path
+     */
+    protected function findTesseract(): ?string
+    {
+        // Common paths
+        $paths = [
+            '/usr/bin/tesseract',
+            '/usr/local/bin/tesseract',
+            'C:\\Program Files\\Tesseract-OCR\\tesseract.exe',
+            'C:\\Program Files (x86)\\Tesseract-OCR\\tesseract.exe',
+            'tesseract', // System PATH
+        ];
+
+        foreach ($paths as $path) {
+            if ($path === 'tesseract') {
+                // Check if in PATH
+                exec('which tesseract 2>/dev/null || where tesseract 2>nul', $output, $returnCode);
+                if ($returnCode === 0 && !empty($output)) {
+                    return trim($output[0]);
+                }
+            } elseif (file_exists($path)) {
+                return $path;
+            }
+        }
+
+        return null;
     }
 
     /**

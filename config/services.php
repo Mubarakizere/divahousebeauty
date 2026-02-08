@@ -61,4 +61,8 @@ return [
     'base_currency' => env('EXCHANGE_RATE_BASE_CURRENCY', 'RWF'),
 ],
 
+'google_vision' => [
+    'api_key' => env('GOOGLE_VISION_API_KEY'),
+],
+
 ];
