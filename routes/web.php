@@ -298,6 +298,20 @@ Route::middleware(['auth', 'admin'])
         Route::get('/products-import/template', [\App\Http\Controllers\Admin\ProductImportController::class, 'downloadTemplate'])
             ->name('admin.products.import.template');
 
+        // Bulk Image Import Routes
+        Route::prefix('bulk-import')->name('admin.bulk-import.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\BulkImageImportController::class, 'index'])->name('index');
+            Route::post('/upload', [\App\Http\Controllers\Admin\BulkImageImportController::class, 'upload'])->name('upload');
+            Route::get('/{batch}/crop', [\App\Http\Controllers\Admin\BulkImageImportController::class, 'cropPage'])->name('crop');
+            Route::post('/crop/save', [\App\Http\Controllers\Admin\BulkImageImportController::class, 'saveCrop'])->name('crop.save');
+            Route::post('/crop/auto', [\App\Http\Controllers\Admin\BulkImageImportController::class, 'cropAllAuto'])->name('crop.auto');
+            Route::get('/{batch}/preview', [\App\Http\Controllers\Admin\BulkImageImportController::class, 'preview'])->name('preview');
+            Route::patch('/items/{item}', [\App\Http\Controllers\Admin\BulkImageImportController::class, 'updateItem'])->name('items.update');
+            Route::get('/{batch}/progress', [\App\Http\Controllers\Admin\BulkImageImportController::class, 'batchProgress'])->name('progress');
+            Route::post('/{batch}/insert', [\App\Http\Controllers\Admin\BulkImageImportController::class, 'insertAll'])->name('insert');
+            Route::delete('/{batch}', [\App\Http\Controllers\Admin\BulkImageImportController::class, 'destroy'])->name('destroy');
+        });
+
         // Admin Brands (slug-based, no show)
         Route::resource('brands', AdminBrandController::class)
             ->scoped(['brand' => 'slug'])
