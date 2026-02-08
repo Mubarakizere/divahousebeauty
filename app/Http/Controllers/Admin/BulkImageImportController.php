@@ -326,8 +326,15 @@ class BulkImageImportController extends Controller
 
                 // Determine shipping type based on prices
                 $shippingType = 'express_only';
+                
                 if ($item->standard_price && $item->standard_price > 0) {
-                    $shippingType = 'both';
+                     // If express price is explicitly higher, it's 'both'
+                     // Otherwise (if equal or user didn't change it), allow 'standard_only'
+                     if ($item->express_price > $item->standard_price) {
+                         $shippingType = 'both';
+                     } else {
+                         $shippingType = 'standard_only';
+                     }
                 }
 
                 // Create product

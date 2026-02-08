@@ -92,8 +92,8 @@
                         <tr class="text-left text-xs font-medium text-gray-500 uppercase">
                             <th class="px-3 py-3 w-16">Image</th>
                             <th class="px-3 py-3 min-w-[150px]">Name</th>
-                            <th class="px-3 py-3 w-28">Express Price</th>
-                            <th class="px-3 py-3 w-28">Standard Price</th>
+                            <th class="px-3 py-3 w-28">Standard Price<br><span class="text-[10px] font-normal text-gray-400">(Calculated)</span></th>
+                            <th class="px-3 py-3 w-28">Express Price<br><span class="text-[10px] font-normal text-gray-400">(Manual)</span></th>
                             <th class="px-3 py-3 w-32">Category</th>
                             <th class="px-3 py-3 w-28">Brand</th>
                             <th class="px-3 py-3 w-16">Stock</th>
@@ -125,21 +125,21 @@
                             </td>
                             <td class="px-3 py-2">
                                 <input type="number" 
-                                       class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 express-price-input"
-                                       value="{{ $item->express_price }}"
-                                       data-field="express_price"
+                                       class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 standard-price-input bg-blue-50"
+                                       value="{{ $item->standard_price }}"
+                                       data-field="standard_price"
                                        min="0"
                                        step="1"
                                        placeholder="0">
                             </td>
                             <td class="px-3 py-2">
                                 <input type="number" 
-                                       class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 standard-price-input"
-                                       value="{{ $item->standard_price }}"
-                                       data-field="standard_price"
+                                       class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 express-price-input"
+                                       value="{{ $item->express_price }}"
+                                       data-field="express_price"
                                        min="0"
                                        step="1"
-                                       placeholder="0">
+                                       placeholder="Optional">
                             </td>
                             <td class="px-3 py-2">
                                 <select class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 category-select" data-field="category_id">

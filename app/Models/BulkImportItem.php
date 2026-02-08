@@ -71,17 +71,25 @@ class BulkImportItem extends Model
      * detected_price × 2 × 10 = RWF express price
      * Standard price = express price * 0.8 (20% cheaper)
      */
+    /**
+     * Calculate the final RWF price using the formula:
+     * detected_price × 2 × 10 = RWF standard price
+     * Express price defaults to standard price (user edits manually)
+     */
     public function calculatePrice(): void
     {
         if ($this->parsed_price !== null) {
-            // Express price: original × 2 × 10
-            $this->express_price = $this->parsed_price * 2 * 10;
+            // Standard price: original × 2 × 10 (User logic)
+            $this->standard_price = $this->parsed_price * 2 * 10;
             
-            // Standard price: 20% cheaper than express (for 7+ day delivery)
-            $this->standard_price = $this->express_price * 0.8;
+            // Express price: Default to standard price (placeholder)
+            // User will manually edit this if needed.
+            // Since express_price is required in DB, we populate it.
+            $this->express_price = $this->standard_price;
             
-            // Default to both shipping options
-            $this->shipping_type = 'both';
+            // Default to 'standard_only' since standard is the calculated base
+            // If user adds a higher express price, we'll detecting that during insert
+            $this->shipping_type = 'standard_only';
             
             $this->save();
         }
