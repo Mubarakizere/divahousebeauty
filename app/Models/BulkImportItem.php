@@ -106,8 +106,16 @@ class BulkImportItem extends Model
         }
 
         $text = trim($this->ocr_raw_text);
+
+        // 1. Clean up common OCR noise
+        // Remove timestamps (e.g., 20:15) used in some screenshots
+        $text = preg_replace('/\b\d{1,2}:\d{2}\b/', '', $text);
+        // Remove "<-" arrows often seen in screenshots
+        $text = str_replace(['<-', '->'], '', $text);
         
-        // Look for the @ separator
+        $text = trim($text);
+        
+        // 2. Look for the @ separator
         if (strpos($text, '@') !== false) {
             $parts = explode('@', $text, 2);
             
@@ -115,22 +123,40 @@ class BulkImportItem extends Model
             
             // Extract numeric value from price part
             $priceText = trim($parts[1]);
+            // Remove everything except numbers and dots
             $priceValue = preg_replace('/[^0-9.]/', '', $priceText);
             
             if (is_numeric($priceValue)) {
                 $this->parsed_price = (float) $priceValue;
                 $this->calculatePrice();
+                
+                $this->description = $this->parsed_name;
+                $this->status = 'ready';
+                $this->save();
+                
+                return true;
             }
-            
-            // Set description as name by default
-            $this->description = $this->parsed_name;
-            $this->status = 'ready';
-            $this->save();
-            
-            return true;
         }
 
-        // Try to find price patterns in text (e.g., "$25", "25.00", "RWF 5000")
+        // 3. Fallback: Try to find price patterns at the END of the string
+        // Matches: 100, 100.00, 100 RWF, etc. at the end
+        if (preg_match('/[\s@]+(\d+(?:[.,]\d{2})?)\s*(?:RWF|USD|KES)?$/i', $text, $matches)) {
+             $priceValue = str_replace(',', '.', $matches[1]);
+             $this->parsed_price = (float) $priceValue;
+             
+             // Name is everything before the match
+             $nameText = substr($text, 0, -strlen($matches[0]));
+             $this->parsed_name = trim($nameText) ?: $text;
+             
+             $this->calculatePrice();
+             $this->description = $this->parsed_name;
+             $this->status = 'ready';
+             $this->save();
+             
+             return true;
+        }
+
+        // 4. Fallback: Regex for price anywhere if strict end match fails
         preg_match('/[\$€£]?\s*(\d+(?:[.,]\d{2})?)\s*(?:RWF|USD|KES)?/i', $text, $matches);
         
         if (!empty($matches[1])) {
