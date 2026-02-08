@@ -215,6 +215,19 @@
                                                 : 'text-gray-400 group-hover:text-gray-300' }}"></i>
                                 <span>Orders</span>
                             </a>
+
+                            {{-- Bulk Image Import --}}
+                            <a href="{{ route('admin.bulk-import.index') }}"
+                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
+                                      {{ request()->is('admin/bulk-import*')
+                                            ? 'bg-gray-800 text-white'
+                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                                <i class="fas fa-file-image mr-3 h-5 w-5 flex-shrink-0
+                                          {{ request()->is('admin/bulk-import*')
+                                                ? 'text-white'
+                                                : 'text-gray-400 group-hover:text-gray-300' }}"></i>
+                                <span>Bulk Image Import</span>
+                            </a>
                         </div>
                     @endif
 
@@ -425,6 +438,19 @@
                                                     ? 'text-white'
                                                     : 'text-gray-400 group-hover:text-gray-300' }}"></i>
                                     <span>Orders</span>
+                                </a>
+
+                                {{-- Bulk Image Import --}}
+                                <a href="{{ route('admin.bulk-import.index') }}"
+                                   class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
+                                          {{ request()->is('admin/bulk-import*')
+                                                ? 'bg-gray-800 text-white'
+                                                : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                                    <i class="fas fa-file-image mr-3 h-6 w-6 flex-shrink-0
+                                              {{ request()->is('admin/bulk-import*')
+                                                    ? 'text-white'
+                                                    : 'text-gray-400 group-hover:text-gray-300' }}"></i>
+                                    <span>Bulk Image Import</span>
                                 </a>
                             </div>
                         @endif
