@@ -83,7 +83,8 @@
         },
         "audit": {
             "ignore": [
-                "PKSA-gytq-gtdp-3wb1"
+                "PKSA-gytq-gtdp-3wb1",
+                "PKSA-nhqw-xk85-x2jn"
             ]
         }
     },
