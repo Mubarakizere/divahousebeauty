@@ -154,8 +154,8 @@ function selectImage(itemId, imageUrl) {
     document.getElementById('currentImageName').textContent = 'Image #' + (itemIds.indexOf(itemId) + 1);
     
     // Initialize cropper
+    // Initialize cropper
     const cropImage = document.getElementById('cropImage');
-    cropImage.src = imageUrl;
     
     if (cropper) {
         cropper.destroy();
@@ -179,6 +179,9 @@ function selectImage(itemId, imageUrl) {
         document.getElementById('cropBtn').disabled = false;
         document.getElementById('nextBtn').disabled = false;
     };
+
+    // Set src after defining onload to avoid race conditions
+    cropImage.src = imageUrl;
 }
 
 function rotateCrop(degrees) {
