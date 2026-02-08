@@ -64,9 +64,10 @@
                 @foreach($items as $index => $item)
                 <div class="image-card relative cursor-pointer rounded-lg overflow-hidden border-2 border-transparent hover:border-blue-300 {{ $item->status === 'cropped' ? 'processed' : '' }}" 
                      data-item-id="{{ $item->id }}"
-                     data-image-url="{{ Storage::url($item->temp_image_path) }}"
-                     onclick="selectImage({{ $item->id }}, '{{ Storage::url($item->temp_image_path) }}')">
-                    <img src="{{ Storage::url($item->temp_image_path) }}" alt="Image {{ $index + 1 }}" class="w-full h-20 object-cover">
+                     data-item-id="{{ $item->id }}"
+                     data-image-url="/storage/{{ $item->temp_image_path }}"
+                     onclick="selectImage({{ $item->id }}, '/storage/{{ $item->temp_image_path }}')">
+                    <img src="/storage/{{ $item->temp_image_path }}" alt="Image {{ $index + 1 }}" class="w-full h-20 object-cover">
                     @if($item->status === 'cropped')
                     <div class="absolute inset-0 bg-green-500 bg-opacity-50 flex items-center justify-center">
                         <i class="fas fa-check text-white text-xl"></i>
