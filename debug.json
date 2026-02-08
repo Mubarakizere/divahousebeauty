@@ -1,0 +1,32 @@
+[
+    {
+        "input": "20:15 AO <- Almatic Cosme... @ 100",
+        "success": true,
+        "output": "Processing clean text: 'AO  Almatic Cosme... @ 100'\nSUCCESS (@ split): Name: 'AO  Almatic Cosme...', Price: 100\n"
+    },
+    {
+        "input": "Product Name @ 100",
+        "success": true,
+        "output": "Processing clean text: 'Product Name @ 100'\nSUCCESS (@ split): Name: 'Product Name', Price: 100\n"
+    },
+    {
+        "input": "Product Name @100",
+        "success": true,
+        "output": "Processing clean text: 'Product Name @100'\nSUCCESS (@ split): Name: 'Product Name', Price: 100\n"
+    },
+    {
+        "input": "20:15 Almatic @100",
+        "success": true,
+        "output": "Processing clean text: 'Almatic @100'\nSUCCESS (@ split): Name: 'Almatic', Price: 100\n"
+    },
+    {
+        "input": "20:15 Almatic 100",
+        "success": true,
+        "output": "Processing clean text: 'Almatic 100'\nSUCCESS (End Regex): Name: 'Almatic', Price: 100\n"
+    },
+    {
+        "input": "20:15 AO <- Almatic Cosme...",
+        "success": false,
+        "output": "Processing clean text: 'AO  Almatic Cosme...'\nFAILED: No price found.\n"
+    }
+]
