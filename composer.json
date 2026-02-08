@@ -80,6 +80,11 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true
+        },
+        "audit": {
+            "ignore": [
+                "PKSA-gytq-gtdp-3wb1"
+            ]
         }
     },
     "minimum-stability": "stable",
