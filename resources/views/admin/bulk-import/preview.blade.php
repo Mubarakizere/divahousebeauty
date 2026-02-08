@@ -244,9 +244,25 @@ function updateProgress(data) {
                 statusBadge.className = 'px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full status-badge';
                 statusBadge.innerHTML = 'Failed';
                 statusBadge.title = item.error_message;
-            } else if (item.status === 'processing' || item.status === 'ocr_complete') {
+            } else if (item.status === 'processing') {
                 statusBadge.className = 'px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full status-badge';
-                statusBadge.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                statusBadge.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing';
+            } else if (item.status === 'ocr_complete') {
+                statusBadge.className = 'px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full status-badge';
+                statusBadge.textContent = 'OCR Done';
+            }
+            
+            // Update OCR text preview in the name column
+            const ocrPreview = row.querySelector('.text-xs.text-gray-400');
+            if (ocrPreview) {
+                if (item.ocr_raw_text) {
+                    ocrPreview.textContent = 'OCR: ' + (item.ocr_raw_text.substring(0, 30) || '') + '...';
+                    ocrPreview.title = item.ocr_raw_text;
+                } else if (item.status === 'processing') {
+                    ocrPreview.textContent = 'Processing...';
+                } else {
+                    ocrPreview.textContent = 'No text found';
+                }
             }
         }
     });

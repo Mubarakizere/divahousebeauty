@@ -83,13 +83,22 @@ class ProcessBulkImageJob implements ShouldQueue
     {
         $apiKey = config('services.google_vision.api_key');
         
+        Log::info("Starting Google Vision OCR for item {$this->item->id}");
+
         if (empty($apiKey)) {
-            Log::warning("Google Vision API key not configured");
+            Log::warning("Google Vision API key not configured - Check config/services.php and .env");
             return null;
         }
 
         try {
+            if (!file_exists($imagePath)) {
+                Log::error("Image file not found at path: {$imagePath}");
+                return null;
+            }
+
             $imageContent = base64_encode(file_get_contents($imagePath));
+            
+            Log::info("Sending request to Google Vision API...");
 
             $response = Http::timeout(30)->post(
                 "https://vision.googleapis.com/v1/images:annotate?key={$apiKey}",
@@ -110,20 +119,30 @@ class ProcessBulkImageJob implements ShouldQueue
                 ]
             );
 
+            Log::info("Google Vision API Response Status: " . $response->status());
+            
             if ($response->successful()) {
                 $data = $response->json();
+                // Log the full response for debugging
+                Log::info("Google Vision API Response Body: " . json_encode($data));
+                
                 $textAnnotations = $data['responses'][0]['textAnnotations'] ?? [];
                 
                 if (!empty($textAnnotations)) {
-                    // First annotation contains the full text
-                    return $textAnnotations[0]['description'] ?? '';
+                    $text = $textAnnotations[0]['description'] ?? '';
+                    Log::info("Text extracted successfully: " . substr($text, 0, 50) . "...");
+                    return $text;
+                } else {
+                    Log::warning("Google Vision API returned success but no text annotations found.");
                 }
             } else {
-                Log::warning("Google Vision API error: " . $response->body());
+                Log::error("Google Vision API error: " . $response->body());
+                Log::error("Response Status: " . $response->status());
             }
 
         } catch (\Exception $e) {
             Log::error("Google Vision API exception: " . $e->getMessage());
+            Log::error($e->getTraceAsString());
         }
 
         return null;
