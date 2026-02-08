@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\ProcessBulkImageJob;
+use App\Models\Brand;
 use App\Models\BulkImportBatch;
 use App\Models\BulkImportItem;
 use App\Models\Category;
@@ -219,8 +220,9 @@ class BulkImageImportController extends Controller
     {
         $items = $batch->items()->orderBy('id')->get();
         $categories = Category::orderBy('name')->get();
+        $brands = Brand::orderBy('name')->get();
         
-        return view('admin.bulk-import.preview', compact('batch', 'items', 'categories'));
+        return view('admin.bulk-import.preview', compact('batch', 'items', 'categories', 'brands'));
     }
 
     /**
@@ -230,13 +232,21 @@ class BulkImageImportController extends Controller
     {
         $request->validate([
             'parsed_name' => 'nullable|string|max:255',
-            'calculated_price' => 'nullable|numeric|min:0',
+            'express_price' => 'nullable|numeric|min:0',
+            'standard_price' => 'nullable|numeric|min:0',
+            'category_id' => 'nullable|exists:categories,id',
+            'brand_id' => 'nullable|exists:brands,id',
+            'stock' => 'nullable|integer|min:0',
             'description' => 'nullable|string',
         ]);
 
         $item->update([
             'parsed_name' => $request->parsed_name,
-            'calculated_price' => $request->calculated_price,
+            'express_price' => $request->express_price,
+            'standard_price' => $request->standard_price,
+            'category_id' => $request->category_id,
+            'brand_id' => $request->brand_id,
+            'stock' => $request->stock ?? 10,
             'description' => $request->description ?? $request->parsed_name,
             'status' => 'ready',
         ]);
@@ -254,7 +264,7 @@ class BulkImageImportController extends Controller
     {
         $batch->refresh();
         
-        $items = $batch->items()->select('id', 'status', 'parsed_name', 'calculated_price', 'error_message')->get();
+        $items = $batch->items()->select('id', 'status', 'parsed_name', 'express_price', 'standard_price', 'error_message')->get();
 
         return response()->json([
             'batch' => [
@@ -276,12 +286,17 @@ class BulkImageImportController extends Controller
      */
     public function insertAll(Request $request, BulkImportBatch $batch)
     {
+        // Default category is optional now since items can have their own
         $request->validate([
-            'category_id' => 'required|exists:categories,id',
+            'default_category_id' => 'nullable|exists:categories,id',
+            'default_brand_id' => 'nullable|exists:brands,id',
+            'default_stock' => 'nullable|integer|min:0',
         ]);
 
         $items = $batch->items()->where('status', 'ready')->get();
-        $categoryId = $request->category_id;
+        $defaultCategoryId = $request->default_category_id;
+        $defaultBrandId = $request->default_brand_id;
+        $defaultStock = $request->default_stock ?? 10;
 
         $insertedCount = 0;
         $failedCount = 0;
@@ -295,21 +310,37 @@ class BulkImageImportController extends Controller
                     continue;
                 }
 
-                if (empty($item->calculated_price) || $item->calculated_price <= 0) {
-                    $item->markAsFailed('Valid price is required');
+                if (empty($item->express_price) || $item->express_price <= 0) {
+                    $item->markAsFailed('Valid express price is required');
                     $failedCount++;
                     continue;
+                }
+
+                // Get category from item or use default
+                $categoryId = $item->category_id ?? $defaultCategoryId;
+                if (!$categoryId) {
+                    $item->markAsFailed('Category is required');
+                    $failedCount++;
+                    continue;
+                }
+
+                // Determine shipping type based on prices
+                $shippingType = 'express_only';
+                if ($item->standard_price && $item->standard_price > 0) {
+                    $shippingType = 'both';
                 }
 
                 // Create product
                 $product = Product::create([
                     'name' => $item->parsed_name,
-                    'slug' => Str::slug($item->parsed_name) . '-' . Str::random(5),
                     'description' => $item->description ?? $item->parsed_name,
-                    'price' => $item->calculated_price,
-                    'stock' => 10, // Default stock
+                    'express_price' => $item->express_price,
+                    'standard_price' => $item->standard_price,
+                    'shipping_type' => $shippingType,
+                    'stock' => $item->stock ?? $defaultStock,
                     'category_id' => $categoryId,
-                    'images' => json_encode([$item->cropped_image_path]),
+                    'brand_id' => $item->brand_id ?? $defaultBrandId,
+                    'images' => [$item->cropped_image_path],
                 ]);
 
                 $item->markAsInserted($product->id);

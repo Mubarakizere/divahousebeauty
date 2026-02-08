@@ -18,8 +18,13 @@ class BulkImportItem extends Model
         'ocr_raw_text',
         'parsed_name',
         'parsed_price',
-        'calculated_price',
+        'express_price',
+        'standard_price',
+        'shipping_type',
         'description',
+        'category_id',
+        'brand_id',
+        'stock',
         'status',
         'error_message',
         'product_id',
@@ -27,7 +32,14 @@ class BulkImportItem extends Model
 
     protected $casts = [
         'parsed_price' => 'decimal:2',
-        'calculated_price' => 'decimal:2',
+        'express_price' => 'decimal:2',
+        'standard_price' => 'decimal:2',
+        'stock' => 'integer',
+    ];
+
+    protected $attributes = [
+        'shipping_type' => 'express_only',
+        'stock' => 10,
     ];
 
     // ── Relationships ────────────────────────────────────────────────
@@ -42,16 +54,35 @@ class BulkImportItem extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function brand(): BelongsTo
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
     // ── Price Calculation ────────────────────────────────────────────
 
     /**
      * Calculate the final RWF price using the formula:
-     * detected_price × 2 × 10 = RWF price
+     * detected_price × 2 × 10 = RWF express price
+     * Standard price = express price * 0.8 (20% cheaper)
      */
     public function calculatePrice(): void
     {
         if ($this->parsed_price !== null) {
-            $this->calculated_price = $this->parsed_price * 2 * 10;
+            // Express price: original × 2 × 10
+            $this->express_price = $this->parsed_price * 2 * 10;
+            
+            // Standard price: 20% cheaper than express (for 7+ day delivery)
+            $this->standard_price = $this->express_price * 0.8;
+            
+            // Default to both shipping options
+            $this->shipping_type = 'both';
+            
             $this->save();
         }
     }
@@ -91,7 +122,27 @@ class BulkImportItem extends Model
             return true;
         }
 
-        // If no @ found, use the whole text as name
+        // Try to find price patterns in text (e.g., "$25", "25.00", "RWF 5000")
+        preg_match('/[\$€£]?\s*(\d+(?:[.,]\d{2})?)\s*(?:RWF|USD|KES)?/i', $text, $matches);
+        
+        if (!empty($matches[1])) {
+            // Found a price pattern
+            $priceValue = str_replace(',', '.', $matches[1]);
+            $this->parsed_price = (float) $priceValue;
+            
+            // Remove the price from the text to get the name
+            $nameText = preg_replace('/[\$€£]?\s*\d+(?:[.,]\d{2})?\s*(?:RWF|USD|KES)?/i', '', $text);
+            $this->parsed_name = trim($nameText) ?: $text;
+            
+            $this->calculatePrice();
+            $this->description = $this->parsed_name;
+            $this->status = 'ready';
+            $this->save();
+            
+            return true;
+        }
+
+        // If no price found, use the whole text as name
         $this->parsed_name = $text;
         $this->description = $text;
         $this->status = 'ready';
