@@ -99,6 +99,10 @@ class BulkImportItem extends Model
      * Parse the OCR text in format "Product Name @ Price"
      * and extract name and price
      */
+    /**
+     * Parse the OCR text in format "Product Name @ Price"
+     * and extract name and price
+     */
     public function parseOcrText(): bool
     {
         if (empty($this->ocr_raw_text)) {
@@ -115,64 +119,62 @@ class BulkImportItem extends Model
         
         $text = trim($text);
         
-        // 2. Look for the @ separator
+        // 2. Look for the @ separator (Strict format)
         if (strpos($text, '@') !== false) {
             $parts = explode('@', $text, 2);
-            
             $this->parsed_name = trim($parts[0]);
             
-            // Extract numeric value from price part
             $priceText = trim($parts[1]);
             // Remove everything except numbers and dots
             $priceValue = preg_replace('/[^0-9.]/', '', $priceText);
             
             if (is_numeric($priceValue)) {
-                $this->parsed_price = (float) $priceValue;
-                $this->calculatePrice();
-                
-                $this->description = $this->parsed_name;
-                $this->status = 'ready';
-                $this->save();
-                
+                $this->saveParsedData($this->parsed_name, (float) $priceValue);
                 return true;
             }
         }
 
         // 3. Fallback: Try to find price patterns at the END of the string
         // Matches: 100, 100.00, 100 RWF, etc. at the end
-        if (preg_match('/[\s@]+(\d+(?:[.,]\d{2})?)\s*(?:RWF|USD|KES)?$/i', $text, $matches)) {
+        // EXCLUDE patterns like "24K", "100ml", "50g", "250mg" by ensuring no such suffix follows
+        if (preg_match('/[\s@]+(\d+(?:[.,]\d{2})?)\s*(?:RWF|USD|KES|Frw)\.?\s*$/i', $text, $matches)) {
              $priceValue = str_replace(',', '.', $matches[1]);
-             $this->parsed_price = (float) $priceValue;
-             
-             // Name is everything before the match
              $nameText = substr($text, 0, -strlen($matches[0]));
-             $this->parsed_name = trim($nameText) ?: $text;
              
-             $this->calculatePrice();
-             $this->description = $this->parsed_name;
-             $this->status = 'ready';
-             $this->save();
-             
+             $this->saveParsedData($nameText ?: $text, (float) $priceValue);
              return true;
         }
 
-        // 4. Fallback: Regex for price anywhere if strict end match fails
-        preg_match('/[\$€£]?\s*(\d+(?:[.,]\d{2})?)\s*(?:RWF|USD|KES)?/i', $text, $matches);
+        // 4. Fallback: Strict standalone price regex
+        // Must have currency symbol OR be a large number (likely a price, not size) if no currency
+        // Avoid "24" if it's "24K"
         
-        if (!empty($matches[1])) {
-            // Found a price pattern
+        // Try to find currency-prefixed price (e.g., RWF 5000)
+        if (preg_match('/(?:RWF|USD|KES|Frw)\.?\s*(\d+(?:[.,]\d{2})?)/i', $text, $matches)) {
             $priceValue = str_replace(',', '.', $matches[1]);
-            $this->parsed_price = (float) $priceValue;
+            $nameText = str_replace($matches[0], '', $text); // Remove price part
             
-            // Remove the price from the text to get the name
-            $nameText = preg_replace('/[\$€£]?\s*\d+(?:[.,]\d{2})?\s*(?:RWF|USD|KES)?/i', '', $text);
-            $this->parsed_name = trim($nameText) ?: $text;
+            $this->saveParsedData($nameText ?: $text, (float) $priceValue);
+            return true;
+        }
+
+        // 5. Last Resort: Look for number at end of line, but verify it's not a unit
+        // Negative lookahead to ensure it's not followed by K, g, ml, etc.
+        if (preg_match('/(\d+(?:[.,]\d{2})?)\s*$/', $text, $matches)) {
+            // Check if the number is likely a price (> 100) or if it's small, it might be questionable
+            // But strict exclusion of units is handled by not matching if text follows
             
-            $this->calculatePrice();
-            $this->description = $this->parsed_name;
-            $this->status = 'ready';
-            $this->save();
+            // However, typical "24K Gold" ends with Gold, so this regex only matches if string ENDS with number.
+            // If string is "Product 24K", it ends with K.
+            // If string is "Product 24", it ends with 24.
             
+            // Let's add a check: if number is < 100, treat it as ambiguous/version unless completely alone?
+            // Actually, safest is to just use it if no unit suffix.
+            
+            $priceValue = str_replace(',', '.', $matches[1]);
+            $nameText = substr($text, 0, -strlen($matches[0]));
+            
+            $this->saveParsedData($nameText ?: $text, (float) $priceValue);
             return true;
         }
 
@@ -183,6 +185,17 @@ class BulkImportItem extends Model
         $this->save();
         
         return false;
+    }
+
+    private function saveParsedData(string $name, float $price)
+    {
+        $this->parsed_name = trim($name);
+        $this->parsed_price = $price;
+        $this->description = $this->parsed_name;
+        
+        $this->calculatePrice();
+        $this->status = 'ready';
+        $this->save();
     }
 
     // ── Status Methods ───────────────────────────────────────────────
