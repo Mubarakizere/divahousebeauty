@@ -305,13 +305,22 @@
                         <i class="fas fa-images text-green-500 mr-2"></i>
                         Current Images
                         <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {{ count($product->images) }} images
+                            {{ count($product->images) }} image(s)
                         </span>
                     </h2>
 
+                    {{-- ✅ Clear notice: images are kept automatically --}}
+                    <div class="flex items-start gap-3 bg-green-50 border border-green-200 rounded-lg px-4 py-3 mb-4">
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 text-lg flex-shrink-0"></i>
+                        <div>
+                            <p class="text-sm font-semibold text-green-800">These images are saved and will be kept</p>
+                            <p class="text-xs text-green-700 mt-0.5">You can update any product detail below without touching these images. Only click <strong>Remove</strong> if you want to delete a specific image.</p>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                         @foreach($product->images as $index => $img)
-                            <div class="relative group bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                            <div class="relative bg-gray-50 rounded-lg border border-gray-200 overflow-hidden shadow-sm">
                                 <div class="aspect-square">
                                     <img
                                         src="{{ asset('storage/' . $img) }}"
@@ -320,77 +329,83 @@
                                     >
                                 </div>
 
-                                {{-- Overlay: remove button --}}
-                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-200 flex items-center justify-center">
+                                {{-- Badge + Remove always visible --}}
+                                <div class="p-2 bg-white border-t border-gray-100 flex items-center justify-between">
+                                    <div class="flex items-center gap-1">
+                                        <span class="text-xs text-gray-500 font-medium">#{{ $index + 1 }}</span>
+                                        @if($index === 0)
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-yellow-100 text-yellow-800">
+                                                Feature
+                                            </span>
+                                        @endif
+                                    </div>
                                     <form
                                         action="{{ route('admin.products.update', $product) }}"
                                         method="POST"
-                                        class="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                        onsubmit="return confirm('Remove this image?')"
+                                        onsubmit="return confirm('Remove this image permanently?')"
                                     >
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="remove_image" value="{{ $index }}">
                                         <button type="submit"
-                                                class="inline-flex items-center px-3 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors font-medium shadow-lg">
-                                            <i class="fas fa-trash mr-2"></i> Remove
+                                                class="inline-flex items-center px-2 py-1 bg-red-50 text-red-600 text-xs rounded hover:bg-red-100 hover:text-red-700 transition-colors font-medium border border-red-200">
+                                            <i class="fas fa-trash mr-1"></i> Remove
                                         </button>
                                     </form>
-                                </div>
-
-                                {{-- Index badge --}}
-                                <div class="absolute top-2 left-2 bg-white/90 text-gray-700 text-xs px-2 py-1 rounded-full font-medium flex items-center space-x-1">
-                                    <span>#{{ $index + 1 }}</span>
-                                    @if($index === 0)
-                                        <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-yellow-100 text-yellow-800">
-                                            Feature
-                                        </span>
-                                    @endif
                                 </div>
                             </div>
                         @endforeach
                     </div>
 
                     <p class="mt-3 text-xs text-gray-500">
-                        The <span class="font-semibold">first image</span> is treated as the feature image in listings.
+                        The <span class="font-semibold">first image</span> is used as the featured image in product listings.
                     </p>
                 </div>
             @endif
 
-            {{-- Add Images --}}
+            {{-- Add / Replace Images (optional) --}}
             <div class="pb-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <h2 class="text-lg font-semibold text-gray-900 mb-1 flex items-center">
                     <i class="fas fa-plus-circle text-pink-500 mr-2"></i>
-                    Add More Images
+                    {{ (is_array($product->images) && count($product->images)) ? 'Add More Images' : 'Upload Images' }}
+                    <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">Optional</span>
                 </h2>
+                <p class="text-xs text-gray-500 mb-4">
+                    {{ (is_array($product->images) && count($product->images)) ? 'Uploading here adds to existing images — nothing is overwritten.' : 'Upload images for this product.' }}
+                </p>
 
-                <label for="images" class="block text-sm font-medium text-gray-700 mb-2">
-                    Upload Additional Images <span class="text-gray-400 text-xs">(Optional)</span>
-                </label>
-
-                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
-                    <div class="space-y-1 text-center">
-                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
-                        <div class="flex text-sm text-gray-600">
-                            <label for="images"
-                                   class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
-                                <span>Upload files</span>
-                                <input
-                                    id="images"
-                                    name="images[]"
-                                    type="file"
-                                    class="sr-only"
-                                    multiple
-                                    accept="image/*"
-                                >
-                            </label>
-                            <p class="pl-1">or drag and drop</p>
-                        </div>
-                        <p class="text-xs text-gray-500">
-                            PNG, JPG, GIF up to <span class="font-semibold">30MB</span> each. You can upload multiple images at once.
-                        </p>
+                {{-- Drop Zone --}}
+                <div id="drop-zone"
+                     class="mt-1 flex flex-col items-center justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-400 transition-colors cursor-pointer"
+                     onclick="document.getElementById('images').click()">
+                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+                    <div class="text-sm text-gray-600 text-center">
+                        <span class="font-medium text-blue-600 hover:text-blue-500">Click to browse</span>
+                        <span class="ml-1">or drag and drop</span>
                     </div>
+                    <p class="text-xs text-gray-500 mt-1">PNG, JPG, GIF — up to <span class="font-semibold">30MB</span> each</p>
+                    <input
+                        id="images"
+                        name="images[]"
+                        type="file"
+                        class="sr-only"
+                        multiple
+                        accept="image/*"
+                    >
                 </div>
+
+                {{-- File previews (shown after selection) --}}
+                <div id="image-preview-container" class="hidden mt-4">
+                    <p class="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                        <i class="fas fa-eye text-blue-500"></i>
+                        <span id="preview-count"></span>
+                    </p>
+                    <div id="image-previews" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3"></div>
+                    <button type="button" onclick="clearNewImages()" class="mt-2 text-xs text-red-500 hover:text-red-700 underline">
+                        Clear selection
+                    </button>
+                </div>
+
                 @error('images.*')
                     <p class="mt-2 text-sm text-red-600 flex items-center">
                         <i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}
@@ -415,18 +430,74 @@
 
 {{-- Scripts --}}
 <script>
-    // Show number of selected files
-    document.getElementById('images')?.addEventListener('change', function (e) {
-        const files = e.target.files;
-        if (files.length > 0) {
-            const span = document.querySelector('label[for="images"] span');
-            if (span) {
-                span.textContent = `${files.length} file(s) selected`;
-            }
-        }
-    });
+    // ── Image preview for new uploads ──────────────────────────────────────
+    const imagesInput      = document.getElementById('images');
+    const previewContainer = document.getElementById('image-preview-container');
+    const previewGrid      = document.getElementById('image-previews');
+    const previewCount     = document.getElementById('preview-count');
+    const dropZone         = document.getElementById('drop-zone');
 
-    // Filter brands by selected category
+    function renderPreviews(files) {
+        previewGrid.innerHTML = '';
+        if (!files || files.length === 0) {
+            previewContainer.classList.add('hidden');
+            return;
+        }
+        previewCount.textContent = `${files.length} new image${files.length > 1 ? 's' : ''} ready to upload`;
+        previewContainer.classList.remove('hidden');
+
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'relative aspect-square rounded-lg overflow-hidden border-2 border-blue-300 shadow-sm';
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'w-full h-full object-cover';
+                const badge = document.createElement('div');
+                badge.className = 'absolute bottom-0 left-0 right-0 bg-blue-600/80 text-white text-[10px] text-center py-0.5 font-medium truncate px-1';
+                badge.textContent = file.name;
+                wrapper.appendChild(img);
+                wrapper.appendChild(badge);
+                previewGrid.appendChild(wrapper);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    if (imagesInput) {
+        imagesInput.addEventListener('change', function () {
+            renderPreviews(this.files);
+        });
+    }
+
+    // Drag & drop support
+    if (dropZone) {
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-blue-500', 'bg-blue-50');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+            if (e.dataTransfer.files.length) {
+                imagesInput.files = e.dataTransfer.files;
+                renderPreviews(e.dataTransfer.files);
+            }
+        });
+    }
+
+    function clearNewImages() {
+        if (imagesInput) {
+            imagesInput.value = '';
+            renderPreviews(null);
+        }
+    }
+
+    // ── Filter brands by selected category ─────────────────────────────────
     const categorySelect = document.getElementById('category_id');
     const brandSelect    = document.getElementById('brand_id');
 
@@ -436,41 +507,29 @@
 
         const rebuildBrandOptions = () => {
             const currentCategoryId = categorySelect.value;
-
             brandSelect.innerHTML = '';
 
-            // default placeholder
             const placeholder = allBrandOptions.find(opt => opt.value === '');
-            if (placeholder) {
-                brandSelect.appendChild(placeholder.cloneNode(true));
-            }
+            if (placeholder) brandSelect.appendChild(placeholder.cloneNode(true));
 
             allBrandOptions.forEach(opt => {
-                if (!opt.value) return; // skip placeholder here
+                if (!opt.value) return;
                 const catId = opt.getAttribute('data-category-id') || '';
-
                 if (!currentCategoryId || catId === currentCategoryId) {
-                    const clone = opt.cloneNode(true);
-                    brandSelect.appendChild(clone);
+                    brandSelect.appendChild(opt.cloneNode(true));
                 }
             });
 
-            // restore selected value if still valid
             if (selectedBrandId) {
                 Array.from(brandSelect.options).forEach(o => {
-                    if (o.value === selectedBrandId) {
-                        o.selected = true;
-                    }
+                    if (o.value === selectedBrandId) o.selected = true;
                 });
             }
         };
 
-        // initial build
         rebuildBrandOptions();
 
-        // on change
         categorySelect.addEventListener('change', () => {
-            // clear selected brand when category changes
             brandSelect.dataset.selected = '';
             rebuildBrandOptions();
         });

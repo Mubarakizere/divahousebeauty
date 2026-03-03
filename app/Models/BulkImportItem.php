@@ -178,9 +178,9 @@ class BulkImportItem extends Model
             return true;
         }
 
-        // If no price found, use the whole text as name
-        $this->parsed_name = $text;
-        $this->description = $text;
+        // If no price found, use the whole text as name (truncated)
+        $this->parsed_name = substr($text, 0, 250);
+        $this->description = $this->parsed_name;
         $this->status = 'ready';
         $this->save();
         
@@ -189,7 +189,8 @@ class BulkImportItem extends Model
 
     private function saveParsedData(string $name, float $price)
     {
-        $this->parsed_name = trim($name);
+        // Truncate name to 250 chars to fit in DB string column (max 255)
+        $this->parsed_name = substr(trim($name), 0, 250);
         $this->parsed_price = $price;
         $this->description = $this->parsed_name;
         
@@ -231,9 +232,10 @@ class BulkImportItem extends Model
 
     public function markAsFailed(string $error): void
     {
+        // Keep error message within reasonable limits
         $this->update([
             'status' => 'failed',
-            'error_message' => $error,
+            'error_message' => substr($error, 0, 1000),
         ]);
     }
 

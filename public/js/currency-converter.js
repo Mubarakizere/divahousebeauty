@@ -64,12 +64,13 @@ class CurrencyConverter {
             this.currencies = JSON.parse(cachedData);
         } else {
             // Hardcoded fallback rates (use your actual rates from API)
-            this.rates = { USD: 0.0006848, EUR: 0.00058567, GBP: 0.00050969, RWF: 1 };
+            this.rates = { USD: 0.0006848, EUR: 0.00058567, GBP: 0.00050969, RWF: 1, KES: 0.106 };
             this.currencies = {
                 USD: { code: 'USD', symbol: '$', name: 'US Dollar', flag: '🇺🇸', decimals: 2 },
                 EUR: { code: 'EUR', symbol: '€', name: 'Euro', flag: '🇪🇺', decimals: 2 },
                 GBP: { code: 'GBP', symbol: '£', name: 'British Pound', flag: '🇬🇧', decimals: 2 },
-                RWF: { code: 'RWF', symbol: 'RWF', name: 'Rwandan Franc', flag: '🇷🇼', decimals: 0 }
+                RWF: { code: 'RWF', symbol: 'RWF', name: 'Rwandan Franc', flag: '🇷🇼', decimals: 0 },
+                KES: { code: 'KES', symbol: 'KSh', name: 'Kenyan Shilling', flag: '🇰🇪', decimals: 0 }
             };
         }
     }
@@ -138,15 +139,19 @@ class CurrencyConverter {
                     const formatted = this.formatPrice(converted);
 
                     // Update the price text
-                    if (this.currentCurrency === 'RWF') {
+                    if (this.currentCurrency === 'KES') {
                         element.textContent = formatted;
                     } else {
-                        // Dual Price Display: Converted Price + Original RWF Price underneath
-                        const rwfFormatted = this.formatPrice(rwfAmount, 'RWF');
+                        // Dual Price Display: Converted Price + Secondary KES Price underneath
+                        // Convert RWF base price to KES
+                        const kesRate = this.rates['KES'] || 0.106;
+                        const kesAmount = rwfAmount * kesRate;
+                        const kesFormatted = this.formatPrice(kesAmount, 'KES');
+                        
                         element.innerHTML = `
                             <div>${formatted}</div>
                             <div class="text-[10px] sm:text-xs font-normal text-slate-400 mt-0.5 line-through decoration-slate-300 decoration-1 opacity-70">
-                                ${rwfFormatted}
+                                ${kesFormatted}
                             </div>
                         `;
                     }
