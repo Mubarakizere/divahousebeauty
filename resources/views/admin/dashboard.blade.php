@@ -4,6 +4,45 @@
 
 @push('head')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes pulseSoft {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+        .animate-fade-up { animation: fadeInUp 0.5s ease-out forwards; }
+        .animate-scale-in { animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.05);
+            border-color: rgba(203, 213, 225, 1);
+        }
+        .stat-icon {
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover .stat-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -28,75 +67,89 @@
     </div>
 
     {{-- Stats Grid --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-white border border-gray-200 rounded-lg p-1">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        <div class="p-4 sm:border-r border-gray-100 last:border-r-0">
-            <div class="flex items-center justify-between mb-2">
-                <p class="text-sm font-medium text-gray-500">Total Revenue</p>
-                <i class="fas fa-wallet text-gray-400"></i>
+        <div class="glass-card rounded-xl p-5 relative overflow-hidden group animate-scale-in stagger-1">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-50/50 rounded-full blur-2xl group-hover:bg-blue-100/50 transition-colors"></div>
+            <div class="flex items-center justify-between mb-3 relative">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Revenue</p>
+                <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center stat-icon">
+                    <i class="fas fa-wallet text-blue-600"></i>
+                </div>
             </div>
-            <div class="flex items-baseline gap-2">
-                <p class="text-2xl font-semibold text-gray-900">{{ number_format($totalRevenue) }}</p>
-                <p class="text-xs text-gray-500 font-medium">RWF</p>
+            <div class="flex items-baseline gap-2 relative">
+                <p class="text-2xl font-extrabold text-slate-900 tracking-tight">{{ number_format($totalRevenue) }}</p>
+                <p class="text-xs text-slate-400 font-bold uppercase">RWF</p>
             </div>
-            <p class="text-xs text-gray-500 mt-2">
+            <div class="mt-4 flex items-center gap-2 relative">
                 @if($todayRevenue > 0)
-                    <span class="text-green-600 font-medium">+{{ number_format($todayRevenue) }}</span> today
+                    <span class="flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                        <i class="fas fa-arrow-up text-[9px]"></i> {{ number_format($todayRevenue) }}
+                    </span>
+                    <span class="text-[10px] text-slate-400 font-medium">New today</span>
                 @else
-                    No revenue today
+                    <span class="text-[10px] text-slate-400 font-medium italic">No new revenue today</span>
                 @endif
-            </p>
+            </div>
         </div>
 
-        <div class="p-4 sm:border-r border-gray-100 last:border-r-0">
-            <div class="flex items-center justify-between mb-2">
-                <p class="text-sm font-medium text-gray-500">Orders</p>
-                <div class="relative">
-                    <i class="fas fa-shopping-cart text-gray-400"></i>
+        <div class="glass-card rounded-xl p-5 relative overflow-hidden group animate-scale-in stagger-2">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-indigo-50/50 rounded-full blur-2xl group-hover:bg-indigo-100/50 transition-colors"></div>
+            <div class="flex items-center justify-between mb-3 relative">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Orders</p>
+                <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center stat-icon relative" style="{{ $pendingOrders > 0 ? 'animation: pulseSoft 2s infinite;' : '' }}">
+                    <i class="fas fa-shopping-cart text-indigo-600"></i>
                     @if($pendingOrders > 0)
-                        <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
-                        </span>
+                        <span class="absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-indigo-500 border-2 border-white"></span>
                     @endif
                 </div>
             </div>
-            <p class="text-2xl font-semibold text-gray-900">{{ number_format($totalOrders) }}</p>
-            <p class="text-xs text-gray-500 mt-2">
+            <p class="text-2xl font-extrabold text-slate-900 tracking-tight relative">{{ number_format($totalOrders) }}</p>
+            <div class="mt-4 flex items-center gap-3 relative">
                 @if($todayOrders > 0)
-                    <span class="text-green-600 font-medium">+{{ $todayOrders }}</span> today
-                @else
-                    No orders today
+                    <span class="text-[11px] font-bold text-indigo-600">+{{ $todayOrders }} today</span>
                 @endif
-                <span class="text-gray-300 mx-1">|</span>
-                <span class="text-blue-600 font-medium">{{ $pendingOrders }}</span> pending
-            </p>
+                <span class="text-[11px] font-bold text-slate-400">
+                    <span class="text-indigo-500">{{ $pendingOrders }}</span> pending
+                </span>
+            </div>
         </div>
 
-        <div class="p-4 sm:border-r border-gray-100 last:border-r-0">
-            <div class="flex items-center justify-between mb-2">
-                <p class="text-sm font-medium text-gray-500">Customers</p>
-                <i class="fas fa-users text-gray-400"></i>
+        <div class="glass-card rounded-xl p-5 relative overflow-hidden group animate-scale-in stagger-3">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-emerald-50/50 rounded-full blur-2xl group-hover:bg-emerald-100/50 transition-colors"></div>
+            <div class="flex items-center justify-between mb-3 relative">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Customers</p>
+                <div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center stat-icon">
+                    <i class="fas fa-users text-emerald-600"></i>
+                </div>
             </div>
-            <p class="text-2xl font-semibold text-gray-900">{{ number_format($totalCustomers) }}</p>
-            <p class="text-xs text-gray-500 mt-2">
+            <p class="text-2xl font-extrabold text-slate-900 tracking-tight relative">{{ number_format($totalCustomers) }}</p>
+            <div class="mt-4 relative">
                 @if($newCustomersToday > 0)
-                    <span class="text-green-600 font-medium">+{{ $newCustomersToday }}</span> today
+                    <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                        +{{ $newCustomersToday }} new signups
+                    </span>
                 @else
-                    No signups today
+                    <span class="text-[10px] text-slate-400 font-medium italic">No new signups today</span>
                 @endif
-            </p>
+            </div>
         </div>
 
-        <div class="p-4">
-            <div class="flex items-center justify-between mb-2">
-                <p class="text-sm font-medium text-gray-500">Products</p>
-                <i class="fas fa-box text-gray-400"></i>
+        <div class="glass-card rounded-xl p-5 relative overflow-hidden group animate-scale-in stagger-4">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-rose-50/50 rounded-full blur-2xl group-hover:bg-rose-100/50 transition-colors"></div>
+            <div class="flex items-center justify-between mb-3 relative">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Products</p>
+                <div class="w-10 h-10 rounded-lg bg-rose-50 flex items-center justify-center stat-icon">
+                    <i class="fas fa-box text-rose-600"></i>
+                </div>
             </div>
-            <p class="text-2xl font-semibold text-gray-900">{{ number_format($totalProducts) }}</p>
-            <p class="text-xs text-gray-500 mt-2">
-                <a href="{{ route('admin.products.index') }}" class="text-gray-600 hover:text-gray-900 hover:underline">Manage catalog</a>
-            </p>
+            <p class="text-2xl font-extrabold text-slate-900 tracking-tight relative">{{ number_format($totalProducts) }}</p>
+            <div class="mt-4 relative">
+                <a href="{{ route('admin.products.index') }}" class="text-[11px] font-bold text-rose-600 hover:text-rose-700 flex items-center gap-1 group/link transition-colors">
+                    Manage catalog 
+                    <i class="fas fa-chevron-right text-[8px] group-hover/link:translate-x-0.5 transition-transform"></i>
+                </a>
+            </div>
         </div>
 
     </div>
@@ -184,7 +237,7 @@
                         </thead>
                         <tbody class="divide-y divide-gray-100 bg-white">
                             @foreach($recentOrders as $order)
-                                <tr class="hover:bg-gray-50/50 transition-colors group">
+                                <tr class="hover:bg-slate-50/80 transition-all duration-300 group border-transparent hover:border-slate-200 border-l-4">
                                     <td class="py-4 px-5">
                                         <a href="{{ route('admin.orders.show', $order) }}" class="font-medium text-gray-900 block group-hover:text-blue-600">
                                             #{{ $order->order_number ?? $order->id }}
@@ -335,16 +388,19 @@
                             datasets: [{
                                 label: 'Revenue (RWF)',
                                 data: revenueData,
-                                borderColor: '#0f172a', // slate-900
+                                borderColor: '#3b82f6', // blue-500
                                 backgroundColor: gradient,
-                                borderWidth: 2,
+                                borderWidth: 3,
                                 pointBackgroundColor: '#fff',
-                                pointBorderColor: '#0f172a',
+                                pointBorderColor: '#3b82f6',
                                 pointBorderWidth: 2,
-                                pointRadius: 3,
-                                pointHoverRadius: 5,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                pointHoverBackgroundColor: '#3b82f6',
+                                pointHoverBorderColor: '#fff',
+                                pointHoverBorderWidth: 2,
                                 fill: true,
-                                tension: 0.3
+                                tension: 0.4
                             }]
                         },
                         options: {
@@ -411,15 +467,15 @@
                         return;
                     }
 
-                    // Colors mapping based on status
+                    // Vivid Colors mapping
                     const colorMap = {
-                        'pending_payment': '#eab308', // yellow-500
-                        'processing': '#3b82f6', // blue-500
-                        'shipped': '#a855f7', // purple-500
+                        'pending_payment': '#f59e0b', // amber-500
+                        'processing': '#6366f1', // indigo-500
+                        'shipped': '#8b5cf6', // violet-500
                         'out_for_delivery': '#f97316', // orange-500
-                        'completed': '#22c55e', // green-500
-                        'cancelled': '#ef4444', // red-500
-                        'refunded': '#64748b', // slate-500
+                        'completed': '#10b981', // emerald-500
+                        'cancelled': '#f43f5e', // rose-500
+                        'refunded': '#94a3b8', // slate-400
                     };
                     
                     const labels = [];
