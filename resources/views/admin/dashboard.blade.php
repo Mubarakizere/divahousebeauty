@@ -113,7 +113,7 @@
             <div class="mt-3 flex flex-wrap gap-2">
                 @foreach($lowStockProducts->take(3) as $product)
                     <a href="{{ route('admin.products.edit', $product) }}" class="inline-flex items-center gap-1.5 px-2 py-1 bg-white border border-amber-200 rounded text-[10px] font-medium text-amber-800 hover:bg-amber-50 transition-colors">
-                        {{ $product->name }} ({{ $product->quantity }})
+                        {{ $product->name }} ({{ $product->stock }})
                     </a>
                 @endforeach
                 @if($lowStockCount > 3)

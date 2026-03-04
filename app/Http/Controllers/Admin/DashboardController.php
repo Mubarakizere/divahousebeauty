@@ -29,7 +29,7 @@ class DashboardController extends Controller
         $completedOrders = Order::where('status', 'completed')->count();
 
         // Low stock alerts (items below 5 units)
-        $lowStockProducts = Product::where('quantity', '<', 5)->get();
+        $lowStockProducts = Product::where('stock', '<', 5)->get();
         $lowStockCount = $lowStockProducts->count();
 
         // Recent orders
