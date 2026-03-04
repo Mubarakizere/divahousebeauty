@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-50">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title', 'Admin Dashboard') - Diva House Beauty</title>
+    <title>@yield('title', 'Dashboard') - Diva House Beauty</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    {{-- Favicon / Site Icon --}}
+    {{-- Favicon --}}
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/images/icons/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/images/icons/favicon-16x16.png') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/images/icons/apple-touch-icon.png') }}">
@@ -15,26 +15,17 @@
     {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
-    {{-- Tailwind CSS --}}
+    {{-- Tailwind --}}
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
                     },
-                    colors: {
-                        'diva-black': '#0F172A',
-                        'diva-gold': '#C5A059',
-                        'diva-gold-hover': '#B08D4C',
-                    },
-                    boxShadow: {
-                        'ring': '0 0 0 1px rgba(0,0,0,0.05), 0 2px 8px rgba(0,0,0,0.05)',
-                    }
                 }
             }
         }
@@ -51,527 +42,187 @@
     @stack('head')
 </head>
 
-<body class="h-full bg-gray-50 text-gray-900 antialiased" x-data="{ mobileOpen: false }" x-cloak>
+<body class="h-full bg-gray-50 text-gray-900 antialiased" x-data="{ sidebarOpen: false }" x-cloak>
 
 <div class="flex min-h-screen">
 
-    {{-- ========================= --}}
-    {{-- SIDEBAR: DESKTOP --}}
-    {{-- ========================= --}}
+    {{-- Sidebar --}}
+    @php
+        $navItems = [];
+
+        if (auth()->user()->role === 'admin') {
+            $navItems = [
+                ['label' => 'Dashboard', 'icon' => 'fa-home', 'url' => route('dashboard'), 'match' => 'dashboard'],
+                ['divider' => true],
+                ['label' => 'Products', 'icon' => 'fa-box', 'url' => route('admin.products.index'), 'match' => 'admin/products*'],
+                ['label' => 'Categories', 'icon' => 'fa-tags', 'url' => route('admin.categories.index'), 'match' => 'admin/categories*'],
+                ['label' => 'Brands', 'icon' => 'fa-industry', 'url' => route('admin.brands.index'), 'match' => 'admin/brands*'],
+                ['label' => 'Orders', 'icon' => 'fa-shopping-bag', 'url' => route('admin.orders.index'), 'match' => 'admin/orders*'],
+                ['divider' => true],
+                ['label' => 'Coupons', 'icon' => 'fa-ticket-alt', 'url' => route('admin.coupons.index'), 'match' => 'admin/coupons*'],
+                ['label' => 'Banners', 'icon' => 'fa-images', 'url' => route('admin.banners.index'), 'match' => 'admin/banners*'],
+                ['label' => 'Reviews', 'icon' => 'fa-star', 'url' => route('admin.reviews.index'), 'match' => 'admin/reviews*'],
+                ['divider' => true],
+                ['label' => 'Users', 'icon' => 'fa-users', 'url' => route('admin.users.index'), 'match' => 'admin/users*'],
+                ['label' => 'Newsletter', 'icon' => 'fa-envelope', 'url' => route('admin.newsletter.index'), 'match' => 'admin/newsletter*'],
+                ['label' => 'Bulk Import', 'icon' => 'fa-file-import', 'url' => route('admin.bulk-import.index'), 'match' => 'admin/bulk-import*'],
+            ];
+        } elseif (auth()->user()->role === 'customer') {
+            $navItems = [
+                ['label' => 'Dashboard', 'icon' => 'fa-home', 'url' => route('dashboard'), 'match' => 'dashboard'],
+                ['divider' => true],
+                ['label' => 'My Orders', 'icon' => 'fa-shopping-bag', 'url' => route('orders.index'), 'routeMatch' => 'orders.*'],
+                ['label' => 'My Addresses', 'icon' => 'fa-map-marker-alt', 'url' => route('address.index'), 'routeMatch' => 'address.*'],
+            ];
+        }
+    @endphp
+
+    {{-- Desktop sidebar --}}
     <aside class="hidden lg:flex lg:flex-shrink-0">
-        <div class="flex flex-col w-64 bg-gray-900 text-gray-200 border-r border-black/20">
+        <div class="flex flex-col w-56 bg-white border-r border-gray-200">
             {{-- Brand --}}
-            <div class="flex items-center justify-between px-4 py-5 border-b border-gray-800">
-                <div class="flex items-center space-x-2">
-                    <div class="h-9 w-9 rounded-lg bg-gradient-to-br from-diva-primary to-diva-dark flex items-center justify-center text-xs font-semibold text-white shadow-lg shadow-black/30 uppercase tracking-wide">
-                        DH
-                    </div>
-                    <div>
-                        <div class="text-sm font-semibold text-white leading-tight">Diva Dashboard</div>
-                        <div class="text-[11px] text-gray-400 leading-none">Beauty Admin Panel</div>
-                    </div>
-                </div>
+            <div class="px-4 py-4 border-b border-gray-100">
+                <div class="text-sm font-semibold text-gray-900">Diva House</div>
+                <div class="text-xs text-gray-400">Admin</div>
             </div>
 
-            {{-- Nav scroll area --}}
-            <nav class="flex-1 overflow-y-auto py-6 divide-y divide-gray-800 text-sm">
-                <div class="px-2 space-y-1">
-
-                    {{-- Back to Website --}}
+            {{-- Nav --}}
+            <nav class="flex-1 overflow-y-auto py-3 text-[13px]">
+                <div class="px-2 space-y-0.5">
                     <a href="{{ url('/') }}" target="_blank"
-                       class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                              hover:bg-gray-700 hover:text-white text-gray-300">
-                        <i class="fas fa-globe mr-3 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-300"></i>
-                        <span>Back to Website</span>
+                       class="flex items-center gap-2.5 px-3 py-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-external-link-alt w-4 text-center text-xs"></i>
+                        <span>View Site</span>
                     </a>
 
-                    {{-- Dashboard --}}
-                    <a href="{{ route('dashboard') }}"
-                       class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                              {{ request()->is('dashboard')
-                                    ? 'bg-gray-800 text-white'
-                                    : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                        <i class="fas fa-home mr-3 h-5 w-5 flex-shrink-0
-                                  {{ request()->is('dashboard')
-                                        ? 'text-white'
-                                        : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                        <span>Dashboard</span>
-                    </a>
-
-                    {{-- ADMIN SECTION --}}
-                    @if(auth()->user()->role === 'admin')
-                        <div class="pt-4">
-                            <p class="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
-                                Admin
-                            </p>
-
-                            {{-- Products --}}
-                            <a href="{{ route('admin.products.index') }}"
-                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                      {{ request()->is('admin/products*')
-                                            ? 'bg-gray-800 text-white'
-                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                <i class="fas fa-box mr-3 h-5 w-5 flex-shrink-0
-                                          {{ request()->is('admin/products*')
-                                                ? 'text-white'
-                                                : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                <span>Products</span>
+                    @foreach($navItems as $item)
+                        @if(isset($item['divider']))
+                            <div class="my-2 border-t border-gray-100"></div>
+                        @else
+                            @php
+                                $isActive = isset($item['routeMatch'])
+                                    ? request()->routeIs($item['routeMatch'])
+                                    : request()->is($item['match']);
+                            @endphp
+                            <a href="{{ $item['url'] }}"
+                               class="flex items-center gap-2.5 px-3 py-2 rounded-md transition-colors
+                                      {{ $isActive
+                                            ? 'bg-gray-900 text-white'
+                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50' }}">
+                                <i class="fas {{ $item['icon'] }} w-4 text-center text-xs {{ $isActive ? 'text-white' : 'text-gray-400' }}"></i>
+                                <span>{{ $item['label'] }}</span>
                             </a>
-
-                            {{-- Categories --}}
-                            <a href="{{ route('admin.categories.index') }}"
-                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                      {{ request()->is('admin/categories*')
-                                            ? 'bg-gray-800 text-white'
-                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                <i class="fas fa-tags mr-3 h-5 w-5 flex-shrink-0
-                                          {{ request()->is('admin/categories*')
-                                                ? 'text-white'
-                                                : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                <span>Categories</span>
-                            </a>
-
-                            {{-- Brands --}}
-                            <a href="{{ route('admin.brands.index') }}"
-                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                      {{ request()->is('admin/brands*')
-                                            ? 'bg-gray-800 text-white'
-                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                <i class="fas fa-industry mr-3 h-5 w-5 flex-shrink-0
-                                          {{ request()->is('admin/brands*')
-                                                ? 'text-white'
-                                                : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                <span>Brands</span>
-                            </a>
-
-                            {{-- Coupons --}}
-                            <a href="{{ route('admin.coupons.index') }}"
-                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                      {{ request()->is('admin/coupons*')
-                                            ? 'bg-gray-800 text-white'
-                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                <i class="fas fa-ticket-alt mr-3 h-5 w-5 flex-shrink-0
-                                          {{ request()->is('admin/coupons*')
-                                                ? 'text-white'
-                                                : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                <span>Coupons</span>
-                            </a>
-                            
-                            {{-- Banners --}}
-                            <a href="{{ route('admin.banners.index') }}"
-                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                      {{ request()->is('admin/banners*')
-                                            ? 'bg-gray-800 text-white'
-                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                <i class="fas fa-images mr-3 h-5 w-5 flex-shrink-0
-                                          {{ request()->is('admin/banners*')
-                                                ? 'text-white'
-                                                : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                <span>Banners</span>
-                            </a>
-
-                            {{-- Users --}}
-                            <a href="{{ route('admin.users.index') }}"
-                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                      {{ request()->is('admin/users*')
-                                            ? 'bg-gray-800 text-white'
-                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                             <i class="fas fa-users-cog mr-3 h-5 w-5 flex-shrink-0
-                                       {{ request()->is('admin/users*')
-                                             ? 'text-white'
-                                             : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                             <span>Users</span>
-                         </a>
-
-                            {{-- Newsletter --}}
-                            <a href="{{ route('admin.newsletter.index') }}"
-                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                      {{ request()->is('admin/newsletter*')
-                                            ? 'bg-gray-800 text-white'
-                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                             <i class="fas fa-envelope mr-3 h-5 w-5 flex-shrink-0
-                                       {{ request()->is('admin/newsletter*')
-                                             ? 'text-white'
-                                             : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                             <span>Newsletter</span>
-                         </a>
-
-                            {{-- Reviews --}}
-                            <a href="{{ route('admin.reviews.index') }}"
-                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                      {{ request()->is('admin/reviews*')
-                                            ? 'bg-gray-800 text-white'
-                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                <i class="fas fa-star mr-3 h-5 w-5 flex-shrink-0
-                                          {{ request()->is('admin/reviews*')
-                                                ? 'text-white'
-                                                : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                <span>Reviews</span>
-                            </a>
-
-                            {{-- Orders --}}
-                            <a href="{{ route('admin.orders.index') }}"
-                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                      {{ request()->is('admin/orders*')
-                                            ? 'bg-gray-800 text-white'
-                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                <i class="fas fa-shopping-bag mr-3 h-5 w-5 flex-shrink-0
-                                          {{ request()->is('admin/orders*')
-                                                ? 'text-white'
-                                                : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                <span>Orders</span>
-                            </a>
-
-                            {{-- Bulk Image Import --}}
-                            <a href="{{ route('admin.bulk-import.index') }}"
-                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                      {{ request()->is('admin/bulk-import*')
-                                            ? 'bg-gray-800 text-white'
-                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                <i class="fas fa-file-image mr-3 h-5 w-5 flex-shrink-0
-                                          {{ request()->is('admin/bulk-import*')
-                                                ? 'text-white'
-                                                : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                <span>Bulk Image Import</span>
-                            </a>
-                        </div>
-                    @endif
-
-                    {{-- CUSTOMER SECTION --}}
-                    @if(auth()->user()->role === 'customer')
-                        <div class="pt-6">
-                            <p class="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
-                                My Account
-                            </p>
-
-                            {{-- My Orders --}}
-                            <a href="{{ route('orders.index') }}"
-                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                      {{ request()->routeIs('orders.*')
-                                            ? 'bg-gray-800 text-white'
-                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                <i class="fas fa-shopping-bag mr-3 h-5 w-5 flex-shrink-0
-                                          {{ request()->routeIs('orders.*')
-                                                ? 'text-white'
-                                                : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                <span>My Orders</span>
-                            </a>
-
-                            {{-- My Addresses --}}
-                            <a href="{{ route('address.index') }}"
-                               class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                      {{ request()->routeIs('address.*')
-                                            ? 'bg-gray-800 text-white'
-                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                <i class="fas fa-map-marker-alt mr-3 h-5 w-5 flex-shrink-0
-                                          {{ request()->routeIs('address.*')
-                                                ? 'text-white'
-                                                : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                <span>My Addresses</span>
-                            </a>
-                        </div>
-                    @endif
-                </div>
-
-                {{-- Logout --}}
-                <div class="px-2 pt-8">
-                    <a href="{{ route('logout') }}"
-                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                       class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                              text-gray-300 hover:bg-red-600 hover:text-white">
-                        <i class="fas fa-sign-out-alt mr-3 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-white"></i>
-                        <span>Logout</span>
-                    </a>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
-                        @csrf
-                    </form>
+                        @endif
+                    @endforeach
                 </div>
             </nav>
+
+            {{-- Bottom --}}
+            <div class="border-t border-gray-100 px-2 py-3">
+                <a href="{{ route('logout') }}"
+                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                   class="flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors">
+                    <i class="fas fa-sign-out-alt w-4 text-center text-xs"></i>
+                    <span>Log out</span>
+                </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
+            </div>
         </div>
     </aside>
 
-    {{-- ========================= --}}
-    {{-- SIDEBAR: MOBILE (drawer) --}}
-    {{-- ========================= --}}
-    <div class="lg:hidden relative z-40" x-show="mobileOpen" x-transition.opacity.duration.200ms
-         role="dialog" aria-modal="true">
-
-        {{-- Overlay --}}
-        <div class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm"
-             @click="mobileOpen = false"
-             x-show="mobileOpen"
-             x-transition.opacity.duration.200ms></div>
+    {{-- Mobile sidebar overlay --}}
+    <div class="lg:hidden relative z-40" x-show="sidebarOpen" x-cloak>
+        <div class="fixed inset-0 bg-black/30" @click="sidebarOpen = false"
+             x-show="sidebarOpen" x-transition.opacity.duration.200ms></div>
 
         <div class="fixed inset-0 flex z-40">
-            {{-- Drawer --}}
-            <div x-show="mobileOpen"
-                 x-transition.duration.200ms
-                 class="relative flex flex-col w-64 max-w-full bg-gray-900 text-gray-200 border-r border-black/20 shadow-xl shadow-black/40">
+            <div x-show="sidebarOpen" x-transition.duration.200ms
+                 class="relative flex flex-col w-56 max-w-full bg-white border-r border-gray-200 shadow-lg">
 
-                {{-- Top brand + close --}}
-                <div class="flex items-center justify-between px-4 py-5 border-b border-gray-800">
-                    <div class="flex items-center space-x-2">
-                        <div class="h-9 w-9 rounded-lg bg-gradient-to-br from-diva-primary to-diva-dark flex items-center justify-center text-xs font-semibold text-white shadow-lg shadow-black/30 uppercase tracking-wide">
-                            DH
-                        </div>
-                        <div>
-                            <div class="text-sm font-semibold text-white leading-tight">Diva Dashboard</div>
-                            <div class="text-[11px] text-gray-400 leading-none">Beauty Admin Panel</div>
-                        </div>
+                <div class="flex items-center justify-between px-4 py-4 border-b border-gray-100">
+                    <div>
+                        <div class="text-sm font-semibold text-gray-900">Diva House</div>
+                        <div class="text-xs text-gray-400">Admin</div>
                     </div>
-
-                    <button @click="mobileOpen = false"
-                            class="text-gray-400 hover:text-white transition-colors"
-                            aria-label="Close menu">
-                        <i class="fas fa-times h-6 w-6"></i>
+                    <button @click="sidebarOpen = false" class="text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close">
+                        <i class="fas fa-times"></i>
                     </button>
                 </div>
 
-                {{-- Menu --}}
-                <div class="flex-1 overflow-y-auto py-6 text-sm">
-                    <nav class="px-2 space-y-1">
+                <nav class="flex-1 overflow-y-auto py-3 text-[13px]">
+                    <div class="px-2 space-y-0.5">
                         <a href="{{ url('/') }}" target="_blank"
-                           class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                  text-gray-300 hover:bg-gray-700 hover:text-white">
-                            <i class="fas fa-globe mr-3 h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-300"></i>
-                            <span>Back to Website</span>
+                           class="flex items-center gap-2.5 px-3 py-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-external-link-alt w-4 text-center text-xs"></i>
+                            <span>View Site</span>
                         </a>
 
-                        <a href="{{ route('dashboard') }}"
-                           class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                  {{ request()->is('dashboard')
-                                        ? 'bg-gray-800 text-white'
-                                        : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="fas fa-home mr-3 h-6 w-6 flex-shrink-0
-                                      {{ request()->is('dashboard')
-                                            ? 'text-white'
-                                            : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                            <span>Dashboard</span>
-                        </a>
-
-                        @if(auth()->user()->role === 'admin')
-                            <div class="pt-4 pb-1">
-                                <p class="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
-                                    Admin
-                                </p>
-
-                                {{-- Products --}}
-                                <a href="{{ route('admin.products.index') }}"
-                                   class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                          {{ request()->is('admin/products*')
-                                                ? 'bg-gray-800 text-white'
-                                                : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                    <i class="fas fa-box mr-3 h-6 w-6 flex-shrink-0
-                                              {{ request()->is('admin/products*')
-                                                    ? 'text-white'
-                                                    : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                    <span>Products</span>
+                        @foreach($navItems as $item)
+                            @if(isset($item['divider']))
+                                <div class="my-2 border-t border-gray-100"></div>
+                            @else
+                                @php
+                                    $isActive = isset($item['routeMatch'])
+                                        ? request()->routeIs($item['routeMatch'])
+                                        : request()->is($item['match']);
+                                @endphp
+                                <a href="{{ $item['url'] }}"
+                                   class="flex items-center gap-2.5 px-3 py-2 rounded-md transition-colors
+                                          {{ $isActive
+                                                ? 'bg-gray-900 text-white'
+                                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50' }}">
+                                    <i class="fas {{ $item['icon'] }} w-4 text-center text-xs {{ $isActive ? 'text-white' : 'text-gray-400' }}"></i>
+                                    <span>{{ $item['label'] }}</span>
                                 </a>
+                            @endif
+                        @endforeach
+                    </div>
+                </nav>
 
-                                {{-- Categories --}}
-                                <a href="{{ route('admin.categories.index') }}"
-                                   class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                          {{ request()->is('admin/categories*')
-                                                ? 'bg-gray-800 text-white'
-                                                : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                    <i class="fas fa-tags mr-3 h-6 w-6 flex-shrink-0
-                                              {{ request()->is('admin/categories*')
-                                                    ? 'text-white'
-                                                    : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                    <span>Categories</span>
-                                </a>
-
-                                {{-- Brands --}}
-                                <a href="{{ route('admin.brands.index') }}"
-                                   class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                          {{ request()->is('admin/brands*')
-                                                ? 'bg-gray-800 text-white'
-                                                : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                    <i class="fas fa-industry mr-3 h-6 w-6 flex-shrink-0
-                                              {{ request()->is('admin/brands*')
-                                                    ? 'text-white'
-                                                    : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                    <span>Brands</span>
-                                </a>
-
-                                {{-- Coupons --}}
-                                <a href="{{ route('admin.coupons.index') }}"
-                                   class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                          {{ request()->is('admin/coupons*')
-                                                ? 'bg-gray-800 text-white'
-                                                : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                    <i class="fas fa-ticket-alt mr-3 h-5 w-5 flex-shrink-0
-                                              {{ request()->is('admin/coupons*')
-                                                    ? 'text-white'
-                                                    : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                    <span>Coupons</span>
-                                </a>
-                                
-                                {{-- Banners --}}
-                                <a href="{{ route('admin.banners.index') }}"
-                                   class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                          {{ request()->is('admin/banners*')
-                                                ? 'bg-gray-800 text-white'
-                                                : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                    <i class="fas fa-images mr-3 h-5 w-5 flex-shrink-0
-                                              {{ request()->is('admin/banners*')
-                                                    ? 'text-white'
-                                                    : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                    <span>Banners</span>
-                                </a>
-
-                                {{-- Reviews --}}
-                                <a href="{{ route('admin.reviews.index') }}"
-                                   class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                          {{ request()->is('admin/reviews*')
-                                                ? 'bg-gray-800 text-white'
-                                                : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                    <i class="fas fa-star mr-3 h-5 w-5 flex-shrink-0
-                                              {{ request()->is('admin/reviews*')
-                                                    ? 'text-white'
-                                                    : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                    <span>Reviews</span>
-                                </a>
-
-                                {{-- Orders --}}
-                                <a href="{{ route('admin.orders.index') }}"
-                                   class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                          {{ request()->is('admin/orders*')
-                                                ? 'bg-gray-800 text-white'
-                                                : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                    <i class="fas fa-shopping-bag mr-3 h-6 w-6 flex-shrink-0
-                                              {{ request()->is('admin/orders*')
-                                                    ? 'text-white'
-                                                    : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                    <span>Orders</span>
-                                </a>
-
-                                {{-- Bulk Image Import --}}
-                                <a href="{{ route('admin.bulk-import.index') }}"
-                                   class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                          {{ request()->is('admin/bulk-import*')
-                                                ? 'bg-gray-800 text-white'
-                                                : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                    <i class="fas fa-file-image mr-3 h-6 w-6 flex-shrink-0
-                                              {{ request()->is('admin/bulk-import*')
-                                                    ? 'text-white'
-                                                    : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                    <span>Bulk Image Import</span>
-                                </a>
-                            </div>
-                        @endif
-
-                        @if(auth()->user()->role === 'customer')
-                            <div class="pt-6 pb-1">
-                                <p class="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
-                                    My Account
-                                </p>
-
-                                <a href="{{ route('orders.index') }}"
-                                   class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                          {{ request()->routeIs('orders.*')
-                                                ? 'bg-gray-800 text-white'
-                                                : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                    <i class="fas fa-shopping-bag mr-3 h-6 w-6 flex-shrink-0
-                                              {{ request()->routeIs('orders.*')
-                                                    ? 'text-white'
-                                                    : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                    <span>My Orders</span>
-                                </a>
-
-                                <a href="{{ route('address.index') }}"
-                                   class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                          {{ request()->routeIs('address.*')
-                                                ? 'bg-gray-800 text-white'
-                                                : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                    <i class="fas fa-map-marker-alt mr-3 h-6 w-6 flex-shrink-0
-                                              {{ request()->routeIs('address.*')
-                                                    ? 'text-white'
-                                                    : 'text-gray-400 group-hover:text-gray-300' }}"></i>
-                                    <span>My Addresses</span>
-                                </a>
-                            </div>
-                        @endif
-
-                        {{-- Logout (mobile) --}}
-                        <a href="{{ route('logout') }}"
-                           onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit();"
-                           class="group flex items-center rounded-md px-2 py-2 font-medium transition-colors
-                                  text-gray-300 hover:bg-red-600 hover:text-white">
-                            <i class="fas fa-sign-out-alt mr-3 h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-white"></i>
-                            <span>Logout</span>
-                        </a>
-                        <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST" class="hidden">
-                            @csrf
-                        </form>
-
-                    </nav>
+                <div class="border-t border-gray-100 px-2 py-3">
+                    <a href="{{ route('logout') }}"
+                       onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit();"
+                       class="flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors">
+                        <i class="fas fa-sign-out-alt w-4 text-center text-xs"></i>
+                        <span>Log out</span>
+                    </a>
+                    <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
                 </div>
             </div>
 
-            {{-- Clicking empty flex area also closes drawer --}}
-            <div class="flex-1" @click="mobileOpen = false"></div>
+            <div class="flex-1" @click="sidebarOpen = false"></div>
         </div>
     </div>
 
-    {{-- ========================= --}}
-    {{-- MAIN COLUMN --}}
-    {{-- ========================= --}}
+    {{-- Main content --}}
     <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
 
-        {{-- Top header bar --}}
-        <header class="bg-white border-b border-gray-200 shadow-sm">
-            <div class="flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-                <div class="flex items-center">
-                    {{-- Mobile menu button --}}
-                    <button
-                        @click="mobileOpen = true"
-                        class="lg:hidden -ml-0.5 -mt-0.5 inline-flex h-12 w-12 items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-white"
-                        aria-label="Open menu">
-                        <i class="fas fa-bars text-lg"></i>
+        {{-- Top bar --}}
+        <header class="bg-white border-b border-gray-200">
+            <div class="flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+                <div class="flex items-center gap-3">
+                    <button @click="sidebarOpen = true"
+                            class="lg:hidden p-2 -ml-2 text-gray-500 hover:text-gray-700 transition-colors"
+                            aria-label="Open menu">
+                        <i class="fas fa-bars"></i>
                     </button>
-
-                    {{-- Page title --}}
-                    <h1 class="ml-4 lg:ml-0 text-2xl font-semibold text-gray-900 tracking-tight">
-                        @yield('title', 'Dashboard')
-                    </h1>
+                    <h1 class="text-lg font-semibold text-gray-900">@yield('title', 'Dashboard')</h1>
                 </div>
 
-                {{-- User info --}}
-                <div class="flex items-center space-x-4">
-                    <div class="text-right leading-tight hidden sm:block">
-                        <div class="text-sm text-gray-700 font-medium">
-                            {{ auth()->user()->name }}
-                        </div>
-                        <div class="text-[11px] text-gray-500">
-                            @if(auth()->user()->role === 'admin')
-                                Admin
-                            @elseif(auth()->user()->role === 'customer')
-                                Customer
-                            @else
-                                User
-                            @endif
-                        </div>
+                <div class="flex items-center gap-3">
+                    <div class="text-right hidden sm:block">
+                        <div class="text-sm text-gray-700">{{ auth()->user()->name }}</div>
+                        <div class="text-xs text-gray-400">{{ ucfirst(auth()->user()->role) }}</div>
                     </div>
-
-                    {{-- Small badge / avatar circle --}}
-                    <div class="relative flex items-center">
-                        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-gray-700 text-xs font-semibold uppercase shadow-inner ring-1 ring-white/60">
-                            {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
-                        </div>
-
-                        @if(auth()->user()->role === 'admin')
-                            <span class="absolute -bottom-1 -right-1 inline-flex items-center rounded-full bg-blue-600 px-1.5 py-0.5 text-[10px] font-medium text-white shadow ring-2 ring-white">
-                                Admin
-                            </span>
-                        @endif
+                    <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600">
+                        {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                     </div>
                 </div>
             </div>
         </header>
 
         {{-- Page content --}}
-        <main class="flex-1 overflow-y-auto focus:outline-none">
+        <main class="flex-1 overflow-y-auto">
             <div class="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
                 @yield('content')
             </div>
