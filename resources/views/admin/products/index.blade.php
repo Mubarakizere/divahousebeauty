@@ -205,11 +205,23 @@
 
         {{-- Pagination --}}
         @if($products->hasPages())
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-5">
+            @php
+                $current = $products->currentPage();
+                $last = $products->lastPage();
+                // Build a smart page window: 1, ..., current-1, current, current+1, ..., last
+                $pages = collect();
+                $pages->push(1);
+                for ($i = max(2, $current - 1); $i <= min($last - 1, $current + 1); $i++) {
+                    $pages->push($i);
+                }
+                if ($last > 1) $pages->push($last);
+                $pages = $pages->unique()->sort()->values();
+            @endphp
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-5">
                 <p class="text-sm text-gray-500">
                     Showing {{ $products->firstItem() }}–{{ $products->lastItem() }} of {{ $products->total() }}
                 </p>
-                <nav class="flex items-center gap-1">
+                <nav class="flex flex-wrap items-center gap-1">
                     @if($products->onFirstPage())
                         <span class="px-3 py-1.5 text-xs text-gray-400 rounded border border-gray-200 cursor-default">Prev</span>
                     @else
@@ -217,11 +229,16 @@
                            class="px-3 py-1.5 text-xs text-gray-700 rounded border border-gray-300 hover:bg-gray-50 transition-colors">Prev</a>
                     @endif
 
-                    @foreach($products->getUrlRange(1, $products->lastPage()) as $page => $url)
-                        @if($page == $products->currentPage())
+                    @foreach($pages as $idx => $page)
+                        {{-- Ellipsis if gap between this page and previous --}}
+                        @if($idx > 0 && $page - $pages[$idx - 1] > 1)
+                            <span class="px-2 py-1.5 text-xs text-gray-400">…</span>
+                        @endif
+
+                        @if($page == $current)
                             <span class="px-3 py-1.5 text-xs font-medium text-white bg-gray-900 rounded">{{ $page }}</span>
                         @else
-                            <a href="{{ $url }}"
+                            <a href="{{ $products->url($page) }}"
                                class="px-3 py-1.5 text-xs text-gray-700 rounded border border-gray-300 hover:bg-gray-50 transition-colors">{{ $page }}</a>
                         @endif
                     @endforeach

@@ -79,25 +79,25 @@
 
     {{-- Desktop sidebar --}}
     <aside class="hidden lg:flex lg:flex-shrink-0">
-        <div class="flex flex-col w-56 bg-white border-r border-gray-200">
+        <div class="flex flex-col w-56 bg-slate-800 border-r border-slate-700">
             {{-- Brand --}}
-            <div class="px-4 py-4 border-b border-gray-100">
-                <div class="text-sm font-semibold text-gray-900">Diva House</div>
-                <div class="text-xs text-gray-400">Admin</div>
+            <div class="px-4 py-4 border-b border-slate-700">
+                <div class="text-sm font-semibold text-white">Diva House</div>
+                <div class="text-xs text-slate-400">Admin</div>
             </div>
 
             {{-- Nav --}}
             <nav class="flex-1 overflow-y-auto py-3 text-[13px]">
                 <div class="px-2 space-y-0.5">
                     <a href="{{ url('/') }}" target="_blank"
-                       class="flex items-center gap-2.5 px-3 py-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
+                       class="flex items-center gap-2.5 px-3 py-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">
                         <i class="fas fa-external-link-alt w-4 text-center text-xs"></i>
                         <span>View Site</span>
                     </a>
 
                     @foreach($navItems as $item)
                         @if(isset($item['divider']))
-                            <div class="my-2 border-t border-gray-100"></div>
+                            <div class="my-2 border-t border-slate-700"></div>
                         @else
                             @php
                                 $isActive = isset($item['routeMatch'])
@@ -107,9 +107,9 @@
                             <a href="{{ $item['url'] }}"
                                class="flex items-center gap-2.5 px-3 py-2 rounded-md transition-colors
                                       {{ $isActive
-                                            ? 'bg-gray-900 text-white'
-                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50' }}">
-                                <i class="fas {{ $item['icon'] }} w-4 text-center text-xs {{ $isActive ? 'text-white' : 'text-gray-400' }}"></i>
+                                            ? 'bg-slate-700 text-white'
+                                            : 'text-slate-300 hover:text-white hover:bg-slate-700' }}">
+                                <i class="fas {{ $item['icon'] }} w-4 text-center text-xs {{ $isActive ? 'text-white' : 'text-slate-500' }}"></i>
                                 <span>{{ $item['label'] }}</span>
                             </a>
                         @endif
@@ -118,10 +118,10 @@
             </nav>
 
             {{-- Bottom --}}
-            <div class="border-t border-gray-100 px-2 py-3">
+            <div class="border-t border-slate-700 px-2 py-3">
                 <a href="{{ route('logout') }}"
                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                   class="flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors">
+                   class="flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] text-slate-400 hover:text-red-400 hover:bg-slate-700 transition-colors">
                     <i class="fas fa-sign-out-alt w-4 text-center text-xs"></i>
                     <span>Log out</span>
                 </a>
@@ -137,14 +137,14 @@
 
         <div class="fixed inset-0 flex z-40">
             <div x-show="sidebarOpen" x-transition.duration.200ms
-                 class="relative flex flex-col w-56 max-w-full bg-white border-r border-gray-200 shadow-lg">
+                 class="relative flex flex-col w-56 max-w-full bg-slate-800 border-r border-slate-700 shadow-lg">
 
-                <div class="flex items-center justify-between px-4 py-4 border-b border-gray-100">
+                <div class="flex items-center justify-between px-4 py-4 border-b border-slate-700">
                     <div>
-                        <div class="text-sm font-semibold text-gray-900">Diva House</div>
-                        <div class="text-xs text-gray-400">Admin</div>
+                        <div class="text-sm font-semibold text-white">Diva House</div>
+                        <div class="text-xs text-slate-400">Admin</div>
                     </div>
-                    <button @click="sidebarOpen = false" class="text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close">
+                    <button @click="sidebarOpen = false" class="text-slate-400 hover:text-white transition-colors" aria-label="Close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -152,7 +152,7 @@
                 <nav class="flex-1 overflow-y-auto py-3 text-[13px]">
                     <div class="px-2 space-y-0.5">
                         <a href="{{ url('/') }}" target="_blank"
-                           class="flex items-center gap-2.5 px-3 py-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
+                           class="flex items-center gap-2.5 px-3 py-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">
                             <i class="fas fa-external-link-alt w-4 text-center text-xs"></i>
                             <span>View Site</span>
                         </a>
@@ -169,9 +169,9 @@
                                 <a href="{{ $item['url'] }}"
                                    class="flex items-center gap-2.5 px-3 py-2 rounded-md transition-colors
                                           {{ $isActive
-                                                ? 'bg-gray-900 text-white'
-                                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50' }}">
-                                    <i class="fas {{ $item['icon'] }} w-4 text-center text-xs {{ $isActive ? 'text-white' : 'text-gray-400' }}"></i>
+                                                ? 'bg-slate-700 text-white'
+                                                : 'text-slate-300 hover:text-white hover:bg-slate-700' }}">
+                                    <i class="fas {{ $item['icon'] }} w-4 text-center text-xs {{ $isActive ? 'text-white' : 'text-slate-500' }}"></i>
                                     <span>{{ $item['label'] }}</span>
                                 </a>
                             @endif
@@ -179,10 +179,10 @@
                     </div>
                 </nav>
 
-                <div class="border-t border-gray-100 px-2 py-3">
+                <div class="border-t border-slate-700 px-2 py-3">
                     <a href="{{ route('logout') }}"
                        onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit();"
-                       class="flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors">
+                       class="flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] text-slate-400 hover:text-red-400 hover:bg-slate-700 transition-colors">
                         <i class="fas fa-sign-out-alt w-4 text-center text-xs"></i>
                         <span>Log out</span>
                     </a>
