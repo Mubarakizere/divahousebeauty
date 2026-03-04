@@ -60,7 +60,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name'           => ['required', 'string', 'max:255'],
-            'express_price'  => ['required', 'numeric', 'min:0'],
+            'express_price'  => ['nullable', 'numeric', 'min:0'],
             'standard_price' => ['nullable', 'numeric', 'min:0'],
             'shipping_type'  => ['required', 'in:both,express_only,standard_only'],
             'stock'          => ['required', 'integer'],
@@ -70,6 +70,13 @@ class ProductController extends Controller
             // 30MB per image (Laravel uses KB)
             'images.*'       => ['nullable', 'image', 'max:30720'],
         ]);
+
+        // Validate express_price is required when shipping_type is 'express_only' or 'both'
+        if (in_array($validated['shipping_type'], ['both', 'express_only']) && empty($validated['express_price'])) {
+            return back()
+                ->withInput()
+                ->withErrors(['express_price' => 'Express price is required for this shipping type.']);
+        }
 
         // Validate standard_price is required when shipping_type is 'both' or 'standard_only'
         if (in_array($validated['shipping_type'], ['both', 'standard_only']) && empty($validated['standard_price'])) {
@@ -166,7 +173,7 @@ class ProductController extends Controller
         // ✅ STEP 2: normal update
         $validated = $request->validate([
             'name'           => ['required', 'string', 'max:255'],
-            'express_price'  => ['required', 'numeric', 'min:0'],
+            'express_price'  => ['nullable', 'numeric', 'min:0'],
             'standard_price' => ['nullable', 'numeric', 'min:0'],
             'shipping_type'  => ['required', 'in:both,express_only,standard_only'],
             'stock'          => ['required', 'integer'],
@@ -175,6 +182,13 @@ class ProductController extends Controller
             'description'    => ['nullable', 'string'],
             'images.*'       => ['nullable', 'image', 'max:30720'], // 30MB
         ]);
+
+        // Validate express_price is required when shipping_type is 'express_only' or 'both'
+        if (in_array($validated['shipping_type'], ['both', 'express_only']) && empty($validated['express_price'])) {
+            return back()
+                ->withInput()
+                ->withErrors(['express_price' => 'Express price is required for this shipping type.']);
+        }
 
         // Validate standard_price is required when shipping_type is 'both' or 'standard_only'
         if (in_array($validated['shipping_type'], ['both', 'standard_only']) && empty($validated['standard_price'])) {
@@ -209,7 +223,6 @@ class ProductController extends Controller
             }
         }
 
-        $validated['slug']   = Str::slug($validated['name']) . '-' . uniqid();
         $validated['images'] = $images;
 
         $product->update($validated);

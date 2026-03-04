@@ -11,6 +11,11 @@
   <title>Diva House Beauty - Premium Cosmetics & Fashion</title>
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
+  {{-- Favicon --}}
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/images/icons/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/images/icons/favicon-16x16.png') }}">
+  <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+
   {{-- Tailwind + Alpine --}}
   <script>
     tailwind = { config: { corePlugins: { preflight: false } } }
