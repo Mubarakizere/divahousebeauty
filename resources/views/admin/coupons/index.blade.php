@@ -43,6 +43,7 @@
         .stagger-5 { animation-delay: 0.5s; }
     </style>
 @endpush
+@section('content')
 <div class="space-y-6">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-up">

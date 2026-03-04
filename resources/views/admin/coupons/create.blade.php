@@ -1,3 +1,6 @@
+@extends('layouts.dashboard')
+@section('title', isset($coupon) ? 'Edit Coupon' : 'Create Coupon')
+@section('content')
 @push('head')
     <style>
         @keyframes slideInRight {
