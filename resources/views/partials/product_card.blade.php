@@ -6,10 +6,10 @@
     // Check for active promotion
     $promotion = $product->promotion()->where('end_time', '>=', now())->first();
 
-    // Fix for 0 prices: Use express_price if available, else standard_price
-    $displayPrice = (float)$product->express_price > 0 
-        ? (float)$product->express_price 
-        : ((float)$product->standard_price > 0 ? (float)$product->standard_price : 0);
+    // Fix for 0 prices: Use standard_price if available, else express_price
+    $displayPrice = (float)$product->standard_price > 0 
+        ? (float)$product->standard_price 
+        : ((float)$product->express_price > 0 ? (float)$product->express_price : 0);
 
     $discountedPrice = $promotion 
         ? $displayPrice * (1 - $promotion->discount_percentage / 100) 

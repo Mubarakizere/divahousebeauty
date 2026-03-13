@@ -212,7 +212,7 @@
                 </div>
 
                 <div class="mb-6" x-data="{ 
-                    selectedShipping: '{{ $product->has_express ? 'express' : 'standard' }}',
+                    selectedShipping: '{{ $product->has_standard ? 'standard' : 'express' }}',
                     hasExpress: {{ $product->has_express ? 'true' : 'false' }},
                     hasStandard: {{ $product->has_standard ? 'true' : 'false' }},
                     hasBoth: {{ ($product->has_express && $product->has_standard) ? 'true' : 'false' }},

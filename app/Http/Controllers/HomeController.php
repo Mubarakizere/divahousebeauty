@@ -167,14 +167,14 @@ class HomeController extends Controller
                 return redirect()->back()->with('error', 'Product not found');
             }
 
-            // Get shipping type from request (default to 'express')
-            $shippingType = $request->input('shipping_type', 'express');
+            // Get shipping type from request (default to 'standard')
+            $shippingType = $request->input('shipping_type', 'standard');
             
             // Validate shipping type against product's available options
-            if ($shippingType === 'standard' && !$product->has_standard) {
-                $shippingType = 'express';
-            } elseif ($shippingType === 'express' && !$product->has_express) {
+            if ($shippingType === 'express' && !$product->has_express) {
                 $shippingType = 'standard';
+            } elseif ($shippingType === 'standard' && !$product->has_standard) {
+                $shippingType = 'express';
             }
 
             // Get the base price based on shipping type
