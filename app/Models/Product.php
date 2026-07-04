@@ -196,11 +196,11 @@ class Product extends Model
     // ── Pricing / Promotion ──────────────────────────────────────────
     
     /**
-     * Backward compatibility: 'price' now returns express_price
+     * Backward compatibility: 'price' now returns standard_price
      */
     public function getPriceAttribute(): float
     {
-        return (float) ($this->express_price ?? 0);
+        return (float) ($this->standard_price ?? 0);
     }
 
     /**
@@ -221,8 +221,8 @@ class Product extends Model
 
     public function getFormattedPriceAttribute(): string
     {
-        // RWF generally shown without decimals - returns express price
-        return number_format((float) $this->express_price, 0) . ' RWF';
+        // RWF generally shown without decimals - returns standard price
+        return number_format((float) ($this->standard_price ?? 0), 0) . ' RWF';
     }
 
     public function getFormattedExpressPriceAttribute(): string

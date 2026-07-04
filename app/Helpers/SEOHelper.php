@@ -235,6 +235,113 @@ class SEOHelper
     }
 
     /**
+     * Generate SEO meta tags for About page
+     */
+    public static function aboutMeta()
+    {
+        return [
+            'title' => 'About Diva House Beauty - Rwanda\'s Premier Cosmetics & Beauty Store | Our Story',
+            'description' => 'Learn about Diva House Beauty — Rwanda\'s #1 online cosmetics and beauty store based in Kigali. Authentic products, fast delivery, and trusted by thousands of happy customers.',
+            'keywords' => implode(', ', [
+                'about Diva House Beauty',
+                'cosmetics store Rwanda',
+                'beauty store Kigali',
+                'Rwanda beauty company',
+                'Diva House Beauty story',
+                'online cosmetics Rwanda',
+                'authentic beauty products Kigali',
+            ]),
+            'canonical' => route('about'),
+            'og' => [
+                'title' => 'About Diva House Beauty - Rwanda\'s #1 Cosmetics Store',
+                'description' => 'Discover our story. Diva House Beauty is Kigali\'s trusted destination for premium cosmetics, skincare, haircare & fashion.',
+                'url' => route('about'),
+                'type' => 'website',
+                'image' => asset('assets/images/og-image.jpg'),
+            ],
+            'schema' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'AboutPage',
+                'name' => 'About Diva House Beauty',
+                'description' => 'Rwanda\'s premier online cosmetics and beauty store, based in Kigali.',
+                'url' => route('about'),
+                'mainEntity' => [
+                    '@type' => 'Organization',
+                    'name' => 'Diva House Beauty',
+                    'url' => url('/'),
+                    'telephone' => '+250780159059',
+                    'address' => [
+                        '@type' => 'PostalAddress',
+                        'addressLocality' => 'Kigali',
+                        'addressCountry' => 'RW',
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Generate SEO meta tags for Contact page
+     */
+    public static function contactMeta()
+    {
+        return [
+            'title' => 'Contact Diva House Beauty - Reach Us in Kigali, Rwanda | Phone, Email, WhatsApp',
+            'description' => 'Get in touch with Diva House Beauty in Kigali, Rwanda. Call +250 780 159 059, email info@divahousebeauty.com, or WhatsApp us. Fast response guaranteed.',
+            'keywords' => implode(', ', [
+                'contact Diva House Beauty',
+                'Diva House Beauty phone',
+                'cosmetics store Kigali contact',
+                'beauty store Rwanda phone number',
+                'Diva House Beauty email',
+                'Diva House Beauty WhatsApp',
+                'Kigali beauty store location',
+            ]),
+            'canonical' => route('contact'),
+            'og' => [
+                'title' => 'Contact Diva House Beauty - Kigali, Rwanda',
+                'description' => 'Reach us at +250 780 159 059 or email info@divahousebeauty.com. Visit our store in Kigali, Rwanda.',
+                'url' => route('contact'),
+                'type' => 'website',
+                'image' => asset('assets/images/og-image.jpg'),
+            ],
+            'schema' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'ContactPage',
+                'name' => 'Contact Diva House Beauty',
+                'description' => 'Contact information for Diva House Beauty in Kigali, Rwanda.',
+                'url' => route('contact'),
+                'mainEntity' => [
+                    '@type' => 'Organization',
+                    'name' => 'Diva House Beauty',
+                    'url' => url('/'),
+                    'email' => 'info@divahousebeauty.com',
+                    'telephone' => '+250780159059',
+                    'address' => [
+                        '@type' => 'PostalAddress',
+                        'addressLocality' => 'Kigali',
+                        'addressCountry' => 'RW',
+                    ],
+                    'openingHoursSpecification' => [
+                        [
+                            '@type' => 'OpeningHoursSpecification',
+                            'dayOfWeek' => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+                            'opens' => '09:00',
+                            'closes' => '20:00',
+                        ],
+                        [
+                            '@type' => 'OpeningHoursSpecification',
+                            'dayOfWeek' => 'Sunday',
+                            'opens' => '12:00',
+                            'closes' => '18:00',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
      * Generate breadcrumb schema
      */
     public static function breadcrumbSchema($items)

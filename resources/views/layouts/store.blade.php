@@ -4,7 +4,22 @@
   <meta charset="UTF-8"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>@yield('title', 'Diva House Beauty')</title>
+  
+  {{-- SEO Meta Tags (title, description, OG, Twitter, JSON-LD) --}}
+  @if(isset($seo))
+    @include('partials.seo_meta')
+  @else
+    <title>@yield('title', 'Diva House Beauty - Rwanda\'s #1 Cosmetics & Beauty Store')</title>
+    <meta name="description" content="@yield('meta_description', 'Shop premium cosmetics, skincare, makeup, haircare & fashion at Diva House Beauty. Rwanda\'s #1 online beauty store with fast Kigali delivery.')">
+    <meta property="og:title" content="@yield('title', 'Diva House Beauty')" />
+    <meta property="og:description" content="@yield('meta_description', 'Rwanda\'s #1 online cosmetics & beauty store.')" />
+    <meta property="og:image" content="{{ asset('assets/images/og-image.jpg') }}" />
+    <meta property="og:url" content="{{ url()->current() }}" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="{{ url()->current() }}">
+  @endif
+
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
   {{-- PWA Meta Tags --}}

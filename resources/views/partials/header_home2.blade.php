@@ -85,7 +85,7 @@
       {{-- Logo --}}
       <div class="col-span-6 md:col-span-2 flex items-center">
         <a href="{{ route('home') }}" aria-label="Diva House Beauty">
-          <img src="{{ asset('assets/images/demos/demo-14/logo.png') }}" alt="DHB" class="h-8 w-auto">
+          <img src="{{ asset('assets/images/demos/demo-14/logo.png') }}" alt="Diva House Beauty - Rwanda Cosmetics & Beauty Store" class="h-8 w-auto">
         </a>
       </div>
 

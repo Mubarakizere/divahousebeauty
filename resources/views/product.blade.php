@@ -211,35 +211,7 @@
                   </a>
                 </div>
 
-                <div class="mb-6" x-data="{ 
-                    selectedShipping: '{{ $product->has_standard ? 'standard' : 'express' }}',
-                    hasExpress: {{ $product->has_express ? 'true' : 'false' }},
-                    hasStandard: {{ $product->has_standard ? 'true' : 'false' }},
-                    hasBoth: {{ ($product->has_express && $product->has_standard) ? 'true' : 'false' }},
-                    expressPrice: {{ $product->express_price ?? 0 }},
-                    standardPrice: {{ $product->standard_price ?? 0 }}
-                  }">
-                  
-                  {{-- Shipping Type Selector (only show if both options available) --}}
-                  <template x-if="hasBoth">
-                    <div class="flex gap-2 mb-4">
-                      <button type="button" 
-                              @click="selectedShipping = 'express'"
-                              :class="selectedShipping === 'express' ? 'bg-[var(--black)] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                              class="flex-1 px-4 py-3 rounded-lg font-medium transition-colors text-sm">
-                        <i class="la la-bolt mr-1"></i> Express
-                        <span class="block text-xs opacity-75">Fast Delivery</span>
-                      </button>
-                      <button type="button" 
-                              @click="selectedShipping = 'standard'"
-                              :class="selectedShipping === 'standard' ? 'bg-[var(--black)] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                              class="flex-1 px-4 py-3 rounded-lg font-medium transition-colors text-sm">
-                        <i class="la la-clock mr-1"></i> Standard
-                        <span class="block text-xs opacity-75">7+ Days</span>
-                      </button>
-                    </div>
-                  </template>
-
+                <div class="mb-6">
                   {{-- Price Display --}}
                   @if($isOnSale)
                     <div class="flex items-baseline gap-3 bg-red-50 px-3 py-1 rounded-lg">
@@ -247,35 +219,13 @@
                       <span class="text-lg text-slate-400 line-through font-serif convertible-price" data-price-rwf="{{ $basePrice }}" data-currency="RWF">Rw {{ number_format($basePrice) }}</span>
                     </div>
                   @else
-                    {{-- Dynamic price based on selection --}}
-                    <template x-if="hasBoth">
-                      <div>
-                        <div x-show="selectedShipping === 'express'" class="text-3xl font-serif text-[var(--black)]">
-                          <span class="convertible-price" data-price-rwf="{{ $product->express_price ?? 0 }}" data-currency="RWF">Rw {{ number_format($product->express_price ?? 0) }}</span>
-                          <span class="text-sm text-blue-600 font-normal ml-2"><i class="la la-bolt"></i> Express</span>
-                        </div>
-                        <div x-show="selectedShipping === 'standard'" class="text-3xl font-serif text-[var(--black)]">
-                          <span class="convertible-price" data-price-rwf="{{ $product->standard_price ?? 0 }}" data-currency="RWF">Rw {{ number_format($product->standard_price ?? 0) }}</span>
-                          <span class="text-sm text-green-600 font-normal ml-2"><i class="la la-clock"></i> 7+ Days</span>
-                        </div>
-                      </div>
-                    </template>
-                    <template x-if="!hasBoth && hasExpress">
-                      <div class="text-3xl font-serif text-[var(--black)]">
-                        <span class="convertible-price" data-price-rwf="{{ $product->express_price ?? 0 }}" data-currency="RWF">Rw {{ number_format($product->express_price ?? 0) }}</span>
-                        <span class="text-sm text-blue-600 font-normal ml-2"><i class="la la-bolt"></i> Express Shipping</span>
-                      </div>
-                    </template>
-                    <template x-if="!hasBoth && hasStandard">
-                      <div class="text-3xl font-serif text-[var(--black)]">
-                        <span class="convertible-price" data-price-rwf="{{ $product->standard_price ?? 0 }}" data-currency="RWF">Rw {{ number_format($product->standard_price ?? 0) }}</span>
-                        <span class="text-sm text-green-600 font-normal ml-2"><i class="la la-clock"></i> Standard (7+ Days)</span>
-                      </div>
-                    </template>
+                    <div class="text-3xl font-serif text-[var(--black)]">
+                      <span class="convertible-price" data-price-rwf="{{ $basePrice }}" data-currency="RWF">Rw {{ number_format($basePrice) }}</span>
+                    </div>
                   @endif
                   
-                  {{-- Hidden input for form submission --}}
-                  <input type="hidden" name="shipping_type" x-model="selectedShipping" form="add-to-cart-form">
+                  {{-- Hidden input for form submission (default to standard) --}}
+                  <input type="hidden" name="shipping_type" value="standard" form="add-to-cart-form">
                   
                   <div class="mt-3">
                     @if($inStock)

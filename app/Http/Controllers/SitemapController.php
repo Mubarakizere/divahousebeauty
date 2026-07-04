@@ -144,6 +144,10 @@ class SitemapController extends Controller
      */
     private function addUrl($loc, $lastmod = null, $changefreq = 'weekly', $priority = '0.5')
     {
+        // Sanitize URL: strip carriage returns, line feeds, and trailing whitespace from slugs
+        $loc = preg_replace('/[\r\n\s]+$/', '', $loc);
+        $loc = str_replace(["\r", "\n", "%0D", "%0A", "%0d", "%0a"], '', $loc);
+
         $xml = '<url>';
         $xml .= '<loc>' . htmlspecialchars($loc) . '</loc>';
         

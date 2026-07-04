@@ -115,11 +115,10 @@
 
                 <div class="grid grid-cols-2 gap-3">
                     <div x-show="type === 'express_only' || type === 'both'">
-                        <label class="block text-xs text-gray-500 mb-1">Express Price (RWF) <span class="text-red-400">*</span></label>
+                        <label class="block text-xs text-gray-500 mb-1">Express Price (RWF) <span class="text-gray-400 font-normal">(optional)</span></label>
                         <input type="number" name="express_price" id="express_price"
                                value="{{ old('express_price', $product->express_price) }}"
                                min="0" step="1"
-                               :required="type === 'express_only' || type === 'both'"
                                class="w-full px-3 py-2 text-sm border @error('express_price') border-red-400 @else border-gray-300 @enderror rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400">
                         @error('express_price')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                     </div>

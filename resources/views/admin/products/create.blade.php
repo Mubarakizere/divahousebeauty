@@ -121,7 +121,7 @@
                     {{-- Express Price (Fast Delivery) --}}
                     <div x-show="shippingType === 'express_only' || shippingType === 'both'">
                         <label for="express_price" class="block text-sm font-medium text-gray-700 mb-2">
-                            Express Price (RWF) <span class="text-red-500">*</span>
+                            Express Price (RWF) <span class="text-gray-400 text-xs font-normal">(Optional)</span>
                             <span class="text-xs text-blue-600 font-normal ml-1">Fast Delivery</span>
                         </label>
                         <div class="relative">
@@ -134,7 +134,6 @@
                                 id="express_price"
                                 class="block w-full pl-12 pr-3 py-2 border {{ $errors->has('express_price') ? 'border-red-300 ring-red-500' : 'border-gray-300' }} rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 value="{{ old('express_price') }}"
-                                :required="shippingType === 'express_only' || shippingType === 'both'"
                                 min="0"
                                 step="1"
                                 placeholder="0">

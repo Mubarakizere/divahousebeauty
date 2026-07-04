@@ -8,7 +8,22 @@
   {{-- Google Search Console Verification --}}
   <meta name="google-site-verification" content="42_XUFLKGXoph33K7-fbfNzwRUFnFvInTzPQCuIJLYM" />
   
-  <title>Diva House Beauty - Premium Cosmetics & Fashion</title>
+  {{-- SEO Meta Tags (title, description, OG, Twitter, JSON-LD) --}}
+  @include('partials.seo_meta')
+
+  {{-- Fallback title if $seo is not set --}}
+  @if(!isset($seo))
+    <title>Diva House Beauty - Premium Cosmetics & Fashion in Rwanda</title>
+    <meta name="description" content="Rwanda's #1 online cosmetics & beauty store. Shop premium skincare, makeup, haircare, wigs, fragrances & fashion. Fast Kigali delivery. Diva House Beauty.">
+    <meta property="og:title" content="Diva House Beauty - Premium Cosmetics & Fashion" />
+    <meta property="og:description" content="Rwanda's #1 online cosmetics & beauty store. Shop authentic beauty products with fast Kigali delivery." />
+    <meta property="og:image" content="{{ asset('assets/images/og-image.jpg') }}" />
+    <meta property="og:url" content="{{ url('/') }}" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="{{ url('/') }}">
+  @endif
+
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
   {{-- Favicon --}}

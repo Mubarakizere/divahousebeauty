@@ -107,7 +107,7 @@
               $slugOrId = $p->slug ?? $p->id;
               $price = (float)$p->standard_price > 0 
                   ? (float)$p->standard_price 
-                  : ((float)$p->express_price > 0 ? (float)$p->express_price : 0);
+                  : 0;
             @endphp
 
             <article class="snap-start w-64 sm:w-72 shrink-0 rounded-xl bg-white border border-slate-200 shadow-ring hover:shadow-lg transition-shadow"

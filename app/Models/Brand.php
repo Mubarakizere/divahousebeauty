@@ -23,6 +23,15 @@ class Brand extends Model
         return 'slug';
     }
 
+    /**
+     * Accessor: sanitize slug on read to strip any stray CR/LF characters.
+     * Fixes the 'lash-care%0D%0A' broken URL issue.
+     */
+    public function getSlugAttribute($value): string
+    {
+        return trim(str_replace(["\r", "\n"], '', $value ?? ''));
+    }
+
     /** Auto-generate unique slugs on create/update */
     protected static function boot()
     {

@@ -16,8 +16,17 @@
   <meta charset="UTF-8"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>About Diva House Beauty</title>
+  
+  {{-- SEO Meta Tags --}}
+  @php $seo = $seo ?? \App\Helpers\SEOHelper::aboutMeta(); @endphp
+  @include('partials.seo_meta')
+  
   <meta name="csrf-token" content="{{ csrf_token() }}">
+
+  {{-- Favicon --}}
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/images/icons/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/images/icons/favicon-16x16.png') }}">
+  <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
   {{-- Google Fonts: Inter + Playfair Display --}}
   <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -103,13 +103,13 @@
                                 </td>
                                 <td class="py-3 px-3">
                                     @if($product->shipping_type === 'both')
-                                        <div class="text-xs text-gray-700">{{ number_format($product->express_price) }} <span class="text-gray-400">exp</span></div>
+                                        <div class="text-xs text-gray-700">{{ number_format($product->express_price ?? 0) }} <span class="text-gray-400">exp</span></div>
                                         <div class="text-xs text-gray-500">{{ number_format($product->standard_price ?? 0) }} <span class="text-gray-400">std</span></div>
                                     @elseif($product->shipping_type === 'standard_only')
                                         <div class="text-sm text-gray-900">{{ number_format($product->standard_price ?? 0) }}</div>
                                         <div class="text-xs text-gray-400">standard</div>
                                     @else
-                                        <div class="text-sm text-gray-900">{{ number_format($product->express_price) }}</div>
+                                        <div class="text-sm text-gray-900">{{ number_format($product->express_price ?? 0) }}</div>
                                         <div class="text-xs text-gray-400">express</div>
                                     @endif
                                 </td>
@@ -162,11 +162,11 @@
                                         <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
                                             <span>
                                                 @if($product->shipping_type === 'both')
-                                                    {{ number_format($product->express_price) }} / {{ number_format($product->standard_price ?? 0) }} RWF
+                                                    {{ number_format($product->express_price ?? 0) }} / {{ number_format($product->standard_price ?? 0) }} RWF
                                                 @elseif($product->shipping_type === 'standard_only')
                                                     {{ number_format($product->standard_price ?? 0) }} RWF
                                                 @else
-                                                    {{ number_format($product->express_price) }} RWF
+                                                    {{ number_format($product->express_price ?? 0) }} RWF
                                                 @endif
                                             </span>
                                             <span>Stock: 
