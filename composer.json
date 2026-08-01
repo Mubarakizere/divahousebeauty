@@ -14,6 +14,7 @@
         "firebase/php-jwt": "^6.11",
         "guzzlehttp/guzzle": "^7.9",
         "intervention/image-laravel": "^1.0",
+        "knuckleswtf/scribe": "^5.11",
         "laravel/framework": "^10.0",
         "laravel/sanctum": "^3.2",
         "laravel/socialite": "^5.18",
@@ -28,7 +29,6 @@
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
-        "knuckleswtf/scribe": "^5.11",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",
         "mockery/mockery": "^1.4.4",
