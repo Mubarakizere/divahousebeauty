@@ -120,11 +120,10 @@
                 <div class="mt-3">
                   <label for="phone" class="block text-[13px] font-medium text-slate-700">Phone Number *</label>
                   <input id="phone" name="phone" type="tel" required
-                         placeholder="+2507XXXXXXXX or 07XXXXXXXX"
+                         placeholder="Enter your phone number"
                          value="{{ old('phone', auth()->user()->phone ?? '') }}"
-                         pattern="^(\+?250)?\s?7[2389]\d{7}$|^0?7[2389]\d{7}$"
                          class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold)]/20"/>
-                  <p class="mt-1 text-[12px] text-slate-500">Use your MoMo/Airtel Money number.</p>
+                  <p class="mt-1 text-[12px] text-slate-500">Use your MoMo/Airtel Money or billing phone number.</p>
                   @error('phone')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                   @enderror
@@ -203,6 +202,21 @@
                   </label>
 
                   {{-- Card --}}
+                  <label class="relative flex items-center gap-3 rounded-lg border border-slate-300 bg-white p-3 cursor-pointer hover:border-[var(--gold)] hover:bg-slate-50">
+                    <input type="radio" name="payment_method" value="card"
+                           class="sr-only peer"
+                           {{ old('payment_method') === 'card' ? 'checked' : '' }}>
+                    <span class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-[var(--gold)]">
+                      <i class="la la-credit-card text-xl"></i>
+                    </span>
+                    <span class="flex-1">
+                      <span class="block text-sm font-semibold text-slate-900">Credit / Debit Card</span>
+                      <span class="block text-[12px] text-slate-500">Pay securely with your card</span>
+                    </span>
+                    <span class="grid place-items-center rounded-full h-6 w-6 border border-slate-300 text-white peer-checked:bg-[var(--gold)] peer-checked:border-[var(--gold)]">
+                      <i class="la la-check text-xs"></i>
+                    </span>
+                  </label>
                 </div>
                 @error('payment_method')
                   <p class="mt-2 text-xs text-red-600">{{ $message }}</p>
