@@ -56,6 +56,11 @@ Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
 
 Route::get('/about', [PageController::class, 'about'])->name('about');
 
+// Placeholder for Booking (feature coming soon)
+Route::get('/booking', function () {
+    return redirect('/')->with('info', 'Booking feature is coming soon!');
+})->name('booking.create');
+
 // Products
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
