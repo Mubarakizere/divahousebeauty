@@ -56,9 +56,9 @@ Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
 
 Route::get('/about', [PageController::class, 'about'])->name('about');
 
-// Placeholder for Booking (feature coming soon)
+// External Booking / Ihuriro Link
 Route::get('/booking', function () {
-    return redirect('/')->with('info', 'Booking feature is coming soon!');
+    return redirect()->away('https://ihuriro.divahousebeauty.com/');
 })->name('booking.create');
 
 // Products
