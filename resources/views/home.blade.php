@@ -94,7 +94,7 @@
 </head>
 
 <body class="bg-[#fafafa] text-slate-700 antialiased"
-      x-data="{ authOpen:false, authTab:'signin' }"
+      x-data="{ authOpen: {{ session('showLoginModal') ? 'true' : 'false' }}, authTab:'signin' }"
       @open-auth.window="authOpen=true; authTab=$event.detail?.tab || 'signin'">
 
   {{-- HEADER --}}

@@ -17,8 +17,7 @@ class LoginController extends Controller
      */
     public function showLoginForm()
     {
-        $categories = Category::all(); // optional for the login view
-        return view('auth.login', compact('categories'));
+        return redirect('/')->with('showLoginModal', true);
     }
 
     /**

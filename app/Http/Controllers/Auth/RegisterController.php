@@ -33,6 +33,14 @@ class RegisterController extends Controller
     }
 
     /**
+     * Show the application registration form.
+     */
+    public function showRegistrationForm()
+    {
+        return redirect('/')->with('showLoginModal', true);
+    }
+
+    /**
      * Override default register to trigger email verification.
      */
     public function register(Request $request)

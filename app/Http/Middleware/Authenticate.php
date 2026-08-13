@@ -17,7 +17,8 @@ class Authenticate extends Middleware
             // Store the last page the user was trying to visit
             Session::put('url.intended', url()->current());
 
-            session()->flash('error', 'Access Denied! You must log in first.');
+            session()->flash('error', 'Please log in or create an account first.');
+            session()->flash('showLoginModal', true);
             return route('home'); // Redirect to home page
         }
     }

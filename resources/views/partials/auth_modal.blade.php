@@ -29,6 +29,11 @@
 
       {{-- Sign In --}}
       <div x-show="authTab==='signin'">
+        @if (session('error'))
+          <div class="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            <i class="la la-exclamation-triangle mr-1"></i> {{ session('error') }}
+          </div>
+        @endif
         @if ($errors->any() && old('_tab','signin')==='signin')
           <div class="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
             <i class="la la-exclamation-triangle mr-1"></i> There were issues with your sign in.
