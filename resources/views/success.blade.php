@@ -446,17 +446,7 @@
                                     <a href="{{ route('password.request') }}" class="forgot-link">Forgot Your Password?</a>
                                 </div>
                             </form>                                    
-                            <div class="form-choice">
-                                <p class="text-center">or sign in with</p>
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <a href="{{route('google-auth')}}" class="btn btn-login btn-g">
-                                            <i class="icon-google"></i>
-                                            Login With Google
-                                        </a>
-                                    </div><!-- End .col-6 -->
-                                </div><!-- End .row -->
-                            </div><!-- End .form-choice -->
+
                         </div><!-- .End .tab-pane -->
                         <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
                             <form method="POST" action="{{ route('register') }}">
@@ -496,17 +486,7 @@
                                     </div>
                                 </div>
                             </form>                                    
-                            <div class="form-choice">
-                                <p class="text-center">or sign in with</p>
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <a href="{{route('google-auth')}}" class="btn btn-login btn-g">
-                                            <i class="icon-google"></i>
-                                            Login With Google
-                                        </a>
-                                    </div><!-- End .col-6 -->
-                                </div><!-- End .row -->
-                            </div><!-- End .form-choice -->
+
                         </div><!-- .End .tab-pane -->
                     </div><!-- End .tab-content -->
                 </div><!-- End .form-tab -->

@@ -34,7 +34,7 @@ use App\Http\Controllers\Admin\BrandController as AdminBrandController;
 // =========================
 // 🔐 Authentication Routes
 // =========================
-Auth::routes();
+Auth::routes(['verify' => true]);
 
 // =========================
 // 🌐 Public Routes

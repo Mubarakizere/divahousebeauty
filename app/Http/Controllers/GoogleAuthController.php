@@ -70,6 +70,7 @@ class GoogleAuthController extends Controller
             return redirect()->intended(route('dashboard'))->with('success', 'Welcome, ' . $user->name . '!');
 
         } catch (\Throwable $th) {
+            \Illuminate\Support\Facades\Log::error('Google Auth Exception: ' . $th->getMessage(), ['trace' => $th->getTraceAsString()]);
             return redirect('/')->with('error', 'Google login failed: ' . $th->getMessage())->with('showLoginModal', true);
         }
     }

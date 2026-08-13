@@ -320,13 +320,7 @@
           </div>
         </form>
 
-        <div class="mt-5">
-          <p class="text-center text-xs text-slate-500 mb-2">or sign in with</p>
-          <a href="{{ route('google-auth') }}"
-             class="w-full inline-flex items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50">
-            <i class="la la-google text-red-500"></i> Login with Google
-          </a>
-        </div>
+
       </div>
 
       {{-- Register --}}
@@ -404,13 +398,7 @@
           </div>
         </form>
 
-        <div class="mt-5">
-          <p class="text-center text-xs text-slate-500 mb-2">or continue with</p>
-          <a href="{{ route('google-auth') }}"
-             class="w-full inline-flex items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50">
-            <i class="la la-google text-red-500"></i> Continue with Google
-          </a>
-        </div>
+
       </div>
     </div>
   </div>

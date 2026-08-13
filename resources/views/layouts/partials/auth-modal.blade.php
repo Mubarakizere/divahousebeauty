@@ -32,12 +32,7 @@
                 </div>
                 <button type="submit" class="w-full bg-pink-600 hover:bg-pink-700 text-white py-2 rounded">Sign In</button>
             </form>
-            <div class="text-center mt-4">
-                <p class="text-gray-600">or continue with</p>
-                <a href="{{ route('google-auth') }}" class="inline-flex mt-2 items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
-                    <i class="ph ph-google-logo"></i> Google
-                </a>
-            </div>
+
         </div>
 
         {{-- Register Form --}}
@@ -66,12 +61,7 @@
                 </label>
                 <button type="submit" class="w-full bg-pink-600 hover:bg-pink-700 text-white py-2 rounded">Sign Up</button>
             </form>
-            <div class="text-center mt-4">
-                <p class="text-gray-600">or continue with</p>
-                <a href="{{ route('google-auth') }}" class="inline-flex mt-2 items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
-                    <i class="ph ph-google-logo"></i> Google
-                </a>
-            </div>
+
         </div>
     </div>
 </div>
