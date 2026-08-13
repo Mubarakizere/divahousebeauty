@@ -41,7 +41,7 @@
             <h4 class="font-semibold mb-4 text-white">Services</h4>
             <ul class="space-y-2 text-sm text-gray-300">
                 @foreach (['SPA', 'Hairstyle', 'Lashes', 'Nails', 'Barber Shop', 'Tattoo'] as $service)
-                    <li><a href="{{ route('booking.create') }}" class="hover:text-pink-400">{{ $service }}</a></li>
+                    <li><a href="https://ihuriro.divahousebeauty.com/" class="hover:text-pink-400">{{ $service }}</a></li>
                 @endforeach
             </ul>
         </div>

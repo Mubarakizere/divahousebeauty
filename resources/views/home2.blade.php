@@ -92,7 +92,7 @@
                class="inline-flex items-center gap-2 rounded-md border border-[var(--gold)] px-4 py-2.5 text-sm font-semibold text-[var(--gold)] hover:bg-[var(--gold)] hover:text-white">
               Shop Fashion
             </a>
-            <a href="{{ route('booking.create') }}"
+            <a href="https://ihuriro.divahousebeauty.com/"
                class="inline-flex items-center gap-2 rounded-md border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
               Book a Service
             </a>

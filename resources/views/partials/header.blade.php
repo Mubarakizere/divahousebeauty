@@ -19,7 +19,7 @@
                     Ihuriro <i class="ph ph-caret-down text-xs mt-[1px]"></i>
                 </button>
                 <div class="absolute left-0 mt-2 hidden group-hover:block bg-white shadow-md rounded-md p-2 space-y-2 z-20">
-                    <a href="{{ route('booking.create') }}" class="block hover:text-pink-600">Booking</a>
+                    <a href="https://ihuriro.divahousebeauty.com/" class="block hover:text-pink-600">Booking</a>
                 </div>
             </div>
             @guest
@@ -130,7 +130,7 @@
     <div id="mobile-menu" class="md:hidden hidden flex flex-col px-4 pb-4 space-y-3 bg-white border-t">
         <a href="{{ route('home') }}" class="block">Home</a>
         <a href="{{ route('category') }}" class="block">Shop</a>
-        <a href="{{ route('booking.create') }}" class="block">Booking</a>
+        <a href="https://ihuriro.divahousebeauty.com/" class="block">Booking</a>
         @guest
             <a href="#signin-modal" class="block">Sign in / Sign up</a>
         @else
