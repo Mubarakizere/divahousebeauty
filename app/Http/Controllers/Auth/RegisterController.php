@@ -20,7 +20,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/email/verify'; // Redirect to email verification notice
+    protected $redirectTo = '/dashboard'; // Redirect to dashboard
 
     /**
      * Create a new controller instance.
@@ -38,25 +38,6 @@ class RegisterController extends Controller
     public function showRegistrationForm()
     {
         return redirect('/')->with('showLoginModal', true);
-    }
-
-    /**
-     * Override default register to trigger email verification.
-     */
-    public function register(Request $request)
-    {
-        $this->validator($request->all())->validate();
-
-        $user = $this->create($request->all());
-
-        // 🔥 Trigger verification email
-        event(new Registered($user));
-
-        // Log the user in
-        $this->guard()->login($user);
-
-        // Redirect to email verification notice
-        return redirect()->route('verification.notice');
     }
 
     /**
