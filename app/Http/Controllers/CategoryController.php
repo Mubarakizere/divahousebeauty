@@ -112,9 +112,9 @@ class CategoryController extends Controller
         } else {
             // Generic category/shop page SEO
             $seo = [
-                'title' => 'Shop All Products - Rwanda\'s #1 Cosmetics Store | Diva House Beauty',
-                'description' => 'Shop authentic beauty products and cosmetics in Rwanda ✓ 100+ Products ✓ Fast Kigali Delivery ✓ MTN & Airtel Money ✓ Trusted Quality ✓ Best Prices',
-                'keywords' => 'shop cosmetics Rwanda, beauty products Kigali, buy makeup online Rwanda, skincare Rwanda, Diva House Beauty',
+                'title' => 'Shop All Products - East Africa\'s #1 Cosmetics Store | Diva House Beauty',
+                'description' => 'Shop authentic beauty products and cosmetics in East Africa ✓ 100+ Products ✓ Fast Kigali Delivery ✓ MTN & Airtel Money ✓ Trusted Quality ✓ Best Prices',
+                'keywords' => 'shop cosmetics East Africa, beauty products Kigali, buy makeup online East Africa, skincare East Africa, Diva House Beauty',
                 'canonical' => route('category'),
             ];
         }

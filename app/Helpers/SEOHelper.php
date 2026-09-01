@@ -12,12 +12,12 @@ class SEOHelper
         $category = optional($product->category)->name;
         $brand = optional($product->brand)->name;
         
-        // Enhanced title for Rwanda market
-        $title = $product->name . ' - ' . ($brand ?: 'Premium') . ' | Buy in Rwanda | Diva House Beauty';
+        // Enhanced title for East Africa market
+        $title = $product->name . ' - ' . ($brand ?: 'Premium') . ' | Buy in East Africa | Diva House Beauty';
         
         // Enhanced description with local keywords
         $baseDescription = strip_tags(substr($product->description, 0, 100));
-        $description = $baseDescription . ' ✓ Authentic Products ✓ Fast Kigali Delivery ✓ MTN & Airtel Money Payment ✓ Rwanda\'s #1 Cosmetics Store';
+        $description = $baseDescription . ' ✓ Authentic Products ✓ Fast Kigali Delivery ✓ MTN & Airtel Money Payment ✓ East Africa\'s #1 Cosmetics Store';
         $description = substr($description, 0, 155);
         
         $image = $product->first_image_url;
@@ -30,19 +30,19 @@ class SEOHelper
                 $product->name,
                 $brand,
                 $category,
-                'buy ' . strtolower($product->name) . ' Rwanda',
-                'cosmetics Rwanda',
+                'buy ' . strtolower($product->name) . ' East Africa',
+                'cosmetics East Africa',
                 'beauty products Kigali',
-                'makeup Rwanda',
+                'makeup East Africa',
                 'skincare Kigali',
-                'online shopping Rwanda',
+                'online shopping East Africa',
                 'Diva House Beauty',
                 'authentic cosmetics',
-                'premium beauty products Rwanda'
+                'premium beauty products East Africa'
             ])),
             'canonical' => route('product', $product->slug),
             'og' => [
-                'title' => $product->name . ' - Rwanda\'s Premier Beauty Store',
+                'title' => $product->name . ' - East Africa\'s Premier Beauty Store',
                 'description' => $description,
                 'image' => $image,
                 'url' => route('product', $product->slug),
@@ -106,71 +106,72 @@ class SEOHelper
      */
     public static function categoryMeta($category, $products = null)
     {
-        $title = "Buy {$category->name} in Rwanda - Authentic Products | Diva House Beauty";
+        $title = "Buy {$category->name} in East Africa - Authentic Products | Diva House Beauty";
         
         $productCount = $products ? $products->count() : 'Premium';
-        $description = $category->description ?? "Shop authentic {$category->name} in Rwanda ✓ {$productCount}+ Products ✓ Fast Kigali Delivery ✓ Genuine Brands ✓ MTN & Airtel Money Payment ✓ Rwanda's #1 Online Cosmetics Store";
+        $description = $category->description ?? "Shop authentic {$category->name} in East Africa ✓ {$productCount}+ Products ✓ Fast Kigali Delivery ✓ Genuine Brands ✓ MTN & Airtel Money Payment ✓ East Africa's #1 Online Cosmetics Store";
         
         return [
             'title' => $title,
             'description' => substr($description, 0, 155),
             'keywords' => implode(', ', [
-                "{$category->name} Rwanda",
+                "{$category->name} East Africa",
                 "buy {$category->name} Kigali",
-                "{$category->name} online shopping Rwanda",
+                "{$category->name} online shopping East Africa",
                 "authentic {$category->name}",
-                "cosmetics Rwanda",
+                "cosmetics East Africa",
                 "beauty products Kigali",
-                "makeup Rwanda",
+                "makeup East Africa",
                 "skincare Kigali",
                 "Diva House Beauty",
-                "online shopping Rwanda"
+                "online shopping East Africa"
             ]),
             'canonical' => route('category.show', $category->slug),
             'og' => [
-                'title' => "{$category->name} - Rwanda's Premier Beauty Store",
+                'title' => "{$category->name} - East Africa's Premier Beauty Store",
                 'description' => substr($description, 0, 155),
                 'url' => route('category.show', $category->slug),
                 'type' => 'website',
+                'image' => asset('assets/images/og-image.jpg'),
             ],
         ];
     }
 
     /**
-     * Generate SEO meta tags for homepage - optimized for #1 Rwanda ranking
+     * Generate SEO meta tags for homepage - optimized for #1 East Africa ranking
      */
     public static function homeMeta()
     {
         return [
-            'title' => 'Diva House Beauty - Rwanda\'s #1 Online Cosmetics & Beauty Store | Authentic Products, Fast Kigali Delivery',
-            'description' => '🇷🇼 Rwanda\'s Premier Online Cosmetics & Beauty E-commerce Store ✓ 100% Authentic Products ✓ Fast Kigali Delivery ✓ MTN & Airtel Money ✓ Trusted by 1000s ✓ Makeup, Skincare, Fashion & More',
+            'title' => 'Diva House Beauty - East Africa\'s #1 Online Cosmetics & Beauty Store | Authentic Products, Fast Kigali Delivery',
+            'description' => '🌍 East Africa\'s Premier Online Cosmetics & Beauty E-commerce Store ✓ 100% Authentic Products ✓ Fast Kigali Delivery ✓ MTN & Airtel Money ✓ Trusted by 1000s ✓ Makeup, Skincare, Fashion & More',
             'keywords' => implode(', ', [
-                'cosmetics Rwanda',
+                'cosmetics East Africa',
                 'beauty products Kigali',
-                'cosmetics online Rwanda',
-                'buy makeup Rwanda',
+                'cosmetics online East Africa',
+                'buy makeup East Africa',
                 'skincare products Kigali',
-                'beauty store Rwanda',
-                'online cosmetics store Rwanda',
-                'Rwanda cosmetics e-commerce',
-                'beauty products online shopping Rwanda',
+                'beauty store East Africa',
+                'online cosmetics store East Africa',
+                'East Africa cosmetics e-commerce',
+                'beauty products online shopping East Africa',
                 'authentic cosmetics Kigali',
-                'makeup store Rwanda',
-                'fashion Rwanda',
+                'makeup store East Africa',
+                'fashion East Africa',
                 'beauty shop Kigali',
                 'Diva House Beauty',
-                'cosmetic shopping Rwanda',
-                'Rwanda beauty e-commerce',
-                'best cosmetics store Rwanda',
+                'cosmetic shopping East Africa',
+                'East Africa beauty e-commerce',
+                'best cosmetics store East Africa',
                 'online beauty store Kigali',
-                'genuine beauty products Rwanda',
+                'genuine beauty products East Africa',
                 'MTN Mobile Money cosmetics',
                 'Airtel Money beauty products'
             ]),
             'canonical' => route('home'),
             'og' => [
-                'title' => 'Diva House Beauty - Rwanda\'s #1 Cosmetics & Beauty E-commerce Store',
-                'description' => 'Shop authentic cosmetics & beauty products in Rwanda. Fast Kigali delivery, trusted brands, MTN & Airtel Money payment.',
+                'title' => 'Diva House Beauty - East Africa\'s #1 Cosmetics & Beauty E-commerce Store',
+                'description' => 'Shop authentic cosmetics & beauty products in East Africa. Fast Kigali delivery, trusted brands, MTN & Airtel Money payment.',
                 'url' => route('home'),
                 'type' => 'website',
                 'image' => asset('assets/images/og-image.jpg'),
@@ -192,8 +193,8 @@ class SEOHelper
                 'alternateName' => 'Diva House',
                 'url' => url('/'),
                 'logo' => asset('assets/images/logo.png'),
-                'description' => 'Rwanda\'s leading online cosmetics and beauty products e-commerce store. Authentic products, fast Kigali delivery, trusted quality.',
-                'slogan' => 'Rwanda\'s #1 Cosmetics & Beauty E-commerce Store',
+                'description' => 'East Africa\'s leading online cosmetics and beauty products e-commerce store. Authentic products, fast Kigali delivery, trusted quality.',
+                'slogan' => 'East Africa\'s #1 Cosmetics & Beauty E-commerce Store',
                 'address' => [
                     '@type' => 'PostalAddress',
                     'addressCountry' => 'RW',
@@ -206,8 +207,8 @@ class SEOHelper
                     'longitude' => 30.0619
                 ],
                 'areaServed' => [
-                    '@type' => 'Country',
-                    'name' => 'Rwanda'
+                    '@type' => 'Place',
+                    'name' => 'East Africa'
                 ],
                 'priceRange' => 'RWF',
                 'paymentAccepted' => ['MTN Mobile Money', 'Airtel Money', 'Cash on Delivery'],
@@ -240,20 +241,20 @@ class SEOHelper
     public static function aboutMeta()
     {
         return [
-            'title' => 'About Diva House Beauty - Rwanda\'s Premier Cosmetics & Beauty Store | Our Story',
-            'description' => 'Learn about Diva House Beauty — Rwanda\'s #1 online cosmetics and beauty store based in Kigali. Authentic products, fast delivery, and trusted by thousands of happy customers.',
+            'title' => 'About Diva House Beauty - East Africa\'s Premier Cosmetics & Beauty Store | Our Story',
+            'description' => 'Learn about Diva House Beauty — East Africa\'s #1 online cosmetics and beauty store based in Kigali. Authentic products, fast delivery, and trusted by thousands of happy customers.',
             'keywords' => implode(', ', [
                 'about Diva House Beauty',
-                'cosmetics store Rwanda',
+                'cosmetics store East Africa',
                 'beauty store Kigali',
-                'Rwanda beauty company',
+                'East Africa beauty company',
                 'Diva House Beauty story',
-                'online cosmetics Rwanda',
+                'online cosmetics East Africa',
                 'authentic beauty products Kigali',
             ]),
             'canonical' => route('about'),
             'og' => [
-                'title' => 'About Diva House Beauty - Rwanda\'s #1 Cosmetics Store',
+                'title' => 'About Diva House Beauty - East Africa\'s #1 Cosmetics Store',
                 'description' => 'Discover our story. Diva House Beauty is Kigali\'s trusted destination for premium cosmetics, skincare, haircare & fashion.',
                 'url' => route('about'),
                 'type' => 'website',
@@ -263,7 +264,7 @@ class SEOHelper
                 '@context' => 'https://schema.org',
                 '@type' => 'AboutPage',
                 'name' => 'About Diva House Beauty',
-                'description' => 'Rwanda\'s premier online cosmetics and beauty store, based in Kigali.',
+                'description' => 'East Africa\'s premier online cosmetics and beauty store, based in Kigali.',
                 'url' => route('about'),
                 'mainEntity' => [
                     '@type' => 'Organization',
@@ -286,21 +287,21 @@ class SEOHelper
     public static function contactMeta()
     {
         return [
-            'title' => 'Contact Diva House Beauty - Reach Us in Kigali, Rwanda | Phone, Email, WhatsApp',
-            'description' => 'Get in touch with Diva House Beauty in Kigali, Rwanda. Call +250 780 159 059, email info@divahousebeauty.com, or WhatsApp us. Fast response guaranteed.',
+            'title' => 'Contact Diva House Beauty - Reach Us in Kigali, East Africa | Phone, Email, WhatsApp',
+            'description' => 'Get in touch with Diva House Beauty in Kigali, East Africa. Call +250 780 159 059, email info@divahousebeauty.com, or WhatsApp us. Fast response guaranteed.',
             'keywords' => implode(', ', [
                 'contact Diva House Beauty',
                 'Diva House Beauty phone',
                 'cosmetics store Kigali contact',
-                'beauty store Rwanda phone number',
+                'beauty store East Africa phone number',
                 'Diva House Beauty email',
                 'Diva House Beauty WhatsApp',
                 'Kigali beauty store location',
             ]),
             'canonical' => route('contact'),
             'og' => [
-                'title' => 'Contact Diva House Beauty - Kigali, Rwanda',
-                'description' => 'Reach us at +250 780 159 059 or email info@divahousebeauty.com. Visit our store in Kigali, Rwanda.',
+                'title' => 'Contact Diva House Beauty - Kigali, East Africa',
+                'description' => 'Reach us at +250 780 159 059 or email info@divahousebeauty.com. Visit our store in Kigali, East Africa.',
                 'url' => route('contact'),
                 'type' => 'website',
                 'image' => asset('assets/images/og-image.jpg'),
@@ -309,7 +310,7 @@ class SEOHelper
                 '@context' => 'https://schema.org',
                 '@type' => 'ContactPage',
                 'name' => 'Contact Diva House Beauty',
-                'description' => 'Contact information for Diva House Beauty in Kigali, Rwanda.',
+                'description' => 'Contact information for Diva House Beauty in Kigali, East Africa.',
                 'url' => route('contact'),
                 'mainEntity' => [
                     '@type' => 'Organization',

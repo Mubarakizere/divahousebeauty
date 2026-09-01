@@ -13,10 +13,10 @@
 
   {{-- Fallback title if $seo is not set --}}
   @if(!isset($seo))
-    <title>Diva House Beauty - Premium Cosmetics & Fashion in Rwanda</title>
-    <meta name="description" content="Rwanda's #1 online cosmetics & beauty store. Shop premium skincare, makeup, haircare, wigs, fragrances & fashion. Fast Kigali delivery. Diva House Beauty.">
+    <title>Diva House Beauty - Premium Cosmetics & Fashion in East Africa</title>
+    <meta name="description" content="East Africa's #1 online cosmetics & beauty store. Shop premium skincare, makeup, haircare, wigs, fragrances & fashion. Fast Kigali delivery. Diva House Beauty.">
     <meta property="og:title" content="Diva House Beauty - Premium Cosmetics & Fashion" />
-    <meta property="og:description" content="Rwanda's #1 online cosmetics & beauty store. Shop authentic beauty products with fast Kigali delivery." />
+    <meta property="og:description" content="East Africa's #1 online cosmetics & beauty store. Shop authentic beauty products with fast Kigali delivery." />
     <meta property="og:image" content="{{ asset('assets/images/og-image.jpg') }}" />
     <meta property="og:url" content="{{ url('/') }}" />
     <meta property="og:type" content="website" />

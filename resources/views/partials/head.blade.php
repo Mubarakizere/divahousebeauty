@@ -8,18 +8,23 @@
     <meta name="google-site-verification" content="42_XUFLKGXoph33K7-fbfNzwRUFnFvInTzPQCuIJLYM" />
     
     <title>Diva House Beauty</title>
+    <link rel="canonical" href="{{ url()->current() }}">
     <meta name="description" content="Diva House Beauty  Your destination for luxury beauty services.">
-    <meta name="keywords" content="beauty, ecommerce, diva house, nails, skincare, booking, salon, Kigali, Rwanda">
+    <meta name="keywords" content="beauty, ecommerce, diva house, nails, skincare, booking, salon, Kigali, East Africa">
     <meta name="author" content="Izere Mubarak">
 
-    <!-- Open Graph -->
+    <!-- Open Graph & Social Share -->
     <meta property="og:title" content="Diva House Beauty" />
-    <meta property="og:description" content="Diva House Beauty  Your destination for luxury beauty services." />
-    <meta property="og:image" content="{{ asset('images/feature-image.jpg') }}" />
+    <meta property="og:description" content="Diva House Beauty - Your destination for luxury beauty services." />
+    <meta property="og:image" content="{{ asset('assets/images/og-image.jpg') }}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:url" content="{{ url()->current() }}" />
     <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Diva House Beauty" />
+    <meta name="twitter:description" content="Diva House Beauty - Your destination for luxury beauty services." />
+    <meta name="twitter:image" content="{{ asset('assets/images/og-image.jpg') }}" />
     <!-- Theme Color -->
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-title" content="Diva House Beauty">

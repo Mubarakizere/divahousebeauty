@@ -129,6 +129,12 @@ class ProductController extends Controller
             $seo = [
                 'title' => $product->name . ' | Diva House Beauty',
                 'description' => substr($product->description ?? '', 0, 155),
+                'og' => [
+                    'title' => $product->name . ' - Diva House Beauty',
+                    'description' => substr($product->description ?? '', 0, 155),
+                    'image' => $product->first_image_url,
+                    'type' => 'product',
+                ]
             ];
             \Log::warning('Failed to generate SEO meta: ' . $e->getMessage());
         }

@@ -1,15 +1,15 @@
-{{-- SEO Meta Tags Partial - Rwanda Market Optimized --}}
+{{-- SEO Meta Tags Partial - East Africa Market Optimized --}}
 @if(isset($seo))
     {{-- Basic Meta Tags --}}
-    <title>{{ $seo['title'] ?? 'Diva House Beauty - Rwanda\'s #1 Cosmetics Store' }}</title>
+    <title>{{ $seo['title'] ?? 'Diva House Beauty - East Africa\'s #1 Cosmetics Store' }}</title>
     <meta name="description" content="{{ $seo['description'] ?? '' }}">
     @if(isset($seo['keywords']))
         <meta name="keywords" content="{{ $seo['keywords'] }}">
     @endif
     
-    {{-- Geographic Targeting for Rwanda --}}
+    {{-- Geographic Targeting for East Africa --}}
     <meta name="geo.region" content="RW" />
-    <meta name="geo.placename" content="Kigali, Rwanda" />
+    <meta name="geo.placename" content="Kigali, East Africa" />
     <meta name="geo.position" content="-1.9441;30.0619" />
     <meta name="ICBM" content="-1.9441, 30.0619" />
     
@@ -21,9 +21,7 @@
     <link rel="alternate" hreflang="x-default" href="{{ url()->current() }}" />
     
     {{-- Canonical URL --}}
-    @if(isset($seo['canonical']))
-        <link rel="canonical" href="{{ $seo['canonical'] }}">
-    @endif
+    <link rel="canonical" href="{{ $seo['canonical'] ?? url()->current() }}">
     
     {{-- Author & Publisher --}}
     <meta name="author" content="Diva House Beauty">
@@ -31,22 +29,24 @@
     <meta name="copyright" content="Diva House Beauty">
     
     {{-- Open Graph Tags (Facebook, WhatsApp) --}}
+    @php
+        $shareImage = $seo['og']['image'] ?? asset('assets/images/og-image.jpg');
+        $shareTitle = $seo['og']['title'] ?? $seo['title'] ?? 'Diva House Beauty';
+        $shareDesc  = $seo['og']['description'] ?? $seo['description'] ?? 'East Africa\'s Premier Online Cosmetics & Beauty Store';
+    @endphp
     @if(isset($seo['og']))
-        <meta property="og:title" content="{{ $seo['og']['title'] ?? $seo['title'] }}" />
-        <meta property="og:description" content="{{ $seo['og']['description'] ?? $seo['description'] }}" />
+        <meta property="og:title" content="{{ $shareTitle }}" />
+        <meta property="og:description" content="{{ $shareDesc }}" />
         <meta property="og:url" content="{{ $seo['og']['url'] ?? url()->current() }}" />
         <meta property="og:type" content="{{ $seo['og']['type'] ?? 'website' }}" />
         <meta property="og:site_name" content="Diva House Beauty" />
         <meta property="og:locale" content="en_RW" />
         <meta property="og:locale:alternate" content="fr_RW" />
-        
-        @if(isset($seo['og']['image']))
-            <meta property="og:image" content="{{ $seo['og']['image'] }}" />
-            <meta property="og:image:alt" content="{{ $seo['og']['title'] ?? 'Diva House Beauty Product' }}" />
-            <meta property="og:image:width" content="1200" />
-            <meta property="og:image:height" content="630" />
-            <meta property="og:image:type" content="image/jpeg" />
-        @endif
+        <meta property="og:image" content="{{ $shareImage }}" />
+        <meta property="og:image:alt" content="{{ $shareTitle }}" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:type" content="image/jpeg" />
         
         {{-- Product specific OG tags --}}
         @if(isset($seo['og']['type']) && $seo['og']['type'] === 'product')
@@ -59,17 +59,26 @@
                 <meta property="product:retailer_item_id" content="{{ $seo['og']['product_id'] ?? '' }}" />
             @endif
         @endif
+    @else
+        <meta property="og:title" content="{{ $shareTitle }}" />
+        <meta property="og:description" content="{{ $shareDesc }}" />
+        <meta property="og:url" content="{{ url()->current() }}" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Diva House Beauty" />
+        <meta property="og:image" content="{{ $shareImage }}" />
+        <meta property="og:image:alt" content="{{ $shareTitle }}" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:type" content="image/jpeg" />
     @endif
     
     {{-- Twitter Card Tags --}}
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ $seo['og']['title'] ?? $seo['title'] }}">
-    <meta name="twitter:description" content="{{ $seo['og']['description'] ?? $seo['description'] }}">
+    <meta name="twitter:title" content="{{ $shareTitle }}">
+    <meta name="twitter:description" content="{{ $shareDesc }}">
     <meta name="twitter:site" content="@divahousebeauty">
-    @if(isset($seo['og']['image']))
-        <meta name="twitter:image" content="{{ $seo['og']['image'] }}">
-        <meta name="twitter:image:alt" content="{{ $seo['og']['title'] ?? 'Diva House Beauty Product' }}">
-    @endif
+    <meta name="twitter:image" content="{{ $shareImage }}">
+    <meta name="twitter:image:alt" content="{{ $shareTitle }}">
     
     {{-- Mobile & App Tags --}}
     <meta name="mobile-web-app-capable" content="yes">

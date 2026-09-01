@@ -1,4 +1,4 @@
-# Diva House Beauty - Rwanda's #1 Cosmetics & Beauty E-commerce Store
+# Diva House Beauty - East Africa's #1 Cosmetics & Beauty E-commerce Store
 # Robots.txt - Optimized for Search Engine Crawling
 
 User-agent: *

@@ -9,10 +9,10 @@
   @if(isset($seo))
     @include('partials.seo_meta')
   @else
-    <title>@yield('title', 'Diva House Beauty - Rwanda\'s #1 Cosmetics & Beauty Store')</title>
-    <meta name="description" content="@yield('meta_description', 'Shop premium cosmetics, skincare, makeup, haircare & fashion at Diva House Beauty. Rwanda\'s #1 online beauty store with fast Kigali delivery.')">
+    <title>@yield('title', 'Diva House Beauty - East Africa\'s #1 Cosmetics & Beauty Store')</title>
+    <meta name="description" content="@yield('meta_description', 'Shop premium cosmetics, skincare, makeup, haircare & fashion at Diva House Beauty. East Africa\'s #1 online beauty store with fast Kigali delivery.')">
     <meta property="og:title" content="@yield('title', 'Diva House Beauty')" />
-    <meta property="og:description" content="@yield('meta_description', 'Rwanda\'s #1 online cosmetics & beauty store.')" />
+    <meta property="og:description" content="@yield('meta_description', 'East Africa\'s #1 online cosmetics & beauty store.')" />
     <meta property="og:image" content="{{ asset('assets/images/og-image.jpg') }}" />
     <meta property="og:url" content="{{ url()->current() }}" />
     <meta property="og:type" content="website" />
