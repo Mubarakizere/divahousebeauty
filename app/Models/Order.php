@@ -22,6 +22,7 @@ class Order extends Model
         'customer_name',
         'customer_email',
         'customer_phone',
+        'shipping_address',
         'total',
         'payment_method',
         'status',
@@ -30,6 +31,8 @@ class Order extends Model
         'transaction_id',
         'masked_order_id',
         'payment_token',
+        'customer_notes',
+        'order_status',
     ];
 
     protected $casts = [

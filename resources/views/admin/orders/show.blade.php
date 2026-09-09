@@ -155,6 +155,74 @@
             </div>
 
         </div>
+
+        {{-- Shipping / Delivery Address --}}
+        <div class="mt-6 border-t border-gray-100 pt-6">
+            <h2 class="text-base font-semibold text-gray-900 flex items-center gap-2 mb-4">
+                <i class="fas fa-map-marker-alt text-gray-400"></i>
+                <span>Shipping Address</span>
+            </h2>
+
+            @php
+                $shippingAddr    = $order->shipping_address ?? null;
+                $savedAddresses  = $order->user?->addresses ?? collect();
+                $defaultAddress  = $savedAddresses->firstWhere('is_default', true) ?? $savedAddresses->first();
+            @endphp
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {{-- Address saved at time of order --}}
+                <div class="rounded-lg border {{ $shippingAddr ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50' }} p-4 text-sm">
+                    <div class="font-semibold text-gray-700 flex items-center gap-2 mb-2">
+                        <i class="fas fa-shopping-cart text-blue-400 text-xs"></i>
+                        Shipping address on order
+                    </div>
+                    @if($shippingAddr)
+                        <p class="text-gray-800 leading-relaxed">{{ $shippingAddr }}</p>
+                    @else
+                        <p class="text-gray-400 italic">No shipping address was recorded on this order.</p>
+                    @endif
+                </div>
+
+                {{-- Customer's saved addresses --}}
+                <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm">
+                    <div class="font-semibold text-gray-700 flex items-center gap-2 mb-2">
+                        <i class="fas fa-address-book text-gray-400 text-xs"></i>
+                        Customer's saved addresses
+                        @if($savedAddresses->isNotEmpty())
+                            <span class="ml-auto text-xs font-normal text-gray-500">{{ $savedAddresses->count() }} on file</span>
+                        @endif
+                    </div>
+
+                    @if($savedAddresses->isEmpty())
+                        <p class="text-gray-400 italic">This customer has no saved addresses.</p>
+                    @else
+                        <div class="space-y-3">
+                            @foreach($savedAddresses as $addr)
+                                <div class="rounded border {{ $addr->is_default ? 'border-green-200 bg-white' : 'border-gray-200 bg-white' }} p-3">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="font-medium text-gray-900 text-xs">{{ $addr->name }}</span>
+                                        @if($addr->is_default)
+                                            <span class="text-[10px] font-semibold bg-green-100 text-green-700 px-1.5 py-0.5 rounded">Default</span>
+                                        @endif
+                                    </div>
+                                    <p class="text-gray-600 leading-snug text-xs">
+                                        {{ $addr->address_line_1 }}
+                                        @if($addr->address_line_2), {{ $addr->address_line_2 }}@endif<br>
+                                        {{ $addr->city }}@if($addr->state), {{ $addr->state }}@endif<br>
+                                        {{ $addr->country }}
+                                        @if($addr->postal_code) — {{ $addr->postal_code }}@endif
+                                    </p>
+                                    @if($addr->phone)
+                                        <p class="text-gray-500 text-xs mt-1">📞 {{ $addr->phone }}</p>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
     </div>
 
     {{-- Status / Mark Paid Actions --}}

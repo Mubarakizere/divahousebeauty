@@ -39,10 +39,14 @@ class CheckoutController extends Controller
     public function process(Request $request)
     {
         $validated = $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'customer_email' => 'required|email|max:255',
-            'customer_phone' => 'nullable|string|max:20',
-            'customer_notes' => 'nullable|string|max:1000',
+            'customer_name'     => 'required|string|max:255',
+            'customer_email'    => 'required|email|max:255',
+            'customer_phone'    => 'nullable|string|max:20',
+            'customer_notes'    => 'nullable|string|max:1000',
+            'shipping_street'   => 'required|string|max:255',
+            'shipping_city'     => 'required|string|max:100',
+            'shipping_province' => 'nullable|string|max:100',
+            'shipping_country'  => 'nullable|string|max:100',
         ]);
         
         $userId = auth()->id();
@@ -67,17 +71,27 @@ class CheckoutController extends Controller
         
         $total = $subtotal - $discount;
         
+        // Assemble shipping address from individual fields
+        $shippingParts = array_filter([
+            $validated['shipping_street'],
+            $validated['shipping_city'],
+            $validated['shipping_province'] ?? null,
+            $validated['shipping_country'] ?? 'Rwanda',
+        ]);
+        $shippingAddress = implode(', ', $shippingParts);
+
         // Create order
         $order = Order::create([
-            'user_id' => $userId,
-            'customer_name' => $validated['customer_name'],
-            'customer_email' => $validated['customer_email'],
-            'customer_phone' => $validated['customer_phone'] ?? null,
-            'total' => $total,
-            'payment_method' => 'weflexfy',
-            'status' => 'pending',
-            'order_status' => 'pending',
-            'customer_notes' => $validated['customer_notes'] ?? null,
+            'user_id'          => $userId,
+            'customer_name'    => $validated['customer_name'],
+            'customer_email'   => $validated['customer_email'],
+            'customer_phone'   => $validated['customer_phone'] ?? null,
+            'shipping_address' => $shippingAddress,
+            'total'            => $total,
+            'payment_method'   => 'weflexfy',
+            'status'           => 'pending',
+            'order_status'     => 'pending',
+            'customer_notes'   => $validated['customer_notes'] ?? null,
         ]);
         
         // Create order items

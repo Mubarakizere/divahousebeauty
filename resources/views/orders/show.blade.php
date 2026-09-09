@@ -117,15 +117,53 @@
             <div class="bg-white border border-slate-200 rounded-lg p-6 shadow-ring">
                 <h3 class="text-sm font-bold text-[var(--black)] mb-4 uppercase tracking-wider">Delivery Details</h3>
                 <div class="space-y-4 text-sm">
+
+                    {{-- Shipping address from checkout --}}
                     <div>
-                        <span class="block text-xs text-slate-400 uppercase">Shipping To</span>
-                        <p class="font-medium text-slate-700 mt-1">{{ $order->shipping_address ?? 'No address provided' }}</p>
+                        <span class="block text-xs text-slate-400 uppercase mb-1">Shipping To</span>
+                        @if($order->shipping_address)
+                            <p class="font-medium text-slate-700 leading-relaxed">{{ $order->shipping_address }}</p>
+                        @else
+                            <p class="text-slate-400 italic text-xs">No address recorded on this order.</p>
+                        @endif
                     </div>
+
+                    {{-- Contact --}}
                     <div>
-                         <span class="block text-xs text-slate-400 uppercase">Contact</span>
-                         <p class="font-medium text-slate-700 mt-1">{{ $order->customer_email }}</p>
-                         <p class="font-medium text-slate-700">{{ $order->customer_phone }}</p>
+                        <span class="block text-xs text-slate-400 uppercase mb-1">Contact</span>
+                        <p class="font-medium text-slate-700">{{ $order->customer_email }}</p>
+                        @if($order->customer_phone)
+                            <p class="font-medium text-slate-700">{{ $order->customer_phone }}</p>
+                        @endif
                     </div>
+
+                    {{-- Saved account addresses --}}
+                    @if($savedAddresses->isNotEmpty())
+                        <div class="border-t border-slate-100 pt-4">
+                            <span class="block text-xs text-slate-400 uppercase mb-2">Your Saved Addresses</span>
+                            <div class="space-y-2">
+                                @foreach($savedAddresses as $addr)
+                                    <div class="rounded-md border {{ $addr->is_default ? 'border-[var(--gold)]/40 bg-amber-50' : 'border-slate-100 bg-slate-50' }} p-3">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <span class="text-xs font-semibold text-slate-800">{{ $addr->name }}</span>
+                                            @if($addr->is_default)
+                                                <span class="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">Default</span>
+                                            @endif
+                                        </div>
+                                        <p class="text-xs text-slate-600 leading-snug">
+                                            {{ $addr->address_line_1 }}@if($addr->address_line_2), {{ $addr->address_line_2 }}@endif,
+                                            {{ $addr->city }}@if($addr->state), {{ $addr->state }}@endif,
+                                            {{ $addr->country }}
+                                        </p>
+                                        @if($addr->phone)
+                                            <p class="text-xs text-slate-500 mt-0.5">{{ $addr->phone }}</p>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
                 </div>
             </div>
 

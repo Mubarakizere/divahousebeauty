@@ -101,9 +101,14 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        $order = auth()->user()->orders()->with(['items.product'])->findOrFail($id);
+        $order = auth()->user()->orders()
+            ->with(['items.product', 'user.addresses'])
+            ->findOrFail($id);
 
-        return view('orders.show', compact('order'));
+        // Customer's saved addresses for reference
+        $savedAddresses = auth()->user()->addresses()->orderBy('is_default', 'desc')->get();
+
+        return view('orders.show', compact('order', 'savedAddresses'));
     }
 
     /**

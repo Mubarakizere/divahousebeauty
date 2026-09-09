@@ -69,6 +69,44 @@
                           class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold)]/20">{{ old('customer_notes') }}</textarea>
               </div>
             </div>
+
+            {{-- Shipping Address --}}
+            <div class="bg-white border border-slate-200 rounded-lg shadow-ring p-4 mt-4">
+              <h2 class="text-lg font-semibold text-slate-900 mb-4">Shipping Address</h2>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Street / District *</label>
+                  <input type="text" name="shipping_street" value="{{ old('shipping_street') }}" required
+                         placeholder="e.g. KG 123 St, Kimihurura"
+                         class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold)]/20">
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">City *</label>
+                  <input type="text" name="shipping_city" value="{{ old('shipping_city', 'Kigali') }}" required
+                         placeholder="e.g. Kigali"
+                         class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold)]/20">
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Province</label>
+                  <select name="shipping_province"
+                          class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold)]/20">
+                    <option value="">— Select Province —</option>
+                    @foreach(['Kigali City','Eastern Province','Western Province','Northern Province','Southern Province'] as $prov)
+                      <option value="{{ $prov }}" {{ old('shipping_province') === $prov ? 'selected' : '' }}>{{ $prov }}</option>
+                    @endforeach
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Country</label>
+                  <input type="text" name="shipping_country" value="{{ old('shipping_country', 'Rwanda') }}"
+                         class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold)]/20">
+                </div>
+              </div>
+            </div>
           </section>
           
           {{-- Order Summary --}}
