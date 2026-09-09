@@ -56,19 +56,21 @@ class WeflexfyWebhookController extends Controller
      */
     private function handlePaymentUpdate(array $payload)
     {
-        $payment = Payment::where('request_token', $payload['requestToken'])->first();
+        $payment = Payment::where('request_token', $payload['requestToken'] ?? null)->first();
         
         if (!$payment) {
             \Log::warning('Payment not found for webhook', [
-                'request_token' => $payload['requestToken']
+                'request_token' => $payload['requestToken'] ?? null
             ]);
             return;
         }
         
+        $status = strtolower($payload['status'] ?? '');
+
         // Update payment record
         $payment->update([
             'payment_ref' => $payload['paymentRef'] ?? $payment->payment_ref,
-            'status' => strtolower($payload['status']),
+            'status' => $status,
             'payment_method' => $payload['paymentMethod'] ?? $payment->payment_method,
         ]);
         
@@ -78,9 +80,9 @@ class WeflexfyWebhookController extends Controller
         ]);
         
         // If payment successful, complete the order
-        if (strtolower($payload['status']) === 'success') {
-            $this->completeOrder($payment->order);
-        } elseif (strtolower($payload['status']) === 'failed') {
+        if ($status === 'success') {
+            $this->completeOrder($payment->order, $payload['paymentRef'] ?? null);
+        } elseif ($status === 'failed') {
             $this->failOrder($payment->order);
         }
     }
@@ -90,47 +92,61 @@ class WeflexfyWebhookController extends Controller
      */
     private function handleTransferUpdate(array $payload)
     {
-        $transfer = PaymentTransfer::where('transfer_ref', $payload['transferRef'])->first();
+        $transfer = PaymentTransfer::where('transfer_ref', $payload['transferRef'] ?? null)->first();
         
         if ($transfer) {
+            $status = strtolower($payload['status'] ?? '');
             $transfer->update([
-                'status' => strtolower($payload['status']),
+                'status' => $status,
             ]);
             
             \Log::info('Transfer status updated', [
                 'transfer_id' => $transfer->id,
                 'status' => $transfer->status,
             ]);
+
+            if ($status === 'success' && $transfer->payment && $transfer->payment->order) {
+                $this->completeOrder($transfer->payment->order, $payload['transferRef'] ?? null);
+            }
         }
     }
     
     /**
      * Complete order after successful payment
      */
-    private function completeOrder(Order $order)
+    private function completeOrder(Order $order, ?string $transactionId = null)
     {
-        // Update order status
+        if (!$order) return;
+
+        // Update order status fields
         $order->update([
-            'order_status' => Order::STATUS_CONFIRMED ?? 'confirmed',
+            'status'         => Order::STATUS_CONFIRMED ?? 'confirmed',
             'payment_status' => 'paid',
+            'is_paid'        => true,
+            'paid_at'        => now(),
+            'transaction_id' => $transactionId ?? $order->transaction_id,
         ]);
         
         // Reduce stock for each product
         foreach ($order->items as $item) {
             $product = $item->product;
             if ($product && $product->track_stock) {
-                $product->updateStock(
-                    -$item->quantity,
-                    \App\Models\StockMovement::TYPE_SALE ?? 'sale',
-                    'Order #' . $order->id,
-                    "Sold {$item->quantity} units"
-                );
+                if (method_exists($product, 'updateStock')) {
+                    $product->updateStock(
+                        -$item->quantity,
+                        'sale',
+                        'Order #' . $order->id,
+                        "Sold {$item->quantity} units"
+                    );
+                } else {
+                    $product->decrement('stock', $item->quantity);
+                }
             }
         }
         
         // Send confirmation email (if mailable exists)
         try {
-            if (class_exists('\App\Mail\OrderConfirmed')) {
+            if (class_exists('\App\Mail\OrderConfirmed') && !empty($order->customer_email)) {
                 Mail::to($order->customer_email)->send(new \App\Mail\OrderConfirmed($order));
             }
         } catch (\Exception $e) {
@@ -148,8 +164,11 @@ class WeflexfyWebhookController extends Controller
      */
     private function failOrder(Order $order)
     {
+        if (!$order) return;
+
         $order->update([
             'payment_status' => 'failed',
+            'status'         => 'failed',
         ]);
         
         \Log::info('Order payment failed', ['order_id' => $order->id]);

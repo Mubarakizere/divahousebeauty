@@ -156,14 +156,44 @@ class PaymentController extends Controller
     }
 
     /**
+     * Check payment/order status for frontend polling
+     */
+    public function checkOrderStatus($id)
+    {
+        $order = Order::with('payment')->find($id);
+
+        if (!$order) {
+            return response()->json(['paid' => false, 'status' => 'not_found'], 404);
+        }
+
+        $isPaid = $order->is_paid || $order->payment_status === 'paid' || $order->status === 'confirmed';
+
+        return response()->json([
+            'paid'   => $isPaid,
+            'status' => $isPaid ? 'success' : ($order->payment_status ?? $order->status),
+            'order_id' => $order->id,
+        ]);
+    }
+
+    /**
+     * Handle incoming webhook requests routed to /payment/webhook
+     */
+    public function handleWebhook(Request $request)
+    {
+        return app(WeflexfyWebhookController::class)->handle($request);
+    }
+
+    /**
      * Complete order after successful payment
      */
     private function completeOrder(Order $order)
     {
-        // Update order status
+        // Update order status fields properly
         $order->update([
-            'order_status' => Order::STATUS_CONFIRMED ?? 'confirmed',
+            'status'         => Order::STATUS_CONFIRMED ?? 'confirmed',
             'payment_status' => 'paid',
+            'is_paid'        => true,
+            'paid_at'        => now(),
         ]);
 
         // Update Payment Record status if exists

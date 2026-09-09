@@ -38,7 +38,7 @@
         statusUrl: '/payment/status/{{ $order->id }}',
         successUrl: '/payment/success?order={{ $order->id }}',
         failedUrl:  '/payment/failed?order={{ $order->id }}',
-        iframeOrigins: ['https://weflexfy.com'] // add sandbox/dev origins if needed
+        iframeOrigins: ['https://weflexfy.com', 'https://api.weflexfy.com'] // add sandbox/dev origins if needed
       })"
       x-init="init()">
 
@@ -76,14 +76,14 @@
 
         <div class="flex items-center gap-2">
           <div id="step-paying"
-               class="w-10 h-10 grid place-items-center rounded-full bg-amber-400 animate-pulse font-bold">⏳</div>
+               class="w-10 h-10 grid place-items-center rounded-full bg-amber-400 animate-pulse font-bold text-xs">2</div>
           <span class="text-sm">Payment Processing</span>
         </div>
 
         <div id="step-line" class="hidden md:block h-0.5 w-16 opacity-50 bg-white"></div>
 
         <div class="flex items-center gap-2">
-          <div id="step-done" class="w-10 h-10 grid place-items-center rounded-full bg-slate-500 font-bold">⏳</div>
+          <div id="step-done" class="w-10 h-10 grid place-items-center rounded-full bg-slate-500 font-bold text-xs">3</div>
           <span class="text-sm">Completed</span>
         </div>
       </div>
@@ -250,9 +250,9 @@
                 <h6 class="text-sm font-semibold text-slate-900">Need Support?</h6>
                 <ul class="mt-2 space-y-2 text-sm">
                   <li class="flex items-center gap-2"><i class="la la-envelope text-emerald-600"></i>
-                    <a href="mailto:support@yourstore.com" class="hover:text-[var(--gold)]">support@yourstore.com</a></li>
+                    <a href="mailto:info@divahousebeauty.com" class="hover:text-[var(--gold)]">info@divahousebeauty.com</a></li>
                   <li class="flex items-center gap-2"><i class="la la-phone text-emerald-600"></i>
-                    <a href="tel:+250788000000" class="hover:text-[var(--gold)]">+250 788 000 000</a></li>
+                    <a href="tel:+250780159059" class="hover:text-[var(--gold)]">+250 780 159 059</a></li>
                 </ul>
               </div>
             </div>

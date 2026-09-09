@@ -38,8 +38,8 @@
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/sw.js')
-                .then(reg => console.log('✅ PWA Service Worker Registered!', reg.scope))
-                .catch(err => console.log('❌ PWA Service Worker Registration Failed:', err));
+                .then(reg => console.log('PWA Service Worker Registered!', reg.scope))
+                .catch(err => console.log('PWA Service Worker Registration Failed:', err));
         });
     }
   </script>

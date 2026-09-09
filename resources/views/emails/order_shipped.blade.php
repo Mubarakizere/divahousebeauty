@@ -16,7 +16,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚚 Your Order is On the Way!</h1>
+            <h1>Your Order is On the Way!</h1>
         </div>
         
         <div class="content">
@@ -37,7 +37,7 @@
 
             @if($order->tracking_number)
                 <div class="tracking">
-                    <strong>📦 Track Your Package:</strong><br>
+                    <strong>Track Your Package:</strong><br>
                     Tracking Number: <code style="background: #fff; padding: 5px;">{{ $order->tracking_number }}</code>
                 </div>
             @endif

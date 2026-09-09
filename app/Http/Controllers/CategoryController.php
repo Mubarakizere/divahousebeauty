@@ -113,7 +113,7 @@ class CategoryController extends Controller
             // Generic category/shop page SEO
             $seo = [
                 'title' => 'Shop All Products - East Africa\'s #1 Cosmetics Store | Diva House Beauty',
-                'description' => 'Shop authentic beauty products and cosmetics in East Africa ✓ 100+ Products ✓ Fast Kigali Delivery ✓ MTN & Airtel Money ✓ Trusted Quality ✓ Best Prices',
+                'description' => 'Shop authentic beauty products and cosmetics in East Africa | 100+ Products | Fast Kigali Delivery | MTN & Airtel Money | Trusted Quality | Best Prices',
                 'keywords' => 'shop cosmetics East Africa, beauty products Kigali, buy makeup online East Africa, skincare East Africa, Diva House Beauty',
                 'canonical' => route('category'),
             ];

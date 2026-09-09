@@ -20,7 +20,7 @@ class AbandonedCartEmail extends Mailable
 
     public function build()
     {
-        return $this->subject('You left something in your cart! 🛒')
+        return $this->subject('You left something in your cart!')
                     ->view('emails.abandoned_cart');
     }
 }

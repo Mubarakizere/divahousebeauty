@@ -198,7 +198,7 @@
                 </div>
                 <div>
                   <div class="text-xs uppercase tracking-wider text-slate-500 font-semibold mb-1">Phone / WhatsApp</div>
-                  <a href="tel:0780159059" class="text-lg text-slate-900 hover:text-[var(--gold)] font-playfair transition-colors">+250 780 159 059</a>
+                  <a href="tel:+250780159059" class="text-lg text-slate-900 hover:text-[var(--gold)] font-playfair transition-colors">+250 780 159 059</a>
                 </div>
               </li>
 

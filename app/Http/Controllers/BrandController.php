@@ -55,7 +55,7 @@ class BrandController extends Controller
         // SEO Meta Tags for Brand
         $seo = [
             'title' => "Buy {$brand->name} in East Africa - Authentic Products | Diva House Beauty",
-            'description' => "Shop authentic {$brand->name} products in East Africa ✓ {$totalProducts}+ Products ✓ Fast Kigali Delivery ✓ 100% Genuine ✓ MTN & Airtel Money ✓ East Africa's #1 Cosmetics Store",
+            'description' => "Shop authentic {$brand->name} products in East Africa | {$totalProducts}+ Products | Fast Kigali Delivery | 100% Genuine | MTN & Airtel Money | East Africa's #1 Cosmetics Store",
             'keywords' => "{$brand->name} East Africa, buy {$brand->name} Kigali, {$brand->name} online East Africa, authentic {$brand->name}, cosmetics East Africa, beauty products Kigali",
             'canonical' => route('brand.show', $brand->slug),
             'og' => [

@@ -38,7 +38,7 @@
                 <div class="container">
                     <div class="header-left">
                         <ul class="">
-                        <li><a href="tel:0780159059"><i class="icon-phone"></i>Call: +2507 8015 9059</a></li>
+                        <li><a href="tel:+250780159059"><i class="icon-phone"></i>Call: +250 780 159 059</a></li>
                         <ul>
                     </div><!-- End .header-left -->
             
@@ -167,7 +167,7 @@
             </div><!-- End .header-middle -->
         </header><!-- End .header -->
 <div class="container text-center my-5">
-    <h2 class="text-success mb-3">✅ Payment Complete</h2>
+    <h2 class="text-success mb-3">Payment Complete</h2>
     <p>Thank you! Your payment has been received. We'll begin processing your order shortly.</p>
     <a href="{{ url('/') }}" class="btn btn-outline-primary mt-3">Return to Shop</a>
 </div>
@@ -212,7 +212,7 @@
                             <div class="row">
                                 <div class="col-sm-6 col-md-4">
                                     <span class="widget-about-title">Got Question? Call us 24/7</span>
-                                    <a href="tel:0780159059">+250780159059</a>
+                                    <a href="tel:+250780159059">+250 780 159 059</a>
                                 </div><!-- End .col-sm-6 -->
                                 <div class="col-sm-6 col-md-8">
                                     <span class="widget-about-title">Payment Method Coming Soon</span>
@@ -531,10 +531,10 @@ let strongRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
 
 if (strongRegex.test(password)) {
 helpText.style.color = "#28a745"; // Green for success
-helpText.textContent = "✅ Strong password!";
+helpText.textContent = "Strong password!";
 } else {
 helpText.style.color = "#dc3545"; // Red for error
-helpText.textContent = "⚠️ Password must be at least 8 characters long, including an uppercase letter, a lowercase letter, a number, and a special character.";
+helpText.textContent = "Password must be at least 8 characters long, including an uppercase letter, a lowercase letter, a number, and a special character.";
 }
 });
 </script>

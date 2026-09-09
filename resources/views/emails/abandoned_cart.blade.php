@@ -25,7 +25,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🛒 You Left Something Behind!</h1>
+            <h1>You Left Something Behind!</h1>
         </div>
         
         <div class="content">
@@ -53,7 +53,7 @@
             </div>
 
             <div class="urgency">
-                ⚡ <strong>Complete your purchase now!</strong> Your cart will be saved for 7 days.
+                <strong>Complete your purchase now!</strong> Your cart will be saved for 7 days.
             </div>
 
             <p style="text-align: center;">

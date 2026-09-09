@@ -213,7 +213,7 @@
                                         @if($addr->postal_code) — {{ $addr->postal_code }}@endif
                                     </p>
                                     @if($addr->phone)
-                                        <p class="text-gray-500 text-xs mt-1">📞 {{ $addr->phone }}</p>
+                                        <p class="text-gray-500 text-xs mt-1">Phone: {{ $addr->phone }}</p>
                                     @endif
                                 </div>
                             @endforeach

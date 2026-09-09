@@ -17,7 +17,7 @@ class SEOHelper
         
         // Enhanced description with local keywords
         $baseDescription = strip_tags(substr($product->description, 0, 100));
-        $description = $baseDescription . ' ✓ Authentic Products ✓ Fast Kigali Delivery ✓ MTN & Airtel Money Payment ✓ East Africa\'s #1 Cosmetics Store';
+        $description = $baseDescription . ' | Authentic Products | Fast Kigali Delivery | MTN & Airtel Money Payment | East Africa\'s #1 Cosmetics Store';
         $description = substr($description, 0, 155);
         
         $image = $product->first_image_url;
@@ -109,7 +109,7 @@ class SEOHelper
         $title = "Buy {$category->name} in East Africa - Authentic Products | Diva House Beauty";
         
         $productCount = $products ? $products->count() : 'Premium';
-        $description = $category->description ?? "Shop authentic {$category->name} in East Africa ✓ {$productCount}+ Products ✓ Fast Kigali Delivery ✓ Genuine Brands ✓ MTN & Airtel Money Payment ✓ East Africa's #1 Online Cosmetics Store";
+        $description = $category->description ?? "Shop authentic {$category->name} in East Africa | {$productCount}+ Products | Fast Kigali Delivery | Genuine Brands | MTN & Airtel Money Payment | East Africa's #1 Online Cosmetics Store";
         
         return [
             'title' => $title,
@@ -144,7 +144,7 @@ class SEOHelper
     {
         return [
             'title' => 'Diva House Beauty - East Africa\'s #1 Online Cosmetics & Beauty Store | Authentic Products, Fast Kigali Delivery',
-            'description' => '🌍 East Africa\'s Premier Online Cosmetics & Beauty E-commerce Store ✓ 100% Authentic Products ✓ Fast Kigali Delivery ✓ MTN & Airtel Money ✓ Trusted by 1000s ✓ Makeup, Skincare, Fashion & More',
+            'description' => 'East Africa\'s Premier Online Cosmetics & Beauty E-commerce Store | 100% Authentic Products | Fast Kigali Delivery | MTN & Airtel Money | Trusted by 1000s | Makeup, Skincare, Fashion & More',
             'keywords' => implode(', ', [
                 'cosmetics East Africa',
                 'beauty products Kigali',

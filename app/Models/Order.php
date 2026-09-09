@@ -26,6 +26,7 @@ class Order extends Model
         'total',
         'payment_method',
         'status',
+        'payment_status',
         'is_paid',
         'paid_at',
         'transaction_id',

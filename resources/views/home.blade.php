@@ -307,7 +307,7 @@
       <div class="mx-auto max-w-7xl px-3 sm:px-4">
         <div class="flex items-center justify-between mb-6">
           <div>
-            <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">🔥 On Sale</h2>
+            <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">On Sale</h2>
             <p class="text-sm text-slate-500 mt-1">Limited time offers</p>
           </div>
           <a href="{{ route('deals') }}" class="text-[var(--gold)] hover:underline text-sm font-medium">

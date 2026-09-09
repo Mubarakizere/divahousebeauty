@@ -223,7 +223,7 @@
 
                 <div class="mt-5">
                     <div class="flex justify-between text-[11px] text-gray-500 font-medium mb-1.5">
-                        <span>Beauty investment 😌</span>
+                        <span>Beauty investment</span>
                         <span>75%</span>
                     </div>
                     <div class="h-2 bg-gray-200 rounded-full overflow-hidden">

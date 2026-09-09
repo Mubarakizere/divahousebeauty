@@ -1,5 +1,5 @@
 @component('mail::message')
-# 🎉 Order Confirmed
+# Order Confirmed
 
 Hi {{ $order->user->name ?? 'Customer' }},
 

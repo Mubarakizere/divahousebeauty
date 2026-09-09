@@ -52,7 +52,7 @@
                             <li>
                                 <a href="#">Links</a>
                                 <ul>
-                                    <li><a href="tel:0780159059"><i class="icon-phone"></i>Call: +2507 8015 9059</a></li>
+                                    <li><a href="tel:+250780159059"><i class="icon-phone"></i>Call: +250 780 159 059</a></li>
                                     <li><a href="about.html">About Us</a></li>
                                     <li><a href="contact.html">Contact Us</a></li>
                                     <li><a href="#signin-modal" data-toggle="modal"><i class="icon-user"></i>Login</a></li>

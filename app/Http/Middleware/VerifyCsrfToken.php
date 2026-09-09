@@ -13,5 +13,7 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         'payment/webhook',
+        'webhooks/weflexfy',
+        'api/v1/payment/webhook',
     ];
 }

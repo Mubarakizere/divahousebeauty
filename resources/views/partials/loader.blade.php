@@ -24,40 +24,85 @@
 </style>
 
 <script>
-    // FADE OUT ON LOAD
-    window.addEventListener('load', function() {
+    (function() {
         const loader = document.getElementById('global-loader');
-        if (loader) {
-            setTimeout(() => {
-                loader.style.opacity = '0';
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                }, 500); // Wait for transition
-            }, 500); // Minimum view time
-        }
-    });
+        if (!loader) return;
 
-    // FADE IN ON EXIT (Link Clicks)
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                const target = this.getAttribute('target');
-                
-                // Ignore internal anchors, javascript links, or external tabs
-                if (!href || href.startsWith('#') || href.startsWith('javascript') || target === '_blank' || e.ctrlKey || e.metaKey) {
+        let safetyTimeout = null;
+
+        function hideLoader() {
+            if (safetyTimeout) {
+                clearTimeout(safetyTimeout);
+                safetyTimeout = null;
+            }
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 500); // Wait for fade transition
+        }
+
+        function showLoader() {
+            loader.style.display = 'flex';
+            void loader.offsetWidth; // Force reflow
+            loader.style.opacity = '1';
+
+            // Safety fallback: auto-hide after 8s if navigation stalls or fails
+            if (safetyTimeout) clearTimeout(safetyTimeout);
+            safetyTimeout = setTimeout(hideLoader, 8000);
+        }
+
+        // Hide loader whenever page is displayed (initial load & bfcache back/forward navigation)
+        window.addEventListener('pageshow', function() {
+            hideLoader();
+        });
+
+        // Ensure loader is hidden when navigating away so cached page snapshots stay clean
+        window.addEventListener('pagehide', function() {
+            hideLoader();
+        });
+
+        // Event delegation for link clicks
+        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('click', function(e) {
+                const link = e.target.closest('a');
+                if (!link) return;
+
+                const href = link.getAttribute('href');
+                const target = link.getAttribute('target');
+
+                // Skip if click event was already prevented
+                if (e.defaultPrevented) return;
+
+                // Ignore anchors, javascript links, external tabs, mailto/tel, downloads, modifier keys
+                if (
+                    !href || 
+                    href.startsWith('#') || 
+                    href.startsWith('javascript:') || 
+                    href.startsWith('mailto:') || 
+                    href.startsWith('tel:') || 
+                    target === '_blank' || 
+                    link.hasAttribute('download') ||
+                    e.ctrlKey || e.metaKey || e.shiftKey || e.altKey
+                ) {
                     return;
                 }
 
-                // Show loader
-                const loader = document.getElementById('global-loader');
-                if (loader) {
-                    loader.style.display = 'flex';
-                    // Force reflow
-                    void loader.offsetWidth; 
-                    loader.style.opacity = '1';
-                }
+                // Check if target URL is identical to current page
+                try {
+                    const currentUrl = new URL(window.location.href);
+                    const targetUrl = new URL(link.href, window.location.href);
+                    if (
+                        currentUrl.origin === targetUrl.origin &&
+                        currentUrl.pathname === targetUrl.pathname &&
+                        currentUrl.search === targetUrl.search
+                    ) {
+                        return; // Same page navigation
+                    }
+                } catch (err) {}
+
+                // Show loader on page transition
+                showLoader();
             });
         });
-    });
+    })();
 </script>

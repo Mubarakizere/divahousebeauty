@@ -96,13 +96,13 @@
                                 class="block w-full px-3 py-2 border {{ $errors->has('type') ? 'border-red-300 ring-red-500' : 'border-gray-300' }} rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Select type</option>
                             <option value="home" {{ old('type', $address->type ?? '') == 'home' ? 'selected' : '' }}>
-                                🏠 Home
+                                Home
                             </option>
                             <option value="work" {{ old('type', $address->type ?? '') == 'work' ? 'selected' : '' }}>
-                                🏢 Work
+                                Work
                             </option>
                             <option value="other" {{ old('type', $address->type ?? '') == 'other' ? 'selected' : '' }}>
-                                📍 Other
+                                Other
                             </option>
                         </select>
                         @error('type')

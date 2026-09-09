@@ -65,7 +65,7 @@
         <li class="flex items-start gap-2">
           {{-- mail --}}
           <svg class="w-4 h-4 mt-0.5 text-[var(--gold)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg>
-          <a href="mailto:hello@divahousebeauty.com" class="hover:text-[var(--gold)]">info@divahousebeauty.com</a>
+          <a href="mailto:info@divahousebeauty.com" class="hover:text-[var(--gold)]">info@divahousebeauty.com</a>
         </li>
       </ul>
 
