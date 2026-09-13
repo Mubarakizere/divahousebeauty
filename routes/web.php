@@ -249,6 +249,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/payment/success/{order}', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
     Route::get('/payment/failed/{order}', [App\Http\Controllers\PaymentController::class, 'failed'])->name('payment.failed');
 
+    // Shipping Payment
+    Route::post('/shipping/pay', [App\Http\Controllers\PaymentController::class, 'initiateShippingPayment'])->name('shipping.pay');
+    Route::get('/shipping/success', [App\Http\Controllers\PaymentController::class, 'shippingPaymentSuccess'])->name('shipping.payment.success');
+
 
     // Address management routes
     Route::resource('my-addresses', AddressController::class)->names([
@@ -357,6 +361,7 @@ Route::middleware(['auth', 'admin'])
         Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
         Route::put('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
         Route::put('/orders/{order}/mark-paid', [AdminOrderController::class, 'markPaid'])->name('admin.orders.markPaid');
+        Route::put('/orders/{order}/shipping', [AdminOrderController::class, 'updateShippingCost'])->name('admin.orders.updateShipping');
         Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('admin.orders.destroy');
 
         // Admin Dashboard API Routes (for admin panel charts)

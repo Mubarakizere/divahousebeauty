@@ -28,6 +28,15 @@ class DashboardController extends Controller
         $pendingOrders = Order::whereIn('status', ['pending_payment', 'processing'])->count();
         $completedOrders = Order::where('status', 'completed')->count();
 
+        // Paid vs Unpaid orders
+        $paidOrders = Order::where('is_paid', true)->count();
+        $unpaidOrders = Order::where('is_paid', false)->where('status', '!=', 'cancelled')->count();
+        $paidRevenue = Order::where('is_paid', true)->sum('total');
+        $unpaidRevenue = Order::where('is_paid', false)->where('status', '!=', 'cancelled')->sum('total');
+
+        // Shipping stats
+        $shippingCollected = Order::where('shipping_paid', true)->sum('shipping_cost');
+
         // Low stock alerts (items below 5 units)
         $lowStockProducts = Product::where('stock', '<', 5)->get();
         $lowStockCount = $lowStockProducts->count();
@@ -50,7 +59,9 @@ class DashboardController extends Controller
             'totalOrders', 'totalRevenue', 'totalCustomers', 'totalProducts',
             'todayOrders', 'todayRevenue', 'newCustomersToday',
             'pendingOrders', 'completedOrders', 'recentOrders', 
-            'lowStockCount', 'lowStockProducts', 'topProducts'
+            'lowStockCount', 'lowStockProducts', 'topProducts',
+            'paidOrders', 'unpaidOrders', 'paidRevenue', 'unpaidRevenue',
+            'shippingCollected'
         ));
     }
 

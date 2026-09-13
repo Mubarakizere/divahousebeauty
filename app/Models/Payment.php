@@ -19,6 +19,7 @@ class Payment extends Model
         'status',
         'iframe_url',
         'customer_data',
+        'payment_type',
     ];
 
     protected $casts = [

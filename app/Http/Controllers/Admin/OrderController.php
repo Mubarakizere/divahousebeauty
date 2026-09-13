@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Order;
+use App\Models\User;
 
 class OrderController extends Controller
 {
@@ -102,6 +104,49 @@ class OrderController extends Controller
         return redirect()
             ->route('admin.orders.show', $order->id)
             ->with('success', 'Order marked as paid.');
+    }
+
+    /**
+     * Update shipping cost for an order (admin enters DHL base cost).
+     * Customer will pay base + 5% service fee.
+     */
+    public function updateShippingCost(Request $request, $id)
+    {
+        $request->validate([
+            'shipping_cost' => 'required|numeric|min:0',
+            'shipping_notes' => 'nullable|string|max:1000',
+        ]);
+
+        $order = Order::findOrFail($id);
+
+        $order->update([
+            'shipping_cost' => $request->input('shipping_cost'),
+            'shipping_notes' => $request->input('shipping_notes'),
+        ]);
+
+        // Log in status history
+        $order->statusHistories()->create([
+            'status_from' => $order->status,
+            'status_to' => $order->status,
+            'notes' => 'Shipping cost set to RWF ' . number_format($request->input('shipping_cost'), 0) . ' (customer pays RWF ' . number_format($order->shipping_total, 0) . ' incl. 5% fee)',
+            'updated_by' => auth()->id(),
+        ]);
+
+        // Send email to customer
+        try {
+            if (!empty($order->customer_email)) {
+                Mail::to($order->customer_email)->send(new \App\Mail\ShippingCostSet($order));
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Failed to send shipping cost email', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return redirect()
+            ->route('admin.orders.show', $order->id)
+            ->with('success', 'Shipping cost updated. Customer will pay RWF ' . number_format($order->shipping_total, 0) . ' (incl. 5% service fee). Email sent to customer.');
     }
 
     /**

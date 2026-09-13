@@ -175,6 +175,13 @@
                                         Unpaid
                                     </div>
                                 @endif
+                                @if($order->hasShippingCost())
+                                    <div class="text-[10px] mt-1 flex items-center justify-center gap-1 {{ $order->isShippingPaid() ? 'text-green-600' : 'text-amber-600' }}">
+                                        <i class="fas fa-truck"></i>
+                                        RWF {{ number_format($order->shipping_total, 0) }}
+                                        {{ $order->isShippingPaid() ? '✓' : '⏳' }}
+                                    </div>
+                                @endif
                             </div>
 
                             {{-- Payment --}}
@@ -266,6 +273,13 @@
                                                 </span>
                                             @endif
                                         </div>
+                                        @if($order->hasShippingCost())
+                                            <div class="mt-0.5 text-[11px] {{ $order->isShippingPaid() ? 'text-green-600' : 'text-amber-600' }}">
+                                                <i class="fas fa-truck"></i>
+                                                Shipping: RWF {{ number_format($order->shipping_total, 0) }}
+                                                {{ $order->isShippingPaid() ? '(Paid)' : '(Pending)' }}
+                                            </div>
+                                        @endif
 
                                         <div class="mt-1 text-[11px] text-gray-500">
                                             {{ $order->created_at? $order->created_at->format('d M Y H:i') : '—' }}

@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\PaymentTransfer;
+use App\Models\User;
 use App\Services\WeflexfyService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class PaymentController extends Controller
 {
@@ -80,6 +82,7 @@ class PaymentController extends Controller
                 'currency' => $response['data']['currency'],
                 'iframe_url' => $response['data']['iframeUrl'],
                 'status' => 'pending',
+                'payment_type' => 'order',
                 'customer_data' => [
                     'name' => $paymentData['billName'],
                     'email' => $paymentData['billEmail'],
@@ -219,7 +222,7 @@ class PaymentController extends Controller
             }
         }
         
-        // Send confirmation email
+        // Send confirmation email to customer
         try {
             if (class_exists('\App\Mail\OrderConfirmed')) {
                 \Illuminate\Support\Facades\Mail::to($order->customer_email)->send(new \App\Mail\OrderConfirmed($order));
@@ -230,7 +233,194 @@ class PaymentController extends Controller
                 'error' => $e->getMessage(),
             ]);
         }
+
+        // Send notification to all admin users
+        $this->notifyAdmins($order, 'order');
         
         \Log::channel('single')->info('Order completed successfully via Success Page', ['order_id' => $order->id]);
+    }
+
+    // ===== SHIPPING PAYMENT METHODS =====
+
+    /**
+     * Initiate shipping payment for an order
+     */
+    public function initiateShippingPayment(Request $request)
+    {
+        $validated = $request->validate([
+            'order_id' => 'required|exists:orders,id',
+        ]);
+
+        $order = Order::with('items.product')->findOrFail($validated['order_id']);
+
+        // Ensure order belongs to authenticated user
+        if ($order->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Verify shipping cost is set and not yet paid
+        if (!$order->hasShippingCost()) {
+            return back()->with('error', 'Shipping cost has not been set yet.');
+        }
+
+        if ($order->isShippingPaid()) {
+            return redirect()->route('orders.show', $order->id)
+                ->with('info', 'Shipping has already been paid.');
+        }
+
+        try {
+            // Customer pays shipping_total (base + 5% service fee)
+            $shippingAmount = (int) $order->shipping_total;
+
+            $paymentData = [
+                'amount' => $shippingAmount,
+                'currency' => 'RWF',
+                'billName' => $order->customer_name ?? auth()->user()->name,
+                'billEmail' => $order->customer_email ?? auth()->user()->email,
+                'billPhone' => $order->customer_phone ?? auth()->user()->phone,
+                'billCountry' => 'RW',
+                'transfers' => [
+                    [
+                        'percentage' => 100,
+                        'recipientNumber' => config('services.weflexfy.recipient_number'),
+                        'payload' => [
+                            'orderId' => $order->id,
+                            'orderNumber' => $order->order_number ?? 'ORD-' . $order->id,
+                            'paymentType' => 'shipping',
+                        ]
+                    ]
+                ]
+            ];
+
+            \Log::channel('single')->info('Initiating Shipping Payment', [
+                'user_id' => auth()->id(),
+                'order_id' => $order->id,
+                'shipping_amount' => $shippingAmount,
+            ]);
+
+            $response = $this->weflexfy->initiatePayment($paymentData);
+
+            \Log::channel('single')->info('Weflexfy Shipping Response', ['response' => $response]);
+
+            // Store payment record with type 'shipping'
+            $payment = Payment::create([
+                'order_id' => $order->id,
+                'user_id' => auth()->id(),
+                'request_token' => $response['data']['requestToken'],
+                'amount' => $response['data']['amount'],
+                'currency' => $response['data']['currency'],
+                'iframe_url' => $response['data']['iframeUrl'],
+                'status' => 'pending',
+                'payment_type' => 'shipping',
+                'customer_data' => [
+                    'name' => $paymentData['billName'],
+                    'email' => $paymentData['billEmail'],
+                    'phone' => $paymentData['billPhone'],
+                ]
+            ]);
+
+            // Store transfer records
+            foreach ($response['data']['transfers'] as $transfer) {
+                PaymentTransfer::create([
+                    'payment_id' => $payment->id,
+                    'transfer_ref' => $transfer['transferRef'],
+                    'amount' => $transfer['amount'],
+                    'percentage' => 100,
+                    'recipient_number' => $transfer['recipientNumber'],
+                    'status' => strtolower($transfer['status']),
+                    'payload' => $transfer['payload'] ?? null,
+                ]);
+            }
+
+            return view('payment.iframe', compact('payment', 'order'));
+
+        } catch (\Exception $e) {
+            \Log::channel('single')->error('Shipping payment initiation failed', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Shipping payment initiation failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Shipping payment success page
+     */
+    public function shippingPaymentSuccess(Request $request)
+    {
+        $orderId = $request->query('order');
+        $order = Order::findOrFail($orderId);
+
+        if ($order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // Fallback: mark shipping as paid if not already done by webhook
+        if (!$order->isShippingPaid()) {
+            $this->completeShippingPayment($order);
+        }
+
+        return view('payment.success', compact('order'));
+    }
+
+    /**
+     * Complete shipping payment — mark paid, send emails to customer + all admins
+     */
+    public function completeShippingPayment(Order $order, ?string $transactionId = null)
+    {
+        $order->update([
+            'shipping_paid' => true,
+            'shipping_paid_at' => now(),
+            'shipping_transaction_id' => $transactionId ?? $order->shipping_transaction_id,
+        ]);
+
+        // Send confirmation email to customer
+        try {
+            if (!empty($order->customer_email)) {
+                Mail::to($order->customer_email)->send(new \App\Mail\ShippingPaidNotification($order));
+            }
+        } catch (\Exception $e) {
+            \Log::channel('single')->warning('Failed to send shipping paid email to customer', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // Send notification to all admin users
+        $this->notifyAdmins($order, 'shipping');
+
+        \Log::channel('single')->info('Shipping payment completed', ['order_id' => $order->id]);
+    }
+
+    /**
+     * Send email notification to all admin users
+     */
+    private function notifyAdmins(Order $order, string $type = 'order')
+    {
+        try {
+            $adminEmails = User::where('role', 'admin')->pluck('email')->filter()->toArray();
+
+            if (empty($adminEmails)) {
+                \Log::channel('single')->warning('No admin emails found for notification');
+                return;
+            }
+
+            $mailable = $type === 'shipping'
+                ? new \App\Mail\AdminShippingPaidNotification($order)
+                : new \App\Mail\OrderConfirmed($order);
+
+            Mail::to($adminEmails)->send($mailable);
+
+            \Log::channel('single')->info("Admin {$type} notification sent", [
+                'order_id' => $order->id,
+                'admin_count' => count($adminEmails),
+            ]);
+        } catch (\Exception $e) {
+            \Log::channel('single')->warning("Failed to send admin {$type} notification", [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

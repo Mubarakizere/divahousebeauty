@@ -154,6 +154,64 @@
 
     </div>
 
+    {{-- Payment Overview Cards --}}
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        
+        <div class="glass-card rounded-xl p-5 relative overflow-hidden group animate-scale-in">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-emerald-50/50 rounded-full blur-2xl group-hover:bg-emerald-100/50 transition-colors"></div>
+            <div class="flex items-center justify-between mb-3 relative">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Paid Orders</p>
+                <div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center stat-icon">
+                    <i class="fas fa-check-circle text-emerald-600"></i>
+                </div>
+            </div>
+            <div class="flex items-baseline gap-2 relative">
+                <p class="text-2xl font-extrabold text-emerald-700 tracking-tight">{{ number_format($paidOrders) }}</p>
+                <p class="text-xs text-slate-400 font-bold">orders</p>
+            </div>
+            <div class="mt-3 relative">
+                <span class="text-[11px] font-bold text-emerald-600">{{ number_format($paidRevenue) }} RWF</span>
+                <span class="text-[10px] text-slate-400 font-medium ml-1">revenue collected</span>
+            </div>
+        </div>
+
+        <div class="glass-card rounded-xl p-5 relative overflow-hidden group animate-scale-in">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-red-50/50 rounded-full blur-2xl group-hover:bg-red-100/50 transition-colors"></div>
+            <div class="flex items-center justify-between mb-3 relative">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Unpaid Orders</p>
+                <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center stat-icon">
+                    <i class="fas fa-clock text-red-600"></i>
+                </div>
+            </div>
+            <div class="flex items-baseline gap-2 relative">
+                <p class="text-2xl font-extrabold text-red-700 tracking-tight">{{ number_format($unpaidOrders) }}</p>
+                <p class="text-xs text-slate-400 font-bold">orders</p>
+            </div>
+            <div class="mt-3 relative">
+                <span class="text-[11px] font-bold text-red-600">{{ number_format($unpaidRevenue) }} RWF</span>
+                <span class="text-[10px] text-slate-400 font-medium ml-1">outstanding</span>
+            </div>
+        </div>
+
+        <div class="glass-card rounded-xl p-5 relative overflow-hidden group animate-scale-in">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-50/50 rounded-full blur-2xl group-hover:bg-blue-100/50 transition-colors"></div>
+            <div class="flex items-center justify-between mb-3 relative">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Shipping Collected</p>
+                <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center stat-icon">
+                    <i class="fas fa-truck text-blue-600"></i>
+                </div>
+            </div>
+            <div class="flex items-baseline gap-2 relative">
+                <p class="text-2xl font-extrabold text-blue-700 tracking-tight">{{ number_format($shippingCollected) }}</p>
+                <p class="text-xs text-slate-400 font-bold uppercase">RWF</p>
+            </div>
+            <div class="mt-3 relative">
+                <span class="text-[10px] text-slate-400 font-medium italic">Total shipping fees received</span>
+            </div>
+        </div>
+
+    </div>
+
     {{-- Low Stock Alert --}}
     @if($lowStockCount > 0)
     <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-4">

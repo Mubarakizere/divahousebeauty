@@ -77,11 +77,19 @@ class WeflexfyWebhookController extends Controller
         \Log::info('Payment status updated', [
             'payment_id' => $payment->id,
             'status' => $payment->status,
+            'payment_type' => $payment->payment_type,
         ]);
         
-        // If payment successful, complete the order
+        // If payment successful, complete the order or shipping based on payment_type
         if ($status === 'success') {
-            $this->completeOrder($payment->order, $payload['paymentRef'] ?? null);
+            if ($payment->payment_type === 'shipping') {
+                // This is a shipping payment — complete shipping
+                app(\App\Http\Controllers\PaymentController::class)
+                    ->completeShippingPayment($payment->order, $payload['paymentRef'] ?? null);
+            } else {
+                // This is a regular order payment
+                $this->completeOrder($payment->order, $payload['paymentRef'] ?? null);
+            }
         } elseif ($status === 'failed') {
             $this->failOrder($payment->order);
         }

@@ -360,6 +360,118 @@
 
     </div> {{-- /actions grid --}}
 
+    {{-- Shipping Cost Card --}}
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <h2 class="text-base font-semibold text-gray-900 flex items-center gap-2 mb-4">
+            <i class="fas fa-truck text-gray-400"></i>
+            <span>Shipping Cost (DHL)</span>
+            @if($order->hasShippingCost())
+                @if($order->isShippingPaid())
+                    <span class="ml-auto text-xs font-medium bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                        <i class="fas fa-check-circle mr-1"></i> Shipping Paid
+                    </span>
+                @else
+                    <span class="ml-auto text-xs font-medium bg-amber-100 text-amber-700 px-2 py-1 rounded-full">
+                        <i class="fas fa-clock mr-1"></i> Awaiting Shipping Payment
+                    </span>
+                @endif
+            @endif
+        </h2>
+
+        @if($order->hasShippingCost() && $order->isShippingPaid())
+            <div class="border border-green-200 bg-green-50 rounded-lg p-4 mb-4">
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <span class="text-gray-500">DHL Base Cost:</span>
+                        <span class="font-semibold text-gray-900 ml-1">RWF {{ number_format($order->shipping_cost, 0) }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Service Fee (5%):</span>
+                        <span class="font-semibold text-gray-900 ml-1">RWF {{ number_format($order->shipping_service_fee, 0) }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Customer Paid:</span>
+                        <span class="font-bold text-green-700 ml-1">RWF {{ number_format($order->shipping_total, 0) }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Paid at:</span>
+                        <span class="font-medium text-gray-900 ml-1">{{ $order->shipping_paid_at ? $order->shipping_paid_at->format('d M Y H:i') : '—' }}</span>
+                    </div>
+                </div>
+                @if($order->shipping_notes)
+                    <div class="mt-3 pt-3 border-t border-green-200 text-sm">
+                        <span class="text-gray-500">Notes:</span>
+                        <p class="text-gray-700 mt-1">{{ $order->shipping_notes }}</p>
+                    </div>
+                @endif
+                @if($order->shipping_transaction_id)
+                    <div class="mt-2 text-xs text-gray-500">
+                        Transaction: {{ $order->shipping_transaction_id }}
+                    </div>
+                @endif
+            </div>
+        @endif
+
+        <form action="{{ route('admin.orders.updateShipping', $order->id) }}"
+              method="POST"
+              class="space-y-4">
+            @csrf
+            @method('PUT')
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="shipping_cost" class="block text-sm font-medium text-gray-700 mb-1">
+                        DHL Base Shipping Cost (RWF)
+                    </label>
+                    <input
+                        type="number"
+                        id="shipping_cost"
+                        name="shipping_cost"
+                        step="1"
+                        min="0"
+                        value="{{ old('shipping_cost', $order->shipping_cost > 0 ? $order->shipping_cost : '') }}"
+                        placeholder="e.g. 15000"
+                        class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                    >
+                    <p class="mt-1 text-xs text-gray-500">
+                        Customer will be charged this amount + 5% service fee
+                    </p>
+                </div>
+
+                <div>
+                    <label for="shipping_notes" class="block text-sm font-medium text-gray-700 mb-1">
+                        Shipping Notes (optional)
+                    </label>
+                    <textarea
+                        id="shipping_notes"
+                        name="shipping_notes"
+                        rows="2"
+                        placeholder="DHL tracking number, delivery notes..."
+                        class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >{{ old('shipping_notes', $order->shipping_notes) }}</textarea>
+                </div>
+            </div>
+
+            @if($order->hasShippingCost() && !$order->isShippingPaid())
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm">
+                    <div class="flex items-center gap-2 text-amber-800">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Current: DHL RWF {{ number_format($order->shipping_cost, 0) }} + 5% fee = <strong>RWF {{ number_format($order->shipping_total, 0) }}</strong> for customer</span>
+                    </div>
+                </div>
+            @endif
+
+            <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
+                <button type="submit"
+                        class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                    <i class="fas fa-save mr-2"></i>
+                    {{ $order->hasShippingCost() ? 'Update Shipping Cost' : 'Set Shipping Cost' }}
+                </button>
+            </div>
+        </form>
+    </div>
+
     {{-- Items Table --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-12">
         <h2 class="text-base font-semibold text-gray-900 flex items-center gap-2 mb-4">

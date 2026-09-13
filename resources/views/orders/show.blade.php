@@ -106,12 +106,93 @@
                             <span>-RWF {{ number_format($order->discount, 0) }}</span>
                         </div>
                     @endif
+                    <div class="flex justify-between font-semibold text-[var(--black)]">
+                        <span>Product Total</span>
+                        <span>RWF {{ number_format($order->total, 0) }}</span>
+                    </div>
                 </div>
+
+                {{-- Shipping Cost Section --}}
+                @if($order->hasShippingCost())
+                    <div class="space-y-3 text-sm border-b border-slate-200 pb-4 mb-4">
+                        <div class="flex justify-between text-slate-600">
+                            <span>Shipping (DHL)</span>
+                            <span>RWF {{ number_format($order->shipping_cost, 0) }}</span>
+                        </div>
+                        <div class="flex justify-between text-slate-500 text-xs">
+                            <span>Service Fee (5%)</span>
+                            <span>RWF {{ number_format($order->shipping_service_fee, 0) }}</span>
+                        </div>
+                        <div class="flex justify-between font-semibold {{ $order->isShippingPaid() ? 'text-green-700' : 'text-amber-700' }}">
+                            <span class="flex items-center gap-1">
+                                <i class="la {{ $order->isShippingPaid() ? 'la-check-circle' : 'la-clock' }} text-base"></i>
+                                Shipping Total
+                            </span>
+                            <span>RWF {{ number_format($order->shipping_total, 0) }}</span>
+                        </div>
+                        @if($order->isShippingPaid() && $order->shipping_paid_at)
+                            <div class="text-xs text-green-600">
+                                Paid on {{ $order->shipping_paid_at->format('M d, Y') }}
+                            </div>
+                        @endif
+                        @if($order->shipping_notes)
+                            <div class="text-xs text-slate-500 italic">
+                                {{ $order->shipping_notes }}
+                            </div>
+                        @endif
+                    </div>
+                @else
+                    <div class="space-y-2 text-sm border-b border-slate-200 pb-4 mb-4">
+                        <div class="flex justify-between text-slate-400">
+                            <span class="flex items-center gap-1">
+                                <i class="la la-truck text-base"></i>
+                                Shipping
+                            </span>
+                            <span class="italic">Pending DHL quote</span>
+                        </div>
+                    </div>
+                @endif
+
                 <div class="flex justify-between items-center text-lg font-bold text-[var(--black)]">
-                    <span>Total</span>
-                    <span>RWF {{ number_format($order->total, 0) }}</span>
+                    <span>Grand Total</span>
+                    <span>RWF {{ number_format($order->grand_total, 0) }}</span>
                 </div>
             </div>
+
+            {{-- Shipping Payment Action --}}
+            @if($order->needsShippingPayment())
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-3">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="la la-truck text-amber-700 text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-amber-900">Shipping Payment Required</p>
+                            <p class="text-xs text-amber-700 mt-1">
+                                Your shipping cost has been calculated. Please pay
+                                <strong>RWF {{ number_format($order->shipping_total, 0) }}</strong>
+                                to proceed with delivery.
+                            </p>
+                        </div>
+                    </div>
+                    <form action="{{ route('shipping.pay') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="order_id" value="{{ $order->id }}">
+                        <button type="submit"
+                            class="block w-full py-3 bg-[var(--gold)] hover:bg-[#B08D4C] text-white font-bold rounded shadow-sm text-sm transition-colors">
+                            <i class="la la-credit-card mr-2 text-lg"></i>
+                            Pay Shipping — RWF {{ number_format($order->shipping_total, 0) }}
+                        </button>
+                    </form>
+                </div>
+            @elseif($order->hasShippingCost() && $order->isShippingPaid())
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                    <div class="flex items-center justify-center gap-2 text-green-700">
+                        <i class="la la-check-circle text-xl"></i>
+                        <span class="text-sm font-semibold">Shipping Paid ✓</span>
+                    </div>
+                </div>
+            @endif
 
             {{-- Delivery Info --}}
             <div class="bg-white border border-slate-200 rounded-lg p-6 shadow-ring">

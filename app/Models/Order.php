@@ -34,6 +34,11 @@ class Order extends Model
         'payment_token',
         'customer_notes',
         'order_status',
+        'shipping_cost',
+        'shipping_paid',
+        'shipping_paid_at',
+        'shipping_transaction_id',
+        'shipping_notes',
     ];
 
     protected $casts = [
@@ -43,6 +48,9 @@ class Order extends Model
         'created_at'=> 'datetime',
         'updated_at'=> 'datetime',
         'total'     => 'decimal:2',
+        'shipping_cost'    => 'decimal:2',
+        'shipping_paid'    => 'boolean',
+        'shipping_paid_at' => 'datetime',
     ];
 
     protected static function boot()
@@ -175,5 +183,51 @@ class Order extends Model
     public function getOrderNumberAttribute(): string
     {
         return 'ORD-' . str_pad($this->id, 6, '0', STR_PAD_LEFT);
+    }
+
+    // ===== Shipping Helpers =====
+
+    /**
+     * The 5% service fee on the admin-entered shipping cost.
+     */
+    public function getShippingServiceFeeAttribute(): float
+    {
+        return round($this->shipping_cost * 0.05, 2);
+    }
+
+    /**
+     * Total shipping the customer actually pays (base + 5%).
+     */
+    public function getShippingTotalAttribute(): float
+    {
+        return round($this->shipping_cost + $this->shipping_service_fee, 2);
+    }
+
+    /**
+     * Grand total = product total + shipping total (with 5% fee).
+     */
+    public function getGrandTotalAttribute(): float
+    {
+        return round((float)$this->total + $this->shipping_total, 2);
+    }
+
+    public function getFormattedShippingCostAttribute(): string
+    {
+        return 'RWF ' . number_format($this->shipping_total, 0);
+    }
+
+    public function hasShippingCost(): bool
+    {
+        return (float)$this->shipping_cost > 0;
+    }
+
+    public function isShippingPaid(): bool
+    {
+        return $this->shipping_paid === true;
+    }
+
+    public function needsShippingPayment(): bool
+    {
+        return $this->hasShippingCost() && !$this->isShippingPaid();
     }
 }

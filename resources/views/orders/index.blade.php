@@ -28,6 +28,17 @@
                             <div class="text-xl font-bold text-[var(--gold)]">
                                 RWF {{ number_format($order->total, 0) }}
                             </div>
+                            @if($order->hasShippingCost())
+                                <div class="text-xs mt-1 flex items-center justify-end gap-1 {{ $order->isShippingPaid() ? 'text-green-600' : 'text-amber-600' }}">
+                                    <i class="la la-truck"></i>
+                                    Shipping: RWF {{ number_format($order->shipping_total, 0) }}
+                                    @if($order->isShippingPaid())
+                                        <i class="la la-check-circle"></i>
+                                    @else
+                                        <span class="font-semibold">(Unpaid)</span>
+                                    @endif
+                                </div>
+                            @endif
                         </div>
                     </div>
                     
@@ -71,6 +82,18 @@
                                 <i class="la la-credit-card mr-2 text-lg"></i>
                                 Complete Payment
                             </a>
+                        @endif
+
+                        @if($order->needsShippingPayment())
+                            <form action="{{ route('shipping.pay') }}" method="POST" class="inline">
+                                @csrf
+                                <input type="hidden" name="order_id" value="{{ $order->id }}">
+                                <button type="submit"
+                                    class="inline-flex items-center px-4 py-2 border border-transparent rounded text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 transition-colors shadow-sm">
+                                    <i class="la la-truck mr-2 text-lg"></i>
+                                    Pay Shipping
+                                </button>
+                            </form>
                         @endif
                         
                         @if(in_array($order->status, ['pending_payment', 'processing']))
