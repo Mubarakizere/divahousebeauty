@@ -35,9 +35,9 @@
 <body class="bg-[#f8f9fa] text-slate-700 antialiased"
       x-data="paymentPage({
         orderId: {{ $order->id }},
-        statusUrl: '/payment/status/{{ $order->id }}',
-        successUrl: '/payment/success?order={{ $order->id }}',
-        failedUrl:  '/payment/failed?order={{ $order->id }}',
+        statusUrl: '{{ isset($isShipping) && $isShipping ? route('payment.status', $order->id) . '?type=shipping' : route('payment.status', $order->id) }}',
+        successUrl: '{{ isset($isShipping) && $isShipping ? route('shipping.payment.success', ['order' => $order->id]) : route('payment.success', ['order' => $order->id]) }}',
+        failedUrl:  '{{ route('payment.public.failed', ['order' => $order->id]) }}',
         iframeOrigins: ['https://weflexfy.com', 'https://api.weflexfy.com'] // add sandbox/dev origins if needed
       })"
       x-init="init()">
@@ -140,8 +140,8 @@
 
               <div class="mt-4 rounded-lg bg-white border border-slate-200 p-3">
                 <div class="flex items-center justify-between">
-                  <span class="text-slate-700 font-medium">Total Amount</span>
-                  <span class="text-lg font-extrabold text-slate-900">RWF {{ number_format($order->total, 0) }}</span>
+                  <span class="text-slate-700 font-medium">{{ isset($isShipping) && $isShipping ? 'Shipping Fee (DHL + 5% Fee)' : 'Total Amount' }}</span>
+                  <span class="text-lg font-extrabold text-slate-900">RWF {{ number_format(isset($isShipping) && $isShipping ? $order->shipping_total : $order->total, 0) }}</span>
                 </div>
               </div>
 

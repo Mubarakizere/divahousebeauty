@@ -103,7 +103,11 @@ class PaymentController extends Controller
                 ]);
             }
             
-            return view('payment.iframe', compact('payment', 'order'));
+            return view('payment.iframe', [
+                'payment' => $payment,
+                'order' => $order,
+                'isShipping' => false,
+            ]);
             
         } catch (\Exception $e) {
             \Log::channel('single')->error('Payment initiation failed', [
@@ -129,10 +133,25 @@ class PaymentController extends Controller
             abort(403);
         }
 
-        // FALLBACK for Local/Dev: If order is not paid yet, mark it as paid on success page visit.
-        // In production, you should rely on Webhooks or verify the transaction ID with the API.
-        if ($order->payment_status !== 'paid') {
-            $this->completeOrder($order);
+        // Check if order payment is confirmed via webhook or payment record status
+        $isPaid = $order->payment_status === 'paid' || $order->is_paid;
+
+        if (!$isPaid) {
+            $successfulPayment = Payment::where('order_id', $order->id)
+                ->where('payment_type', 'order')
+                ->where('status', 'success')
+                ->first();
+
+            if ($successfulPayment) {
+                $this->completeOrder($order);
+                $isPaid = true;
+            }
+        }
+
+        // If payment is NOT verified/paid, redirect to order detail with notification
+        if (!$isPaid) {
+            return redirect()->route('orders.show', $order->id)
+                ->with('error', 'Payment has not been confirmed yet. If you completed payment, please allow a moment for confirmation.');
         }
         
         return view('payment.success', compact('order'));
@@ -169,7 +188,43 @@ class PaymentController extends Controller
             return response()->json(['paid' => false, 'status' => 'not_found'], 404);
         }
 
+        $type = request()->query('type');
+
+        if ($type === 'shipping') {
+            $isShippingPaid = $order->isShippingPaid();
+
+            if (!$isShippingPaid) {
+                $successfulPayment = Payment::where('order_id', $order->id)
+                    ->where('payment_type', 'shipping')
+                    ->where('status', 'success')
+                    ->first();
+
+                if ($successfulPayment) {
+                    $this->completeShippingPayment($order, $successfulPayment->payment_ref);
+                    $isShippingPaid = true;
+                }
+            }
+
+            return response()->json([
+                'paid'   => $isShippingPaid,
+                'status' => $isShippingPaid ? 'success' : 'pending',
+                'order_id' => $order->id,
+            ]);
+        }
+
         $isPaid = $order->is_paid || $order->payment_status === 'paid' || $order->status === 'confirmed';
+
+        if (!$isPaid) {
+            $successfulPayment = Payment::where('order_id', $order->id)
+                ->where('payment_type', 'order')
+                ->where('status', 'success')
+                ->first();
+
+            if ($successfulPayment) {
+                $this->completeOrder($order);
+                $isPaid = true;
+            }
+        }
 
         return response()->json([
             'paid'   => $isPaid,
@@ -208,11 +263,10 @@ class PaymentController extends Controller
         foreach ($order->items as $item) {
             $product = $item->product;
             if ($product && $product->track_stock) {
-                // Assuming updateStock exists locally or logic is simple
                 if (method_exists($product, 'updateStock')) {
                     $product->updateStock(
                         -$item->quantity,
-                        'sale', // Assuming hardcoded cause constant might be missing
+                        'sale',
                         'Order #' . $order->id,
                         "Sold {$item->quantity} units"
                     );
@@ -237,7 +291,7 @@ class PaymentController extends Controller
         // Send notification to all admin users
         $this->notifyAdmins($order, 'order');
         
-        \Log::channel('single')->info('Order completed successfully via Success Page', ['order_id' => $order->id]);
+        \Log::channel('single')->info('Order completed successfully', ['order_id' => $order->id]);
     }
 
     // ===== SHIPPING PAYMENT METHODS =====
@@ -332,7 +386,11 @@ class PaymentController extends Controller
                 ]);
             }
 
-            return view('payment.iframe', compact('payment', 'order'));
+            return view('payment.iframe', [
+                'payment' => $payment,
+                'order' => $order,
+                'isShipping' => true,
+            ]);
 
         } catch (\Exception $e) {
             \Log::channel('single')->error('Shipping payment initiation failed', [
@@ -356,9 +414,25 @@ class PaymentController extends Controller
             abort(403);
         }
 
-        // Fallback: mark shipping as paid if not already done by webhook
-        if (!$order->isShippingPaid()) {
-            $this->completeShippingPayment($order);
+        // Verify if shipping payment is confirmed via webhook or payment record status
+        $isPaid = $order->isShippingPaid();
+
+        if (!$isPaid) {
+            $successfulPayment = Payment::where('order_id', $order->id)
+                ->where('payment_type', 'shipping')
+                ->where('status', 'success')
+                ->first();
+
+            if ($successfulPayment) {
+                $this->completeShippingPayment($order, $successfulPayment->payment_ref);
+                $isPaid = true;
+            }
+        }
+
+        // If payment is NOT verified/paid, redirect to order detail with notification
+        if (!$isPaid) {
+            return redirect()->route('orders.show', $order->id)
+                ->with('error', 'Shipping payment has not been confirmed yet. If you completed payment, please allow a moment for confirmation.');
         }
 
         return view('payment.success', compact('order'));
