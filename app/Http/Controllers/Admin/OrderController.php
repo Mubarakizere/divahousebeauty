@@ -26,7 +26,7 @@ class OrderController extends Controller
                           ->orWhere('customer_phone', 'LIKE', "%{$search}%")
                           ->orWhere('customer_email', 'LIKE', "%{$search}%")
                           ->orWhere('masked_order_id', 'LIKE', "%{$search}%")
-                          ->orWhere('transaction_id', 'LIKE', "%{$search}%")
+                          ->orWhere('payment_token', 'LIKE', "%{$search}%")
                           ->orWhere('id', $search); // allow searching by raw ID
                 });
             })

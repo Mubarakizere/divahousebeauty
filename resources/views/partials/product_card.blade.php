@@ -6,7 +6,7 @@
     // Check for active promotion
     $promotion = $product->promotion()->where('end_time', '>=', now())->first();
 
-    // Fix for 0 prices: Use standard_price (ignoring express_price on main site)
+    // Display standard_price only
     $displayPrice = (float)$product->standard_price > 0 
         ? (float)$product->standard_price 
         : 0;
@@ -58,7 +58,7 @@
                     if (this.loading) return;
                     
                     @guest
-                        window.dispatchEvent(new CustomEvent('open-auth', { detail: { tab: 'signin' } }));
+                        window.location.href = "{{ route('login') }}";
                         return;
                     @endguest
 

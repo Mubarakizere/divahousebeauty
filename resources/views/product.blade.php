@@ -251,10 +251,10 @@
                        async toggleWishlist() {
                          if (this.isProcessing) return;
                          
-                         @guest
-                           window.dispatchEvent(new CustomEvent('open-auth', { detail: { tab: 'signin' } }));
-                           return;
-                         @endguest
+                          @guest
+                            window.location.href = "{{ route('login') }}";
+                            return;
+                          @endguest
                          
                          this.isProcessing = true;
                          const productId = {{ $product->id }};

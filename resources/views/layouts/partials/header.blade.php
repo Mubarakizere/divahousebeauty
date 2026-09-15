@@ -24,7 +24,7 @@
                 </div>
             </div>
             @guest
-                <a href="#signin-modal" class="hover:text-pink-600">Sign in / Sign up</a>
+                <a href="{{ route('login') }}" class="hover:text-pink-600">Sign in / Sign up</a>
             @else
                 <div class="relative group">
                     <button class="hover:text-pink-600">
@@ -55,7 +55,7 @@
         <a href="https://ihuriro.divahousebeauty.com/" class="block">Booking</a>
         <a href="{{ route('blog') }}" class="block">Blog</a>
         @guest
-            <a href="#signin-modal" class="block">Sign in / Sign up</a>
+            <a href="{{ route('login') }}" class="block">Sign in / Sign up</a>
         @else
             <a href="{{ route('dashboard') }}" class="block">Dashboard</a>
             <form action="{{ route('logout') }}" method="POST">

@@ -18,13 +18,20 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $search = trim((string) $request->input('search'));
+        $search       = trim((string) $request->input('search'));
+        $shippingType = $request->input('shipping_type');
+        $categoryId   = $request->input('category_id');
+        $brandId      = $request->input('brand_id');
+        $stockStatus  = $request->input('stock_status');
+        $sortBy       = $request->input('sort', 'latest');
 
-        $query = Product::with(['category', 'brand'])->latest();
+        $query = Product::with(['category', 'brand']);
 
+        // Text search
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('id', $search)
                     ->orWhereHas('brand', function ($qb) use ($search) {
                         $qb->where('name', 'like', "%{$search}%");
                     })
@@ -34,11 +41,63 @@ class ProductController extends Controller
             });
         }
 
-        $products = $query->paginate(10)->withQueryString();
+        // Shipping type filter
+        if ($shippingType && in_array($shippingType, ['express_only', 'standard_only', 'both'])) {
+            $query->where('shipping_type', $shippingType);
+        }
+
+        // Category filter
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+
+        // Brand filter
+        if ($brandId) {
+            $query->where('brand_id', $brandId);
+        }
+
+        // Stock status filter
+        if ($stockStatus === 'in_stock') {
+            $query->where('stock', '>', 0);
+        } elseif ($stockStatus === 'out_of_stock') {
+            $query->where('stock', '<=', 0);
+        } elseif ($stockStatus === 'low_stock') {
+            $query->whereBetween('stock', [1, 5]);
+        }
+
+        // Sorting
+        switch ($sortBy) {
+            case 'name_asc':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('name', 'desc');
+                break;
+            case 'price_asc':
+                $query->orderBy('standard_price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('standard_price', 'desc');
+                break;
+            case 'stock_asc':
+                $query->orderBy('stock', 'asc');
+                break;
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            default:
+                $query->latest();
+        }
+
+        $products   = $query->paginate(10)->withQueryString();
+        $categories = Category::orderBy('name')->get();
+        $brands     = Brand::orderBy('name')->get();
 
         return view('admin.products.index', [
-            'products' => $products,
-            'search'   => $search,
+            'products'   => $products,
+            'search'     => $search,
+            'categories' => $categories,
+            'brands'     => $brands,
         ]);
     }
 

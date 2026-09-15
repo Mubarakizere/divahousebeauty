@@ -70,7 +70,7 @@
                 </h2>
 
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" x-data="{ shippingType: '{{ old('shipping_type', 'express_only') }}' }">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" x-data="{ shippingType: '{{ old('shipping_type', 'standard_only') }}' }">
                     {{-- Product Name --}}
                     <div class="md:col-span-2">
                         <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
@@ -103,8 +103,8 @@
                             x-model="shippingType"
                             class="block w-full px-3 py-2 border {{ $errors->has('shipping_type') ? 'border-red-300 ring-red-500' : 'border-gray-300' }} rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             required>
+                            <option value="standard_only" {{ old('shipping_type', 'standard_only') === 'standard_only' ? 'selected' : '' }}>Standard Only (7+ Days)</option>
                             <option value="express_only" {{ old('shipping_type') === 'express_only' ? 'selected' : '' }}>Express Only (Fast Delivery)</option>
-                            <option value="standard_only" {{ old('shipping_type') === 'standard_only' ? 'selected' : '' }}>Standard Only (7+ Days)</option>
                             <option value="both" {{ old('shipping_type') === 'both' ? 'selected' : '' }}>Both Options (Customer Chooses)</option>
                         </select>
                         <p class="mt-1 text-xs text-gray-500">

@@ -53,7 +53,7 @@
                                     @guest
                                         <!-- Show Sign In / Sign Up if the user is not logged in -->
                                         <li class="login">
-                                            <a href="#signin-modal" data-toggle="modal"> <i class="icon-user"></i>Sign in / Sign up</a>
+                                            <a href="{{ route('login') }}"> <i class="icon-user"></i>Sign in / Sign up</a>
                                         </li>
                                     @else
                                         <!-- Show User Name if the user is logged in -->

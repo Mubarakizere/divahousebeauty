@@ -118,7 +118,7 @@
                          if (this.isProcessing) return;
                          
                          @guest
-                           window.dispatchEvent(new CustomEvent('open-auth', { detail: { tab: 'signin' } }));
+                           window.location.href = &quot;{{ route('login') }}&quot;;
                            return;
                          @endguest
                          

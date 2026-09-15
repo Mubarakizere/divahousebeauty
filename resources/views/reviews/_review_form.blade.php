@@ -134,11 +134,10 @@
 <div class="bg-gradient-to-br from-slate-50 to-gray-50 border border-slate-200 rounded-xl p-8 text-center shadow-sm">
   <i class="la la-user-circle text-5xl text-slate-400 mb-3"></i>
   <p class="text-slate-700 font-semibold mb-4">Please log in to write a review</p>
-  <button type="button"
-          @click="window.dispatchEvent(new CustomEvent('open-auth', { detail: { tab: 'signin' } }))"
-          class="inline-flex items-center gap-2 px-6 py-3 bg-[var(--black)] text-white rounded-lg font-semibold hover:bg-[var(--gold)] transition-all duration-300">
+  <a href="{{ route('login') }}"
+     class="inline-flex items-center gap-2 px-6 py-3 bg-[var(--black)] text-white rounded-lg font-semibold hover:bg-[var(--gold)] transition-all duration-300">
     <i class="la la-sign-in-alt"></i>
     Log In
-  </button>
+  </a>
 </div>
 @endguest

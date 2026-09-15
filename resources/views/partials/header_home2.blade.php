@@ -37,11 +37,10 @@
       </a>
 
       @guest
-        <button type="button"
-                @click="$dispatch('open-auth', {tab:'signin'})"
-                class="inline-flex items-center gap-2 border border-[var(--gold)] text-[var(--gold)] px-3 py-1.5 rounded-md font-semibold hover:bg-[var(--gold)] hover:text-white">
-          <i class="la la-user text-sm"></i> / Sign up
-        </button>
+        <a href="{{ route('login') }}"
+           class="inline-flex items-center gap-2 border border-[var(--gold)] text-[var(--gold)] px-3 py-1.5 rounded-md font-semibold hover:bg-[var(--gold)] hover:text-white transition-all">
+          <i class="la la-user text-sm"></i> Login / Sign up
+        </a>
       @else
         <div x-data="{dd:false}" class="relative">
           <button @click="dd=!dd" class="inline-flex items-center gap-1 hover:text-[var(--gold)]">

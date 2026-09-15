@@ -35,32 +35,113 @@
         </div>
     @endif
 
-    {{-- Search --}}
-    <div class="bg-white border border-gray-200 rounded-lg p-4 mb-5">
-        <form method="GET" class="flex flex-col sm:flex-row gap-3 sm:items-end">
-            <div class="flex-1">
-                <label for="search" class="block text-sm text-gray-600 mb-1">Search</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                        <i class="fas fa-search text-xs"></i>
+    {{-- Search & Filters --}}
+    <div class="bg-white border border-gray-200 rounded-lg p-4 mb-5" x-data="{ showFilters: {{ request()->hasAny(['shipping_type','category_id','brand_id','stock_status','sort']) ? 'true' : 'false' }} }">
+        <form method="GET" action="{{ route('admin.products.index') }}">
+            {{-- Top row: Search + Toggle --}}
+            <div class="flex flex-col sm:flex-row gap-3 sm:items-end">
+                <div class="flex-1">
+                    <label for="search" class="block text-sm text-gray-600 mb-1">Search</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                            <i class="fas fa-search text-xs"></i>
+                        </div>
+                        <input type="text" name="search" id="search"
+                               value="{{ request('search') }}"
+                               class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
+                               placeholder="Search by name, ID, brand, category...">
                     </div>
-                    <input type="text" name="search" id="search"
-                           value="{{ request('search') }}"
-                           class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
-                           placeholder="Search by name, brand, category...">
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" @click="showFilters = !showFilters"
+                            class="inline-flex items-center gap-2 text-sm text-gray-600 border border-gray-300 rounded-md px-3 py-2 hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-filter text-xs"></i>
+                        <span x-text="showFilters ? 'Hide Filters' : 'Filters'"></span>
+                        @if(request()->hasAny(['shipping_type','category_id','brand_id','stock_status','sort']))
+                            <span class="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-gray-900 rounded-full">
+                                {{ collect(['shipping_type','category_id','brand_id','stock_status'])->filter(fn($k) => request($k))->count() + (request('sort') && request('sort') !== 'latest' ? 1 : 0) }}
+                            </span>
+                        @endif
+                    </button>
+                    <button type="submit"
+                            class="inline-flex items-center gap-2 text-sm font-medium text-white bg-gray-900 rounded-md px-4 py-2 hover:bg-gray-700 transition-colors">
+                        Search
+                    </button>
+                    @if(request()->hasAny(['search','shipping_type','category_id','brand_id','stock_status','sort']))
+                        <a href="{{ route('admin.products.index') }}"
+                           class="inline-flex items-center gap-2 text-sm text-gray-600 border border-gray-300 rounded-md px-3 py-2 hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-times text-xs"></i> Clear
+                        </a>
+                    @endif
                 </div>
             </div>
-            <div class="flex gap-2">
-                <button type="submit"
-                        class="inline-flex items-center gap-2 text-sm font-medium text-white bg-gray-900 rounded-md px-4 py-2 hover:bg-gray-700 transition-colors">
-                    Search
-                </button>
-                @if(request('search'))
-                    <a href="{{ route('admin.products.index') }}"
-                       class="inline-flex items-center gap-2 text-sm text-gray-600 border border-gray-300 rounded-md px-4 py-2 hover:bg-gray-50 transition-colors">
-                        Clear
-                    </a>
-                @endif
+
+            {{-- Filter row (collapsible) --}}
+            <div x-show="showFilters" x-collapse x-cloak class="mt-4 pt-4 border-t border-gray-100">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                    {{-- Shipping Type --}}
+                    <div>
+                        <label for="shipping_type" class="block text-xs font-medium text-gray-500 mb-1">Price Type</label>
+                        <select name="shipping_type" id="shipping_type"
+                                class="w-full text-sm border border-gray-300 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-gray-400">
+                            <option value="">All Types</option>
+                            <option value="standard_only" {{ request('shipping_type') === 'standard_only' ? 'selected' : '' }}>Standard Only</option>
+                            <option value="express_only" {{ request('shipping_type') === 'express_only' ? 'selected' : '' }}>Express Only</option>
+                            <option value="both" {{ request('shipping_type') === 'both' ? 'selected' : '' }}>Both</option>
+                        </select>
+                    </div>
+
+                    {{-- Category --}}
+                    <div>
+                        <label for="category_id" class="block text-xs font-medium text-gray-500 mb-1">Category</label>
+                        <select name="category_id" id="category_id"
+                                class="w-full text-sm border border-gray-300 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-gray-400">
+                            <option value="">All Categories</option>
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat->id }}" {{ (int)request('category_id') === $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Brand --}}
+                    <div>
+                        <label for="brand_id" class="block text-xs font-medium text-gray-500 mb-1">Brand</label>
+                        <select name="brand_id" id="brand_id"
+                                class="w-full text-sm border border-gray-300 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-gray-400">
+                            <option value="">All Brands</option>
+                            @foreach($brands as $brand)
+                                <option value="{{ $brand->id }}" {{ (int)request('brand_id') === $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Stock Status --}}
+                    <div>
+                        <label for="stock_status" class="block text-xs font-medium text-gray-500 mb-1">Stock</label>
+                        <select name="stock_status" id="stock_status"
+                                class="w-full text-sm border border-gray-300 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-gray-400">
+                            <option value="">All</option>
+                            <option value="in_stock" {{ request('stock_status') === 'in_stock' ? 'selected' : '' }}>In Stock</option>
+                            <option value="low_stock" {{ request('stock_status') === 'low_stock' ? 'selected' : '' }}>Low Stock (≤5)</option>
+                            <option value="out_of_stock" {{ request('stock_status') === 'out_of_stock' ? 'selected' : '' }}>Out of Stock</option>
+                        </select>
+                    </div>
+
+                    {{-- Sort --}}
+                    <div>
+                        <label for="sort" class="block text-xs font-medium text-gray-500 mb-1">Sort By</label>
+                        <select name="sort" id="sort"
+                                class="w-full text-sm border border-gray-300 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-gray-400">
+                            <option value="latest" {{ request('sort', 'latest') === 'latest' ? 'selected' : '' }}>Newest First</option>
+                            <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>Oldest First</option>
+                            <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>Name A–Z</option>
+                            <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>Name Z–A</option>
+                            <option value="price_asc" {{ request('sort') === 'price_asc' ? 'selected' : '' }}>Price Low → High</option>
+                            <option value="price_desc" {{ request('sort') === 'price_desc' ? 'selected' : '' }}>Price High → Low</option>
+                            <option value="stock_asc" {{ request('sort') === 'stock_asc' ? 'selected' : '' }}>Stock Low → High</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
@@ -261,17 +342,17 @@
             </div>
             <h3 class="text-base font-medium text-gray-900 mb-1">No products found</h3>
             <p class="text-sm text-gray-500 mb-6">
-                @if(request('search'))
-                    No products match "{{ request('search') }}". Try a different search.
+                @if(request()->hasAny(['search','shipping_type','category_id','brand_id','stock_status']))
+                    No products match your current filters. Try adjusting your search or filters.
                 @else
                     Get started by adding your first product.
                 @endif
             </p>
             <div class="flex justify-center gap-3">
-                @if(request('search'))
+                @if(request()->hasAny(['search','shipping_type','category_id','brand_id','stock_status','sort']))
                     <a href="{{ route('admin.products.index') }}"
                        class="text-sm text-gray-600 border border-gray-300 rounded-md px-4 py-2 hover:bg-gray-50 transition-colors">
-                        Clear Search
+                        Clear Filters
                     </a>
                 @endif
                 <a href="{{ route('admin.products.create') }}"

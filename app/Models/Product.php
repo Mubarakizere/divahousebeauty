@@ -266,7 +266,7 @@ class Product extends Model
         if (!$this->is_on_sale) return null;
 
         $discount = (float) ($this->promotion->discount_percentage ?? 0);
-        return round(((float) $this->express_price) * (1 - $discount / 100), 0);
+        return round(((float) $this->standard_price) * (1 - $discount / 100), 0);
     }
 
     public function getInStockAttribute(): bool

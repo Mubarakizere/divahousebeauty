@@ -32,7 +32,7 @@
                 <li><a href="#" class="hover:text-pink-400">How to Shop</a></li>
                 <li><a href="#" class="hover:text-pink-400">FAQ</a></li>
                 <li><a href="#" class="hover:text-pink-400">Contact Us</a></li>
-                <li><a href="#" class="hover:text-pink-400">Log in</a></li>
+                <li><a href="{{ route('login') }}" class="hover:text-pink-400">Log in</a></li>
             </ul>
         </div>
 
@@ -50,7 +50,7 @@
         <div>
             <h4 class="font-semibold mb-4 text-white">My Account</h4>
             <ul class="space-y-2 text-sm text-gray-300">
-                <li><a href="#signin-modal" class="hover:text-pink-400">Sign in / Sign up</a></li>
+                <li><a href="{{ route('login') }}" class="hover:text-pink-400">Sign in / Sign up</a></li>
                 <li><a href="#" class="hover:text-pink-400">View Cart</a></li>
                 <li><a href="#" class="hover:text-pink-400">My Wishlist</a></li>
                 <li><a href="#" class="hover:text-pink-400">Track My Order</a></li>

@@ -17,7 +17,7 @@ class LoginController extends Controller
      */
     public function showLoginForm()
     {
-        return redirect('/')->with('showLoginModal', true);
+        return view('auth.login');
     }
 
     /**

@@ -37,7 +37,7 @@ class RegisterController extends Controller
      */
     public function showRegistrationForm()
     {
-        return redirect('/')->with('showLoginModal', true);
+        return view('auth.register');
     }
 
     /**
