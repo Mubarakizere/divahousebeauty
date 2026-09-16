@@ -245,50 +245,7 @@
                 </div>
 
                 <div class="mt-5" 
-                     x-data="{ 
-                       inWishlist: {{ auth()->check() && \App\Models\Wishlist::where('user_id', auth()->id())->where('product_id', $product->id)->exists() ? 'true' : 'false' }},
-                       isProcessing: false,
-                       async toggleWishlist() {
-                         if (this.isProcessing) return;
-                         
-                          @guest
-                            window.location.href = "{{ route('login') }}";
-                            return;
-                          @endguest
-                         
-                         this.isProcessing = true;
-                         const productId = {{ $product->id }};
-                         const url = this.inWishlist 
-                           ? `/wishlist/remove/${productId}`
-                           : `/wishlist/add/${productId}`;
-                         const method = this.inWishlist ? 'DELETE' : 'POST';
-                         
-                         try {
-                           const response = await fetch(url, {
-                             method: method,
-                             headers: {
-                               'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-                               'Accept': 'application/json',
-                               'Content-Type': 'application/json'
-                             }
-                           });
-                           
-                           const data = await response.json();
-                           
-                           if (data.success) {
-                             this.inWishlist = !this.inWishlist;
-                             // Update global count via event
-                             if (data.wishlistCount !== undefined) {
-                               window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { count: data.wishlistCount } }));
-                             }
-                           }
-                         } catch (error) {
-                           console.error('Wishlist error:', error);
-                         } finally {
-                           this.isProcessing = false;
-                         }
-                       }
-                     }">
+                     x-data="wishlistBtn({{ $product->id }}, {{ auth()->check() && \App\Models\Wishlist::where('user_id', auth()->id())->where('product_id', $product->id)->exists() ? 'true' : 'false' }}, '{{ route('login') }}', {{ auth()->check() ? 'false' : 'true' }})">
                   <form id="add-to-cart-form" action="{{ url('addcart', $product->id) }}" method="POST" class="flex flex-wrap items-center gap-3">
                     @csrf
                     <label class="text-xs uppercase tracking-wider font-bold text-[var(--black)] mr-3">Quantity</label>
@@ -303,7 +260,7 @@
 
                     <button type="button" 
                             @click="toggleWishlist()"
-                            :disabled="isProcessing"
+                            :disabled="loading"
                              class="h-10 w-10 border border-slate-300 flex items-center justify-center text-slate-500 hover:border-[var(--black)] hover:text-[var(--black)] transition-colors"
                             :class="inWishlist ? 'text-rose-500 border-rose-500' : ''"
                             title="Add to Wishlist">

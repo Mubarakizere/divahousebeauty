@@ -51,56 +51,7 @@
         {{-- Quick Actions (Buttons) - OUTSIDE the link, z-index higher --}}
         <div class="absolute bottom-3 inset-x-3 flex items-center justify-center gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 z-20">
             {{-- Wishlist --}}
-             <div x-data="{ 
-                inWishlist: {{ $inWishlist ? 'true' : 'false' }}, 
-                loading: false,
-                toggleWishlist() {
-                    if (this.loading) return;
-                    
-                    @guest
-                        window.location.href = "{{ route('login') }}";
-                        return;
-                    @endguest
-
-                    this.loading = true;
-                    // Optimistic update
-                    const originalState = this.inWishlist;
-                    this.inWishlist = !this.inWishlist;
-
-                    const url = originalState 
-                        ? '{{ route('wishlist.remove', $product->id) }}'
-                        : '{{ route('wishlist.add', $product->id) }}';
-                    
-                    const method = originalState ? 'DELETE' : 'POST';
-
-                    fetch(url, {
-                        method: method,
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        this.loading = false;
-                        if (data.success) {
-                            // Update global count
-                            if (data.wishlistCount !== undefined) {
-                                window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { count: data.wishlistCount } }));
-                            }
-                        } else {
-                            // Revert on failure
-                            this.inWishlist = originalState;
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        this.loading = false;
-                        this.inWishlist = originalState; // Revert
-                    });
-                }
-             }">
+             <div x-data="wishlistBtn({{ $product->id }}, {{ $inWishlist ? 'true' : 'false' }}, '{{ route('login') }}', {{ auth()->check() ? 'false' : 'true' }})">
                 <button type="button" 
                         @click.stop="toggleWishlist()" 
                         :disabled="loading"

@@ -408,3 +408,63 @@
     </div>
 </nav>
 
+<script>
+function registerWishlistComponent() {
+    if (window.Alpine && !window.wishlistBtnRegistered) {
+        window.wishlistBtnRegistered = true;
+        Alpine.data('wishlistBtn', (productId, initialInWishlist, loginUrl, isGuest) => ({
+            inWishlist: initialInWishlist,
+            loading: false,
+            toggleWishlist() {
+                if (this.loading) return;
+                if (isGuest) {
+                    window.location.href = loginUrl;
+                    return;
+                }
+                this.loading = true;
+                const originalState = this.inWishlist;
+                this.inWishlist = !this.inWishlist;
+
+                const url = originalState 
+                    ? `/wishlist/remove/${productId}`
+                    : `/wishlist/add/${productId}`;
+                const method = originalState ? 'DELETE' : 'POST';
+
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    this.loading = false;
+                    if (data.success) {
+                        if (data.wishlistCount !== undefined) {
+                            window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { count: data.wishlistCount } }));
+                            const countEl = document.querySelector('[data-wishlist-count]');
+                            if (countEl) {
+                                countEl.textContent = data.wishlistCount;
+                                countEl.style.display = data.wishlistCount > 0 ? '' : 'none';
+                            }
+                        }
+                    } else {
+                        this.inWishlist = originalState;
+                    }
+                })
+                .catch(error => {
+                    console.error('Wishlist error:', error);
+                    this.loading = false;
+                    this.inWishlist = originalState;
+                });
+            }
+        }));
+    }
+}
+document.addEventListener('alpine:init', registerWishlistComponent);
+if (window.Alpine) { registerWishlistComponent(); }
+</script>
+
+
