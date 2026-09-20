@@ -130,7 +130,7 @@
                         $first = is_array($img) && !empty($img) ? $img[0] : null;
                         
                         $imgUrl = $first 
-                            ? (Str::startsWith($first, 'http') ? $first : asset('storage/' . $first))
+                            ? (str_starts_with($first, 'http') ? $first : asset('storage/' . $first))
                             : asset('assets/images/default-product.jpg');
 
                         $rowTotal = (float)$item->price * (int)$item->quantity;
@@ -195,7 +195,7 @@
                         $img = is_string($p->images) ? json_decode($p->images, true) : $p->images;
                         $first = is_array($img) && !empty($img) ? $img[0] : null;
                         $imgUrl = $first 
-                            ? (Str::startsWith($first, 'http') ? $first : asset('storage/' . $first))
+                            ? (str_starts_with($first, 'http') ? $first : asset('storage/' . $first))
                             : asset('assets/images/default-product.jpg');
                         $rowTotal = (float)$item->price * (int)$item->quantity;
                   @endphp
