@@ -1,3 +1,4 @@
+<style>[x-cloak]{display:none!important}</style>
 @php
   use Illuminate\Support\Str;
 
@@ -46,7 +47,7 @@
           <button @click="dd=!dd" class="inline-flex items-center gap-1 hover:text-[var(--gold)]">
             <i class="la la-user"></i>{{ Str::of(Auth::user()->name)->words(2,'') }} <i class="la la-angle-down text-xs"></i>
           </button>
-          <div x-show="dd" x-transition @click.outside="dd=false"
+          <div x-cloak x-show="dd" x-transition @click.outside="dd=false"
                class="absolute right-0 mt-2 w-44 rounded-md bg-white border border-slate-100 shadow-ring z-30">
             <a class="block px-3 py-2 text-sm hover:bg-slate-50" href="{{ route('dashboard') }}">
               <i class="la la-chart-pie mr-1"></i> Dashboard
@@ -268,8 +269,8 @@
                     </div>
 
                     {{-- Desktop brands dropdown (sub-brand appears on hover of parent) --}}
-                    <div x-show="open" x-transition
-                         class="hidden sm:block absolute left-0 mt-2 w-[26rem] max-h-[70vh] overflow-y-auto
+                    <div x-cloak x-show="open" x-transition
+                         class="absolute left-0 mt-2 w-[26rem] max-h-[70vh] overflow-y-auto
                                 bg-white text-slate-700 rounded-md border border-slate-100 shadow-ring z-50 p-3">
 
                         @php
@@ -337,10 +338,10 @@
     </div>
 
     {{-- Mobile brands sheet --}}
-    <div x-show="mobileSheet" x-transition.opacity
+    <div x-cloak x-show="mobileSheet" x-transition.opacity
          class="fixed inset-0 z-40 bg-black/40 sm:hidden"></div>
 
-    <div x-show="mobileSheet" x-transition
+    <div x-cloak x-show="mobileSheet" x-transition
          class="fixed inset-x-0 bottom-0 z-50 sm:hidden rounded-t-2xl bg-white shadow-ring max-h-[70vh] overflow-y-auto">
         @foreach($categories as $cat)
             <section x-show="sheetCat === {{ $cat->id }}">

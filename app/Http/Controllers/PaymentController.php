@@ -431,6 +431,8 @@ class PaymentController extends Controller
                 ->with('error', 'Shipping payment has not been confirmed yet. If you completed payment, please allow a moment for confirmation.');
         }
 
+        $order->load(['payment', 'items.product']);
+
         return view('payment.success', compact('order'));
     }
 
