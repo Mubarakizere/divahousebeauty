@@ -174,9 +174,9 @@ Route::group(['prefix' => 'payment'], function () {
     // Payment status polling (AJAX)
     Route::get('/status/{id}', [PaymentController::class, 'checkOrderStatus'])->name('payment.status');
 
-    // Payment success/failure pages
-    Route::get('/success', [PaymentController::class, 'success'])->name('payment.public.success');
-    Route::get('/failed', [PaymentController::class, 'failed'])->name('payment.public.failed');
+    // Payment success/failure pages (supports both path parameter and query string)
+    Route::get('/success/{order?}', [PaymentController::class, 'success'])->name('payment.public.success');
+    Route::get('/failed/{order?}', [PaymentController::class, 'failed'])->name('payment.public.failed');
 
     // Payment retry
     Route::get('/retry/{order}', [PaymentController::class, 'retryPayment'])->name('payment.retry');
@@ -246,8 +246,8 @@ Route::middleware(['auth'])->group(function () {
     
     // Payment
     Route::post('/payment/initiate', [App\Http\Controllers\PaymentController::class, 'initiateCheckout'])->name('payment.initiate');
-    Route::get('/payment/success/{order}', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
-    Route::get('/payment/failed/{order}', [App\Http\Controllers\PaymentController::class, 'failed'])->name('payment.failed');
+    Route::get('/payment/success/{order?}', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
+    Route::get('/payment/failed/{order?}', [App\Http\Controllers\PaymentController::class, 'failed'])->name('payment.failed');
 
     // Shipping Payment
     Route::post('/shipping/pay', [App\Http\Controllers\PaymentController::class, 'initiateShippingPayment'])->name('shipping.pay');

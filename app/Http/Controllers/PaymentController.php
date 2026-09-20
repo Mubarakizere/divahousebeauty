@@ -124,8 +124,14 @@ class PaymentController extends Controller
     /**
      * Payment success page
      */
-    public function success(Order $order)
+    public function success(Request $request, $order = null)
     {
+        // Resolve Order model from route parameter or query parameter
+        if (!($order instanceof Order)) {
+            $orderId = $order ?? $request->query('order');
+            $order = Order::findOrFail($orderId);
+        }
+
         if ($order->user_id !== auth()->id()) {
             abort(403);
         }
@@ -133,13 +139,24 @@ class PaymentController extends Controller
         $order->load(['payment', 'items.product']);
 
         // Check if order payment is confirmed via webhook or payment record status
-        $isPaid = $order->payment_status === 'paid' || $order->is_paid;
+        $isPaid = $order->payment_status === 'paid' || $order->is_paid || $order->status === 'confirmed';
 
         if (!$isPaid) {
             $successfulPayment = Payment::where('order_id', $order->id)
                 ->where('payment_type', 'order')
-                ->where('status', 'success')
+                ->whereIn('status', ['success', 'successful', 'paid', 'completed', 'approved'])
                 ->first();
+
+            if (!$successfulPayment) {
+                $successfulTransfer = PaymentTransfer::whereHas('payment', function($q) use ($order) {
+                    $q->where('order_id', $order->id)->where('payment_type', 'order');
+                })->whereIn('status', ['success', 'successful', 'paid', 'completed', 'approved'])->first();
+
+                if ($successfulTransfer && $successfulTransfer->payment) {
+                    $successfulPayment = $successfulTransfer->payment;
+                    $successfulPayment->update(['status' => 'success']);
+                }
+            }
 
             if ($successfulPayment) {
                 $this->completeOrder($order);
@@ -159,8 +176,13 @@ class PaymentController extends Controller
     /**
      * Payment failed page
      */
-    public function failed(Order $order)
+    public function failed(Request $request, $order = null)
     {
+        if (!($order instanceof Order)) {
+            $orderId = $order ?? $request->query('order');
+            $order = Order::findOrFail($orderId);
+        }
+
         if ($order->user_id !== auth()->id()) {
             abort(403);
         }
@@ -192,7 +214,7 @@ class PaymentController extends Controller
             if (!$isShippingPaid) {
                 $successfulPayment = Payment::where('order_id', $order->id)
                     ->where('payment_type', 'shipping')
-                    ->where('status', 'success')
+                    ->whereIn('status', ['success', 'successful', 'paid', 'completed', 'approved'])
                     ->first();
 
                 if ($successfulPayment) {
@@ -213,8 +235,19 @@ class PaymentController extends Controller
         if (!$isPaid) {
             $successfulPayment = Payment::where('order_id', $order->id)
                 ->where('payment_type', 'order')
-                ->where('status', 'success')
+                ->whereIn('status', ['success', 'successful', 'paid', 'completed', 'approved'])
                 ->first();
+
+            if (!$successfulPayment) {
+                $successfulTransfer = PaymentTransfer::whereHas('payment', function($q) use ($order) {
+                    $q->where('order_id', $order->id)->where('payment_type', 'order');
+                })->whereIn('status', ['success', 'successful', 'paid', 'completed', 'approved'])->first();
+
+                if ($successfulTransfer && $successfulTransfer->payment) {
+                    $successfulPayment = $successfulTransfer->payment;
+                    $successfulPayment->update(['status' => 'success']);
+                }
+            }
 
             if ($successfulPayment) {
                 $this->completeOrder($order);
