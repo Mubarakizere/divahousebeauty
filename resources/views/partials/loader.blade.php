@@ -1,4 +1,5 @@
 <div id="global-loader" 
+     style="display:none; opacity:0;"
      class="fixed inset-0 z-[9999] bg-white w-screen h-screen flex flex-col items-center justify-center transition-opacity duration-500 ease-in-out">
     
     {{-- Logo Container with Pulse Animation --}}
@@ -46,22 +47,22 @@
             void loader.offsetWidth; // Force reflow
             loader.style.opacity = '1';
 
-            // Safety fallback: auto-hide after 8s if navigation stalls or fails
+            // Safety fallback: auto-hide after 5s if navigation stalls or fails
             if (safetyTimeout) clearTimeout(safetyTimeout);
-            safetyTimeout = setTimeout(hideLoader, 8000);
+            safetyTimeout = setTimeout(hideLoader, 5000);
         }
 
-        // Hide loader whenever page is displayed (initial load & bfcache back/forward navigation)
+        // Ensure loader is hidden on page load / bfcache restore
         window.addEventListener('pageshow', function() {
             hideLoader();
         });
 
-        // Ensure loader is hidden when navigating away so cached page snapshots stay clean
+        // Clean up when leaving the page
         window.addEventListener('pagehide', function() {
             hideLoader();
         });
 
-        // Event delegation for link clicks
+        // Show loader on internal link navigation only
         document.addEventListener('DOMContentLoaded', function() {
             document.addEventListener('click', function(e) {
                 const link = e.target.closest('a');
@@ -96,7 +97,7 @@
                         currentUrl.pathname === targetUrl.pathname &&
                         currentUrl.search === targetUrl.search
                     ) {
-                        return; // Same page navigation
+                        return; // Same page navigation, skip loader
                     }
                 } catch (err) {}
 
