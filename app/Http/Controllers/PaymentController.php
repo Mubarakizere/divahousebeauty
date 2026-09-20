@@ -124,14 +124,13 @@ class PaymentController extends Controller
     /**
      * Payment success page
      */
-    public function success(Request $request)
+    public function success(Order $order)
     {
-        $orderId = $request->query('order');
-        $order = Order::with('payment')->findOrFail($orderId);
-        
         if ($order->user_id !== auth()->id()) {
             abort(403);
         }
+
+        $order->load(['payment', 'items.product']);
 
         // Check if order payment is confirmed via webhook or payment record status
         $isPaid = $order->payment_status === 'paid' || $order->is_paid;
@@ -160,11 +159,8 @@ class PaymentController extends Controller
     /**
      * Payment failed page
      */
-    public function failed(Request $request)
+    public function failed(Order $order)
     {
-        $orderId = $request->query('order');
-        $order = Order::findOrFail($orderId);
-        
         if ($order->user_id !== auth()->id()) {
             abort(403);
         }
