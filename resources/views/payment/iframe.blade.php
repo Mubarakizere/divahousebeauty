@@ -37,7 +37,7 @@
         orderId: {{ $order->id }},
         statusUrl: '{{ isset($isShipping) && $isShipping ? route('payment.status', $order->id) . '?type=shipping' : route('payment.status', $order->id) }}',
         successUrl: '{{ isset($isShipping) && $isShipping ? route('shipping.payment.success', ['order' => $order->id]) : route('payment.success', ['order' => $order->id]) }}',
-        failedUrl:  '{{ route('payment.public.failed', ['order' => $order->id]) }}',
+        failedUrl:  '{{ route('payment.failed', ['order' => $order->id]) }}',
         iframeOrigins: ['https://weflexfy.com', 'https://api.weflexfy.com'] // add sandbox/dev origins if needed
       })"
       x-init="init()">
